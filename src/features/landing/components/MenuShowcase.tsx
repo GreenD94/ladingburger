@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, CardMedia, Button, Chip } from '@mui/material';
+import React, { useEffect, useState, useRef } from 'react';
+import { Box, Typography, Card, CardContent, CardMedia, Button, Chip, useTheme, useMediaQuery } from '@mui/material';
 import { motion } from 'framer-motion';
 import { getAvailableBurgers } from '@/features/database/actions/menu';
 import { Burger } from '@/features/database/types';
@@ -9,8 +9,12 @@ import { useRouter } from 'next/navigation';
 
 export const MenuShowcase = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchBurgers = async () => {
@@ -29,6 +33,26 @@ export const MenuShowcase = () => {
 
     fetchBurgers();
   }, []);
+
+  useEffect(() => {
+    if (!isMobile || !scrollContainerRef.current || burgers.length === 0) return;
+
+    const scrollContainer = scrollContainerRef.current;
+    const cardWidth = 280; // Width of each card + gap
+    const scrollInterval = 3000; // 3 seconds between scrolls
+
+    const autoScroll = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % burgers.length;
+      setCurrentIndex(nextIndex);
+      
+      scrollContainer.scrollTo({
+        left: nextIndex * cardWidth,
+        behavior: 'smooth'
+      });
+    }, scrollInterval);
+
+    return () => clearInterval(autoScroll);
+  }, [isMobile, currentIndex, burgers.length]);
 
   if (loading) {
     return (
@@ -71,10 +95,36 @@ export const MenuShowcase = () => {
         Las Hamburguesas Favoritas de Barquisimeto
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box 
+        ref={scrollContainerRef}
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          overflowX: isMobile ? 'auto' : 'visible',
+          overflowY: 'hidden', // Prevent vertical scrolling
+          pb: isMobile ? 2 : 0,
+          scrollBehavior: 'smooth',
+          height: 'fit-content', // Ensure container height fits content
+          '&::-webkit-scrollbar': {
+            height: '8px',
+            display: 'none', // Hide scrollbar on mobile
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#FFF8F0',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#FF6B00',
+            borderRadius: '4px',
+            '&:hover': {
+              background: '#E55C00',
+            },
+          },
+        }}
+      >
         <Box sx={{ 
-          display: 'grid',
-          gridTemplateColumns: {
+          display: isMobile ? 'flex' : 'grid',
+          gridTemplateColumns: isMobile ? 'none' : {
             xs: '1fr',
             sm: 'repeat(2, 1fr)',
             md: 'repeat(3, 1fr)',
@@ -82,6 +132,12 @@ export const MenuShowcase = () => {
           gap: 4,
           maxWidth: '1200px',
           width: '100%',
+          ...(isMobile ? {
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+            paddingRight: '16px',
+            height: 'fit-content', // Ensure inner container height fits content
+          } : {})
         }}>
           {burgers.map((burger, index) => (
             <Box
@@ -89,6 +145,10 @@ export const MenuShowcase = () => {
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
+                ...(isMobile ? {
+                  minWidth: '280px',
+                  flexShrink: 0,
+                } : {})
               }}
             >
               <motion.div

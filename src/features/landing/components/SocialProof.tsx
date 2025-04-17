@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography,  Avatar, IconButton } from '@mui/material';
+import { Box, Typography, Avatar, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -9,19 +9,19 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 const testimonials = [
   {
     name: 'María González',
-    avatar: '/avatars/maria.jpg',
+    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=maria',
     text: "¡Las mejores hamburguesas que he probado en Barquisimeto! La calidad y el sabor son inigualables.",
     rating: 5
   },
   {
     name: 'Carlos Rodríguez',
-    avatar: '/avatars/carlos.jpg',
+    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=carlos',
     text: 'Servicio increíble y comida deliciosa. ¡Definitivamente volveré!',
     rating: 5
   },
   {
     name: 'Ana Martínez',
-    avatar: '/avatars/ana.jpg',
+    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=ana',
     text: 'El lugar perfecto para los amantes de las hamburguesas en Barquisimeto. ¡Altamente recomendado!',
     rating: 4
   }
@@ -47,33 +47,47 @@ const SocialProof: React.FC = () => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <IconButton
+          <Button
+            variant="contained"
+            startIcon={<WhatsAppIcon />}
+            href="https://wa.me/584125188174"
+            target="_blank"
+            rel="noopener noreferrer"
             sx={{
               bgcolor: '#25D366',
+              '&:hover': { bgcolor: '#128C7E' },
               color: 'white',
-              '&:hover': { bgcolor: '#128C7E' }
+              borderRadius: '50px',
+              minWidth: 'auto',
+              p: 1.5,
+              '& .MuiButton-startIcon': {
+                margin: 0
+              }
             }}
-            href="https://wa.me/584241234567"
-            target="_blank"
-          >
-            <WhatsAppIcon />
-          </IconButton>
+          />
         </motion.div>
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <IconButton
+          <Button
+            variant="contained"
+            startIcon={<InstagramIcon />}
+            href="https://www.instagram.com/jesusg_sanchez/"
+            target="_blank"
+            rel="noopener noreferrer"
             sx={{
               bgcolor: '#E1306C',
+              '&:hover': { bgcolor: '#C13584' },
               color: 'white',
-              '&:hover': { bgcolor: '#C13584' }
+              borderRadius: '50px',
+              minWidth: 'auto',
+              p: 1.5,
+              '& .MuiButton-startIcon': {
+                margin: 0
+              }
             }}
-            href="https://instagram.com/saboreabarquisimeto"
-            target="_blank"
-          >
-            <InstagramIcon />
-          </IconButton>
+          />
         </motion.div>
       </Box>
 
