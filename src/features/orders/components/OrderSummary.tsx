@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, IconButton, Chip, Stack, TextField, Button, Divider } from '@mui/material';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { Box, Typography, Card, CardContent, IconButton, Chip, Stack, TextField, Button, Divider, useTheme, useMediaQuery } from '@mui/material';
 import { CustomizedBurger } from '../types/order.types';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface OrderSummaryProps {
   selectedBurgers: CustomizedBurger[];
@@ -27,6 +27,9 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   onSubmitOrder,
   loading
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   // Calculate order summary
   const totalBurgers = selectedBurgers.length;
   const totalPrice = selectedBurgers.reduce((sum, burger) => sum + burger.price, 0);
@@ -87,8 +90,9 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               </Box>
             </CardContent>
           </Card>
-        {/* Submit Button */}
-        <Button
+
+          {/* Submit Button */}
+          <Button
             variant="contained"
             fullWidth
             onClick={onSubmitOrder}
@@ -106,31 +110,72 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
           >
             {loading ? 'Procesando...' : 'Completar Pedido'}
           </Button>
+
           {/* Selected Burgers List */}
           <Box 
             sx={{ 
-              height: 'calc(4 * 250px)', // Height for 4 burger cards
-              overflowY: 'auto',
-              pr: 2, // Increased padding to accommodate wider scrollbar
-              '&::-webkit-scrollbar': {
-                width: '12px', // Increased width from 8px to 12px
-              },
-              '&::-webkit-scrollbar-track': {
-                background: '#FFF8F0',
-                borderRadius: '6px', // Increased border radius to match wider width
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: '#FF6B00',
-                borderRadius: '6px', // Increased border radius to match wider width
-                '&:hover': {
-                  background: '#E55C00',
+              ...(isMobile ? {
+                display: 'flex',
+                overflowX: 'auto',
+                gap: 2,
+                pb: 2,
+                '&::-webkit-scrollbar': {
+                  height: '8px',
                 },
-              },
+                '&::-webkit-scrollbar-track': {
+                  background: '#FFF8F0',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#FF6B00',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    background: '#E55C00',
+                  },
+                },
+              } : {
+                height: 'calc(4 * 250px)',
+                overflowY: 'auto',
+                pr: 2,
+                '&::-webkit-scrollbar': {
+                  width: '12px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: '#FFF8F0',
+                  borderRadius: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#FF6B00',
+                  borderRadius: '6px',
+                  '&:hover': {
+                    background: '#E55C00',
+                  },
+                },
+              })
             }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ 
+              ...(isMobile ? {
+                display: 'flex',
+                gap: 2,
+                minWidth: 'min-content',
+              } : {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+              })
+            }}>
               {selectedBurgers.map((burger, index) => (
-                <Card key={index} sx={{ borderRadius: 2 }}>
+                <Card 
+                  key={index} 
+                  sx={{ 
+                    ...(isMobile ? {
+                      minWidth: '280px',
+                      flexShrink: 0,
+                    } : {}),
+                    borderRadius: 2 
+                  }}
+                >
                   <CardContent>
                     <Typography variant="h6" sx={{ color: '#2C1810' }}>{burger.name}</Typography>
                     <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
@@ -178,7 +223,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                         onClick={() => onRemoveBurger(index)}
                         sx={{ color: '#FF6B00' }}
                       >
-                        <RemoveIcon />
+                        <DeleteIcon />
                       </IconButton>
                     </Box>
                   </CardContent>
@@ -186,8 +231,6 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               ))}
             </Box>
           </Box>
-
-  
         </>
       )}
 

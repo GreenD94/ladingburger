@@ -1,65 +1,88 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { MenuSection } from './MenuSection';
 import { OrderSummary } from './OrderSummary';
 import { PhoneDialog } from './PhoneDialog';
 import { useOrderForm } from '../hooks/useOrderForm';
 
 export const OrderForm: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const {
     state,
     setState,
     handleAddBurger,
+    handleRemoveBurger,
     handleRemoveIngredient,
     handleAddIngredient,
     handleAddNote,
-    handleRemoveBurger,
-    handleSubmitOrder
+    handleSubmitOrder,
   } = useOrderForm();
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 4 }}>
+    <Box
+      sx={{
+        maxWidth: '1200px',
+        mx: 'auto',
+        px: { xs: 2, md: 4 },
+        py: 4,
+      }}
+    >
       <Typography
-        variant="h2"
+        variant="h4"
+        component="h1"
         sx={{
-          textAlign: 'center',
-          mb: 6,
-          fontWeight: 800,
           color: '#2C1810',
-          fontSize: { xs: '2rem', md: '3rem' },
-          position: 'relative',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: '-10px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '60px',
-            height: '4px',
-            bgcolor: '#FF6B00',
-            borderRadius: '2px',
-          },
+          textAlign: 'center',
+          mb: 4,
+          fontWeight: 'bold',
         }}
       >
-        Crea Tu Pedido
+        Crea tu Pedido
       </Typography>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 4 }}>
-        <MenuSection
-          burgers={state.burgers}
-          onAddBurger={handleAddBurger}
-        />
-        <OrderSummary
-          selectedBurgers={state.selectedBurgers}
-          onRemoveIngredient={handleRemoveIngredient}
-          onAddIngredient={handleAddIngredient}
-          onAddNote={handleAddNote}
-          onRemoveBurger={handleRemoveBurger}
-          onSubmitOrder={handleSubmitOrder}
-          loading={state.loading}
-        />
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 4,
+          alignItems: { xs: 'center', md: 'flex-start' },
+        }}
+      >
+        <Box
+          sx={{
+            width: { xs: '100%', md: '60%' },
+            maxWidth: { xs: '100%', md: '800px' },
+          }}
+        >
+          <MenuSection 
+            burgers={state.burgers} 
+            onAddBurger={handleAddBurger}
+            isMobile={isMobile}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            width: { xs: '100%', md: '40%' },
+            maxWidth: { xs: '100%', md: '400px' },
+            position: { xs: 'relative', md: 'sticky' },
+            top: { md: 0 },
+          }}
+        >
+          <OrderSummary
+            selectedBurgers={state.selectedBurgers}
+            onRemoveIngredient={handleRemoveIngredient}
+            onAddIngredient={handleAddIngredient}
+            onRemoveBurger={handleRemoveBurger}
+            onAddNote={handleAddNote}
+            onSubmitOrder={handleSubmitOrder}
+            loading={state.loading}
+          />
+        </Box>
       </Box>
 
       <PhoneDialog
