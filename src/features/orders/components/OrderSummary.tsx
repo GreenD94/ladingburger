@@ -87,7 +87,25 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               </Box>
             </CardContent>
           </Card>
-
+        {/* Submit Button */}
+        <Button
+            variant="contained"
+            fullWidth
+            onClick={onSubmitOrder}
+            disabled={loading}
+            sx={{
+              bgcolor: '#FF6B00',
+              '&:hover': { bgcolor: '#E55C00' },
+              py: 2,
+              mt: 0,
+              mb: 2,
+              borderRadius: '50px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {loading ? 'Procesando...' : 'Completar Pedido'}
+          </Button>
           {/* Selected Burgers List */}
           <Box 
             sx={{ 
@@ -169,24 +187,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             </Box>
           </Box>
 
-          {/* Submit Button */}
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={onSubmitOrder}
-            disabled={loading}
-            sx={{
-              bgcolor: '#FF6B00',
-              '&:hover': { bgcolor: '#E55C00' },
-              py: 2,
-              mt: 3,
-              borderRadius: '50px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            {loading ? 'Procesando...' : 'Completar Pedido'}
-          </Button>
+  
         </>
       )}
 
