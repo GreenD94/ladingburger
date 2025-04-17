@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Typography, Card, CardContent, CardMedia, Button, Chip, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Typography, Card, CardContent, CardMedia, Button, Chip, useTheme, useMediaQuery, Skeleton } from '@mui/material';
 import { motion } from 'framer-motion';
 import { getAvailableBurgers } from '@/features/database/actions/menu';
 import { Burger } from '@/features/database/types';
@@ -53,6 +53,123 @@ export const MenuShowcase = () => {
 
     return () => clearInterval(autoScroll);
   }, [isMobile, currentIndex, burgers.length]);
+
+  const renderSkeletonCards = () => {
+    const skeletonCount = isMobile ? 3 : 6;
+    return Array.from({ length: skeletonCount }).map((_, index) => (
+      <Box
+        key={index}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          ...(isMobile ? {
+            minWidth: '280px',
+            flexShrink: 0,
+          } : {})
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          style={{ width: '100%', maxWidth: '360px' }}
+        >
+          <Card
+            sx={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+              bgcolor: 'white',
+            }}
+          >
+            <Skeleton
+              variant="rectangular"
+              height={240}
+              sx={{
+                bgcolor: '#FFE0B2',
+                '&::after': {
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                },
+              }}
+            />
+            <CardContent sx={{ flexGrow: 1, p: 3 }}>
+              <Skeleton
+                variant="text"
+                width="80%"
+                height={40}
+                sx={{
+                  bgcolor: '#FFE0B2',
+                  mb: 2,
+                  '&::after': {
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  },
+                }}
+              />
+              <Skeleton
+                variant="text"
+                width="100%"
+                height={20}
+                sx={{
+                  bgcolor: '#FFE0B2',
+                  mb: 1,
+                  '&::after': {
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  },
+                }}
+              />
+              <Skeleton
+                variant="text"
+                width="90%"
+                height={20}
+                sx={{
+                  bgcolor: '#FFE0B2',
+                  mb: 1,
+                  '&::after': {
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  },
+                }}
+              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mt: 'auto',
+                }}
+              >
+                <Skeleton
+                  variant="text"
+                  width="30%"
+                  height={40}
+                  sx={{
+                    bgcolor: '#FFE0B2',
+                    '&::after': {
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                    },
+                  }}
+                />
+                <Skeleton
+                  variant="rectangular"
+                  width="40%"
+                  height={40}
+                  sx={{
+                    bgcolor: '#FFE0B2',
+                    borderRadius: '50px',
+                    '&::after': {
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                    },
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </Box>
+    ));
+  };
 
   if (loading) {
     return (
@@ -139,7 +256,7 @@ export const MenuShowcase = () => {
             height: 'fit-content', // Ensure inner container height fits content
           } : {})
         }}>
-          {burgers.map((burger, index) => (
+          {loading ? renderSkeletonCards() : burgers.map((burger, index) => (
             <Box
               key={index}
               sx={{
