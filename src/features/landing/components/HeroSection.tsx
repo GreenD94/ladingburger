@@ -4,8 +4,11 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { VIDEO_PATHS } from '@/features/database/types';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export const HeroSection = () => {
+  const router = useRouter();
+
   return (
     <Box
       sx={{
@@ -122,6 +125,7 @@ export const HeroSection = () => {
           <Button
             variant="contained"
             size="large"
+            onClick={() => router.push('/create-order')}
             sx={{
               bgcolor: '#FF6B00',
               '&:hover': {

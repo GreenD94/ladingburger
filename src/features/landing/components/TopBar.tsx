@@ -19,7 +19,7 @@ export const TopBar = () => {
 
   const navItems = [
     { label: 'Inicio', path: '/' },
-    { label: 'Ordenar', path: '/order' },
+    { label: 'Ordenar', path: '/create-order' },
     { label: 'Tu Pedido', path: '/pedido' }
   ];
 

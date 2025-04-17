@@ -5,8 +5,10 @@ import { Box, Typography, Card, CardContent, CardMedia, Button, Chip } from '@mu
 import { motion } from 'framer-motion';
 import { getAvailableBurgers } from '@/features/database/actions/menu';
 import { Burger } from '@/features/database/types';
+import { useRouter } from 'next/navigation';
 
 export const MenuShowcase = () => {
+  const router = useRouter();
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -173,6 +175,7 @@ export const MenuShowcase = () => {
                       </Typography>
                       <Button
                         variant="contained"
+                        onClick={() => router.push('/create-order')}
                         sx={{
                           bgcolor: '#FF6B00',
                           '&:hover': {
