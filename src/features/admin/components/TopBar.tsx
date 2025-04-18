@@ -8,9 +8,10 @@ import { logout } from '@/features/database/actions/auth/logout';
 
 interface TopBarProps {
   onMenuClick: () => void;
+  isMobile?: boolean;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
+export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, isMobile = false }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -26,7 +27,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
           aria-label="open drawer"
           edge="start"
           onClick={onMenuClick}
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, display: { xs: 'block', sm: isMobile ? 'block' : 'none' } }}
         >
           <MenuIcon />
         </IconButton>

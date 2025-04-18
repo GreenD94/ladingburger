@@ -29,9 +29,10 @@ const drawerWidth = 240;
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  variant?: 'permanent' | 'persistent' | 'temporary';
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'persistent' }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -47,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   return (
     <Drawer
-      variant={isMobile ? 'temporary' : 'persistent'}
+      variant={variant}
       anchor="left"
       open={open}
       onClose={onClose}
@@ -57,6 +58,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         '& .MuiDrawer-paper': {
           width: drawerWidth,
           boxSizing: 'border-box',
+          position: isMobile ? 'fixed' : 'relative',
+          height: isMobile ? '100%' : 'auto',
+          top: isMobile ? 0 : 'auto',
+          left: isMobile ? 0 : 'auto',
+          right: isMobile ? 0 : 'auto',
+          bottom: isMobile ? 0 : 'auto',
+          zIndex: isMobile ? 2 : 1
         },
       }}
     >
@@ -69,7 +77,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => router.push(item.path)}>
+            <ListItemButton onClick={() => {
+              router.push(item.path);
+              if (isMobile) onClose();
+            }}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
