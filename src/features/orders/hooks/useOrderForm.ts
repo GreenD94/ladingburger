@@ -84,7 +84,9 @@ export const useOrderForm = () => {
           .map(burger => ({
             burgerId: burger._id!.toString(),
             removedIngredients: burger.removedIngredients,
-            quantity: 1
+            quantity: 1,
+            price: burger.price,
+            note: burger.note || ''
           })),
         totalPrice: state.selectedBurgers.reduce((sum, burger) => sum + burger.price, 0),
         status: OrderStatus.WAITING_PAYMENT,

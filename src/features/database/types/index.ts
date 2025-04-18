@@ -43,6 +43,8 @@ export interface OrderItem {
   burgerId: string;
   removedIngredients: string[];
   quantity: number;
+  price: number;  // Price at the time of purchase
+  note?: string;  // Optional note for the burger
 }
 
 export interface PaymentInfo {
@@ -53,6 +55,7 @@ export interface PaymentInfo {
 
 export interface Order {
   _id?: ObjectId | string;
+  userId: ObjectId | string;
   customerPhone: string;
   items: OrderItem[];
   totalPrice: number;
@@ -61,6 +64,8 @@ export interface Order {
   updatedAt: Date;
   paymentInfo: PaymentInfo;
 }
+
+export type CreateOrderDTO = Omit<Order, '_id' | 'createdAt' | 'updatedAt' | 'userId'>;
 
 export interface Burger {
   _id?: ObjectId | string;

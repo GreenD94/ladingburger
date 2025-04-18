@@ -6,8 +6,7 @@ import { TestResult } from '../components/TestResult';
 import { TestItem, TestResult as TestResultType } from '../types/index';
 import { createOrder, getOrdersByPhone, updateOrderStatus } from '@/features/database/actions/orders';
 import { getAvailableBurgers, seedDatabase } from '@/features/database/actions/menu';
-import { OrderStatus, PaymentStatus } from '@/features/database/types';
-import { Order, Burger } from '@/features/database/types';
+import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger } from '@/features/database/types';
 
 export default function BlackboxContainer() {
   const theme = useTheme();
@@ -42,13 +41,15 @@ export default function BlackboxContainer() {
       category: 'orders',
       description: 'Create a new order',
       run: async () => {
-        const order = {
+        const order: CreateOrderDTO = {
           customerPhone: '123456789',
           items: [
             {
               burgerId: '1',
               removedIngredients: [],
               quantity: 1,
+              price: 10,
+              note: 'No onions please'
             },
           ],
           totalPrice: 10,
