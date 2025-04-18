@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography, Container } from '@mui/material';
 import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin';
+import AnalyticsContainer from '@/features/admin/containers/AnalyticsContainer';
 
 interface Admin {
   id: string;
@@ -42,15 +43,6 @@ export default function AdminDashboard() {
   }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Welcome, {admin.email}
-        </Typography>
-        <Typography variant="body1">
-          Select a module from the sidebar to get started.
-        </Typography>
-      </Box>
-    </Container>
+     <AnalyticsContainer />
   );
 } 

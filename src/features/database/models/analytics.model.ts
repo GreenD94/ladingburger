@@ -324,7 +324,7 @@ export async function getTopSellingItems(db: Db, days: number) {
 
   // Get all menu items to map IDs to names
   const menuItems = await db.collection('menu_items').find({}).toArray() as unknown as MenuItemWithId[];
-  const menuItemMap = new Map(menuItems.map(item => [item._id.toString(), item.name]));
+  const menuItemMap = new Map(menuItems.map(item => [item._id.toString(), item]));
 
   // Aggregate item sales
   const itemSales = new Map<string, { quantity: number; revenue: number }>();
@@ -333,24 +333,36 @@ export async function getTopSellingItems(db: Db, days: number) {
     order.items.forEach(item => {
       const itemId = item.burgerId.toString();
       const current = itemSales.get(itemId) || { quantity: 0, revenue: 0 };
-      const menuItem = menuItems.find(mi => mi._id.toString() === itemId);
-      const itemPrice = menuItem?.price || 0;
+      const menuItem = menuItemMap.get(itemId);
+      
+      if (!menuItem) {
+        console.warn(`Menu item not found for ID: ${itemId}`);
+        return; // Skip items that don't exist in the menu
+      }
       
       itemSales.set(itemId, {
         quantity: current.quantity + item.quantity,
-        revenue: current.revenue + (itemPrice * item.quantity)
+        revenue: current.revenue + (menuItem.price * item.quantity)
       });
     });
   });
 
   // Convert to array and sort by quantity
   const topSellingItems: TopSellingItem[] = Array.from(itemSales.entries())
-    .map(([itemId, data]) => ({
-      burgerId: itemId,
-      name: menuItemMap.get(itemId) || 'Unknown Item',
-      quantity: data.quantity,
-      revenue: data.revenue
-    }))
+    .map(([itemId, data]) => {
+      const menuItem = menuItemMap.get(itemId);
+      if (!menuItem) {
+        console.warn(`Menu item not found for ID: ${itemId} during final mapping`);
+        return null;
+      }
+      return {
+        burgerId: itemId,
+        name: menuItem.name,
+        quantity: data.quantity,
+        revenue: data.revenue
+      };
+    })
+    .filter((item): item is TopSellingItem => item !== null)
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 10); // Get top 10 items
 

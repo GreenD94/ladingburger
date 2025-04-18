@@ -1,11 +1,7 @@
 'use client';
 
-import { Typography } from '@mui/material';
+import OrdersContainer from '@/features/admin/containers/OrdersContainer';
 
 export default function OrdersPage() {
-  return (
-    <Typography variant="h4" component="h1">
-      Orders Management
-    </Typography>
-  );
+  return <OrdersContainer />;
 } 

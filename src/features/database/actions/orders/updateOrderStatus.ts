@@ -4,7 +4,7 @@ import clientPromise from '../../config/mongodb';
 import { Order, OrderStatusType, OrderStatusLabels } from '../../types';
 import { ObjectId } from 'mongodb';
 
-export async function updateOrderStatus(orderId: string, status: OrderStatusType) {
+export async function updateOrderStatus(orderId: string, status: OrderStatusType, comment?: string) {
   try {
     const client = await clientPromise;
     const db = client.db('saborea');
@@ -23,7 +23,8 @@ export async function updateOrderStatus(orderId: string, status: OrderStatusType
             logs: {
               status,
               statusName: OrderStatusLabels[status],
-              createdAt: now
+              createdAt: now,
+              comment: comment || undefined
             }
           }
         }
