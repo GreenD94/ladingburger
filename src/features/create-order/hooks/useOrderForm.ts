@@ -98,7 +98,7 @@ export const useOrderForm = () => {
       });
 
       if (order.success) {
-        window.location.href = '/order-confirmation';
+        window.location.href = `/orders?phoneNumber=${state.phoneNumber}`;
       }
     } catch (error) {
       console.error('Error al crear la orden:', error);

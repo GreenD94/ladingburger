@@ -77,7 +77,7 @@ export const OrderConfirmation: React.FC = () => {
         <Button
           variant="contained"
           size="large"
-          onClick={() => router.push('/tu-pedido')}
+          onClick={() => router.push('/orders')}
           sx={{
             bgcolor: '#FF6B00',
             '&:hover': { bgcolor: '#E55C00' },

@@ -6,7 +6,7 @@ interface PhoneDialogProps {
   phoneNumber: string;
   onClose: () => void;
   onPhoneNumberChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (phoneNumber: string) => void;
 }
 
 interface DigitInputProps {
@@ -241,7 +241,7 @@ export const PhoneDialog: React.FC<PhoneDialogProps> = ({
         <Button
           onClick={() => {
             onClose();
-            onSubmit();
+            onSubmit(digits.join(''));
           }}
           disabled={digits.join('').length !== 11}
           variant="contained"

@@ -8,7 +8,16 @@ export async function getBusinessContact() {
     const db = await connectToDatabase();
     const contact = await db.collection<BusinessContact>('businessContacts').findOne({});
 
-    return contact;
+    if (!contact) return null;
+
+    // Convert MongoDB fields to serializable values
+    return {
+      ...contact,
+      _id: contact._id.toString(),
+      createdAt: new Date(contact.createdAt).toISOString(),
+      updatedAt: new Date(contact.updatedAt).toISOString(),
+      dolarRateUpdatedAt: new Date(contact.dolarRateUpdatedAt).toISOString(),
+    };
   } catch (error) {
     console.error('Error getting business contact:', error);
     return null;

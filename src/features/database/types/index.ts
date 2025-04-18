@@ -79,7 +79,7 @@ export interface Burger {
 }
 
 export interface BusinessContact {
-  _id?: ObjectId | string;
+  _id: string;
   whatsappLink: string;
   instagramLink: string;
   venezuelaPayment: {
@@ -89,9 +89,9 @@ export interface BusinessContact {
   };
   qrCodeUrl: string;
   dolarRate: number;
-  dolarRateUpdatedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  dolarRateUpdatedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export * from './status';
