@@ -1,7 +1,7 @@
 'use server';
 
 import clientPromise from '../../config/mongodb';
-import { Order, OrderStatusType } from '../../types/index';
+import { Order, OrderStatusType, OrderStatusLabels } from '../../types';
 import { ObjectId } from 'mongodb';
 
 export async function updateOrderStatus(orderId: string, status: OrderStatusType) {
@@ -9,6 +9,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatusType
     const client = await clientPromise;
     const db = client.db('saborea');
     
+    const now = new Date();
     const result = await db
       .collection<Order>('orders')
       .updateOne(
@@ -16,7 +17,14 @@ export async function updateOrderStatus(orderId: string, status: OrderStatusType
         { 
           $set: { 
             status,
-            updatedAt: new Date()
+            updatedAt: now
+          },
+          $push: {
+            logs: {
+              status,
+              statusName: OrderStatusLabels[status],
+              createdAt: now
+            }
           }
         }
       );

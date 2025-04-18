@@ -32,7 +32,7 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ['carne de res', 'tocino', 'lechuga', 'tomate', 'salsa especial'],
   },
 ];
-const businessContact: BusinessContact = {
+const businessContact: Omit<BusinessContact, '_id'> = {
   whatsappLink: 'https://wa.me/584125188174',
   instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
   venezuelaPayment: {
@@ -42,9 +42,9 @@ const businessContact: BusinessContact = {
   },
   qrCodeUrl: '/qr-code.png',
   dolarRate: 35.5, // Current exchange rate: 1 USD = 35.5 Bs
-  dolarRateUpdatedAt: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date()
+  dolarRateUpdatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
 };
 
 export async function seedDatabase() {
@@ -57,7 +57,7 @@ export async function seedDatabase() {
     await db.collection('businessContacts').deleteMany({});
     // Insert new burgers
     const result = await db.collection<Burger>('burgers').insertMany(initialBurgers);
-    await db.collection<BusinessContact>('businessContacts').insertOne(businessContact);
+    await db.collection<Omit<BusinessContact, '_id'>>('businessContacts').insertOne(businessContact);
     return {
       success: true,
       message: `Base de datos sembrada exitosamente con ${result.insertedCount} hamburguesas`,

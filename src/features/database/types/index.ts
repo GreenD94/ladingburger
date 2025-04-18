@@ -53,6 +53,12 @@ export interface PaymentInfo {
   paymentStatus: PaymentStatusType;
 }
 
+export interface OrderLog {
+  status: OrderStatusType;
+  statusName: string;
+  createdAt: Date;
+}
+
 export interface Order {
   _id?: ObjectId | string;
   userId: ObjectId | string;
@@ -63,6 +69,7 @@ export interface Order {
   createdAt: Date;
   updatedAt: Date;
   paymentInfo: PaymentInfo;
+  logs: OrderLog[];
 }
 
 export type CreateOrderDTO = Omit<Order, '_id' | 'createdAt' | 'updatedAt' | 'userId'>;

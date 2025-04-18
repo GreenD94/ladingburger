@@ -55,6 +55,9 @@ export const OrdersList: React.FC<OrdersListProps> = ({ orders, isLoading }) => 
     );
   }
 
+  // Convert burgers map to array
+  const burgersArray = Object.values(burgers);
+
   return (
     <Box>
       <Typography
@@ -88,8 +91,8 @@ export const OrdersList: React.FC<OrdersListProps> = ({ orders, isLoading }) => 
           >
             <OrderCard 
               order={order} 
-              orderNumber={orders.length - index} 
-              burgers={burgers}
+              orderNumber={ index+1} 
+              burgers={burgersArray}
             />
           </motion.div>
         ))}
