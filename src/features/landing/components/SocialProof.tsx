@@ -1,10 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Avatar, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact';
+
+interface BusinessContact {
+  whatsappLink: string;
+  instagramLink: string;
+  venezuelaPayment: {
+    phoneNumber: string;
+    bankAccount: string;
+    documentNumber: string;
+  };
+  qrCodeUrl: string;
+  dolarRate: number;
+  dolarRateUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const testimonials = [
   {
@@ -27,7 +43,33 @@ const testimonials = [
   }
 ];
 
+const emptyBusinessContact: BusinessContact = {
+  whatsappLink: 'https://wa.me/584125188174',
+  instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
+  venezuelaPayment: {
+    phoneNumber: '584242424242',
+    bankAccount: '0102-1234-5678-9012',
+    documentNumber: 'V-12345678'
+  },
+  qrCodeUrl: '/qr-code.png',
+  dolarRate: 35.5,
+  dolarRateUpdatedAt: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
 const SocialProof: React.FC = () => {
+  const [businessContact, setBusinessContact] = useState<BusinessContact>(emptyBusinessContact);
+
+  useEffect(() => {
+    const fetchBusinessContact = async () => {
+      const contact = await getBusinessContact();
+      if (contact) {
+        setBusinessContact(contact);
+      }
+    };
+    fetchBusinessContact();
+  }, []);
 
   return (
     <Box sx={{ position: 'relative', py: 8 }}>
@@ -50,7 +92,7 @@ const SocialProof: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<WhatsAppIcon />}
-            href="https://wa.me/584125188174"
+            href={businessContact.whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -73,7 +115,7 @@ const SocialProof: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<InstagramIcon />}
-            href="https://www.instagram.com/jesusg_sanchez/"
+            href={businessContact.instagramLink}
             target="_blank"
             rel="noopener noreferrer"
             sx={{

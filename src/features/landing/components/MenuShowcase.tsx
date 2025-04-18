@@ -21,7 +21,6 @@ export const MenuShowcase = () => {
       try {
         const availableBurgers = await getAvailableBurgers();
         if (availableBurgers) {
-          console.log(availableBurgers);
           setBurgers(availableBurgers);
         }
       } catch (error) {

@@ -1,8 +1,8 @@
-import { Order, Burger } from '@/features/database/types/index';
+import { Order, Burger, BusinessContact } from '@/features/database/types/index';
 
-export type TestCategory = 'orders' | 'menu' | 'database';
+export type TestCategory = 'orders' | 'menu' | 'database' | 'business';
 
-export type TestData = Order | Order[] | Burger[] | { message: string };
+export type TestData = Order | Order[] | Burger[] | BusinessContact | { message: string };
 
 export interface TestItem {
   id: string;

@@ -78,6 +78,22 @@ export interface Burger {
   isAvailable: boolean;
 }
 
+export interface BusinessContact {
+  _id?: ObjectId | string;
+  whatsappLink: string;
+  instagramLink: string;
+  venezuelaPayment: {
+    phoneNumber: string;
+    bankAccount: string;
+    documentNumber: string;
+  };
+  qrCodeUrl: string;
+  dolarRate: number;
+  dolarRateUpdatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export * from './status';
 export * from './order';
 export * from './burger';

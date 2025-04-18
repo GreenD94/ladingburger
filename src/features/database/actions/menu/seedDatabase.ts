@@ -1,7 +1,7 @@
 'use server';
 
 import clientPromise from '../../config/mongodb';
-import { Burger } from '../../types/index';
+import { Burger, BusinessContact } from '../../types/index';
 
 const initialBurgers: Omit<Burger, '_id'>[] = [
   {
@@ -32,6 +32,20 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ['carne de res', 'tocino', 'lechuga', 'tomate', 'salsa especial'],
   },
 ];
+const businessContact: BusinessContact = {
+  whatsappLink: 'https://wa.me/584125188174',
+  instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
+  venezuelaPayment: {
+    phoneNumber: '584242424242',
+    bankAccount: '0102-1234-5678-9012',
+    documentNumber: 'V-12345678'
+  },
+  qrCodeUrl: '/qr-code.png',
+  dolarRate: 35.5, // Current exchange rate: 1 USD = 35.5 Bs
+  dolarRateUpdatedAt: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
 
 export async function seedDatabase() {
   try {
@@ -40,10 +54,10 @@ export async function seedDatabase() {
     
     // Clear existing burgers
     await db.collection('burgers').deleteMany({});
-    
+    await db.collection('businessContacts').deleteMany({});
     // Insert new burgers
     const result = await db.collection<Burger>('burgers').insertMany(initialBurgers);
-
+    await db.collection<BusinessContact>('businessContacts').insertOne(businessContact);
     return {
       success: true,
       message: `Base de datos sembrada exitosamente con ${result.insertedCount} hamburguesas`,

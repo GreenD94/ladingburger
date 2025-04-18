@@ -6,7 +6,11 @@ import { TestResult } from '../components/TestResult';
 import { TestItem, TestResult as TestResultType } from '../types/index';
 import { createOrder, getOrdersByPhone, updateOrderStatus } from '@/features/database/actions/orders';
 import { getAvailableBurgers, seedDatabase } from '@/features/database/actions/menu';
-import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger } from '@/features/database/types';
+import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact';
+import { createBusinessContact } from '@/features/database/actions/businessContacts/createBusinessContact';
+import { updateBusinessContact } from '@/features/database/actions/businessContacts/updateBusinessContact';
+import { deleteBusinessContact } from '@/features/database/actions/businessContacts/deleteBusinessContact';
+import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger, BusinessContact } from '@/features/database/types';
 
 export default function BlackboxContainer() {
   const theme = useTheme();
@@ -130,6 +134,83 @@ export default function BlackboxContainer() {
         return {
           success: true,
           data: { message: result.message }
+        };
+      },
+    },
+    {
+      id: '6',
+      name: 'Get Business Contact',
+      category: 'business',
+      description: 'Get business contact information',
+      run: async () => {
+        const contact = await getBusinessContact();
+        if (!contact) {
+          return {
+            success: false,
+            error: 'No business contact found'
+          };
+        }
+        return {
+          success: true,
+          data: contact as BusinessContact
+        };
+      },
+    },
+    {
+      id: '7',
+      name: 'Create Business Contact',
+      category: 'business',
+      description: 'Create a new business contact',
+      run: async () => {
+        const contact: Omit<BusinessContact, '_id' | 'createdAt' | 'updatedAt'> = {
+          whatsappLink: 'https://wa.me/584125188174',
+          instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
+          venezuelaPayment: {
+            phoneNumber: '584242424242',
+            bankAccount: '0102-1234-5678-9012',
+            documentNumber: 'V-12345678'
+          },
+          qrCodeUrl: '/qr-code.png',
+          dolarRate: 35.5,
+          dolarRateUpdatedAt: new Date()
+        };
+        const result = await createBusinessContact(contact);
+        return {
+          success: result.success,
+          data: { message: `Business contact created with ID: ${result.contactId}` },
+          error: result.error
+        };
+      },
+    },
+    {
+      id: '8',
+      name: 'Update Business Contact',
+      category: 'business',
+      description: 'Update business contact information',
+      run: async () => {
+        const update = {
+          whatsappLink: 'https://wa.me/584242424242',
+          instagramLink: 'https://instagram.com/saborea',
+        };
+        const result = await updateBusinessContact(update);
+        return {
+          success: result.success,
+          data: { message: `Business contact updated. Modified count: ${result.modifiedCount}` },
+          error: result.error
+        };
+      },
+    },
+    {
+      id: '9',
+      name: 'Delete Business Contact',
+      category: 'business',
+      description: 'Delete business contact',
+      run: async () => {
+        const result = await deleteBusinessContact();
+        return {
+          success: result.success,
+          data: { message: `Business contact deleted. Deleted count: ${result.deletedCount}` },
+          error: result.error
         };
       },
     },
