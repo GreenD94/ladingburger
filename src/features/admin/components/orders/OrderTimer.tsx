@@ -9,13 +9,7 @@ interface OrderTimerProps {
 }
 
 export function OrderTimer({ createdAt }: OrderTimerProps) {
-  console.log('OrderTimer - createdAt:', createdAt);
-  console.log('OrderTimer - createdAt type:', typeof createdAt);
-  console.log('OrderTimer - createdAt value:', createdAt);
-  
   const dateString = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
-  console.log('OrderTimer - dateString:', dateString);
-  
   const { timeString, color } = useOrderTimer(dateString);
 
   return (

@@ -1,9 +1,14 @@
+'use client';
+
 import { Tabs, Tab, Box } from '@mui/material';
-import { OrderStatus, OrderStatusType, OrderStatusLabels } from '@/features/database/types';
+import { OrderStatus, OrderStatusType } from '@/features/database/types';
+import { OrderStatusLabels } from '@/features/database/types';
+import { OrderCountBadge } from './OrderCountBadge';
 
 interface OrderTabsProps {
   activeTab: number;
   onTabChange: (event: React.SyntheticEvent, newValue: number) => void;
+  orderCounts: Record<OrderStatusType, number>;
 }
 
 const getStatusColor = (status: OrderStatusType) => {
@@ -25,7 +30,7 @@ const getStatusColor = (status: OrderStatusType) => {
   }
 };
 
-export function OrderTabs({ activeTab, onTabChange }: OrderTabsProps) {
+export function OrderTabs({ activeTab, onTabChange, orderCounts }: OrderTabsProps) {
   return (
     <Box sx={{ 
       width: '100%',
@@ -62,7 +67,12 @@ export function OrderTabs({ activeTab, onTabChange }: OrderTabsProps) {
         {Object.values(OrderStatus).map((status, index) => (
           <Tab
             key={status}
-            label={OrderStatusLabels[status]}
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {OrderStatusLabels[status]}
+                <OrderCountBadge count={orderCounts[status]} status={status} />
+              </Box>
+            }
             sx={{
               backgroundColor: getStatusColor(status),
               '&.Mui-selected': {

@@ -7,7 +7,7 @@ import { TabPanel } from '@/features/admin/components/orders/TabPanel';
 import { OrderTabs } from '@/features/admin/components/orders/OrderTabs';
 import { RefreshTimer } from '@/features/admin/components/orders/RefreshTimer';
 import OrdersList from '@/features/admin/components/orders/OrdersList';
-import LoadingState from '@/features/analytics/components/LoadingState';
+import { OrderSkeletonList } from '@/features/admin/components/orders/OrderSkeletonList';
 import { useOrders } from '@/features/admin/hooks/useOrders';
 import { useRefreshTimer } from '@/features/admin/hooks/useRefreshTimer';
 
@@ -43,8 +43,14 @@ export default function OrdersContainer() {
     setActiveTab(newValue);
   };
 
+  // Calculate order counts for each status
+  const orderCounts = Object.values(OrderStatus).reduce((acc, status) => {
+    acc[status] = orders[status]?.length || 0;
+    return acc;
+  }, {} as Record<typeof OrderStatus[keyof typeof OrderStatus], number>);
+
   if (loading) {
-    return <LoadingState title="Cargando órdenes..." />;
+    return <OrderSkeletonList />;
   }
 
   return (
@@ -60,7 +66,11 @@ export default function OrdersContainer() {
         />
       </Stack>
 
-      <OrderTabs activeTab={activeTab} onTabChange={handleTabChange} />
+      <OrderTabs 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange} 
+        orderCounts={orderCounts}
+      />
 
       {Object.values(OrderStatus).map((status, index) => (
         <TabPanel 
