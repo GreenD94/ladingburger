@@ -4,7 +4,7 @@ import { OrderFormState } from '../types/order.types';
 import { getAvailableBurgers } from '@/features/database/actions/menu';
 import { createOrder } from '@/features/database/actions/orders';
 import { OrderStatus, PaymentStatus } from '@/features/database/types';
-import { OrderStatusLabels } from '@/features/database/types';
+import { OrderStatusLabels, PaymentStatusLabels } from '@/features/database/types';
 
 export const useOrderForm = () => {
   const [state, setState] = useState<OrderFormState>({
@@ -94,7 +94,12 @@ export const useOrderForm = () => {
         paymentInfo: {
           bankAccount: '',
           transferReference: '',
-          paymentStatus: PaymentStatus.PENDING
+          paymentStatus: PaymentStatus.PENDING,
+          paymentLogs: [{
+            status: PaymentStatus.PENDING,
+            statusName: PaymentStatusLabels[PaymentStatus.PENDING],
+            createdAt: new Date()
+          }]
         },
         logs: [{
           status: OrderStatus.WAITING_PAYMENT,

@@ -10,7 +10,7 @@ import { getBusinessContact } from '@/features/database/actions/businessContacts
 import { createBusinessContact } from '@/features/database/actions/businessContacts/createBusinessContact';
 import { updateBusinessContact } from '@/features/database/actions/businessContacts/updateBusinessContact';
 import { deleteBusinessContact } from '@/features/database/actions/businessContacts/deleteBusinessContact';
-import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger, BusinessContact } from '@/features/database/types';
+import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger, BusinessContact, PaymentStatusLabels } from '@/features/database/types';
 import { login, logout, getCurrentAdmin } from '@/features/database/actions/auth';
 import { getBurgers } from '@/features/database/actions/burgers';
 
@@ -63,7 +63,12 @@ export default function BlackboxContainer() {
           paymentInfo: {
             bankAccount: '123456789',
             transferReference: '123456789',
-            paymentStatus: PaymentStatus.PENDING
+            paymentStatus: PaymentStatus.PENDING,
+            paymentLogs: [{
+              status: PaymentStatus.PENDING,
+              statusName: PaymentStatusLabels[PaymentStatus.PENDING],
+              createdAt: new Date()
+            }]
           },
           logs: [{
             status: OrderStatus.WAITING_PAYMENT,

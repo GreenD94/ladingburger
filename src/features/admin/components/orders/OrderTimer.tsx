@@ -9,13 +9,13 @@ interface OrderTimerProps {
 }
 
 export function OrderTimer({ createdAt }: OrderTimerProps) {
-  const { timeString, color } = useOrderTimer(createdAt);
+  const { timeString, color } = useOrderTimer(createdAt.toISOString());
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
       <AccessTimeIcon 
         sx={{ 
-          fontSize: '1.2rem', 
+          fontSize: '1rem', 
           mr: 0.5, 
           color: `${color}.main`
         }} 

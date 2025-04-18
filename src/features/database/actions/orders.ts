@@ -1,4 +1,4 @@
-import { Order, OrderStatus, PaymentStatus, OrderStatusType, CreateOrderDTO } from '../types';
+import { Order, OrderStatus, PaymentStatus, OrderStatusType, CreateOrderDTO, PaymentStatusLabels } from '../types';
 import { createOrder as createOrderAction } from './orders/createOrder';
 import { getOrdersByPhone as getOrdersByPhoneAction } from './orders/getOrdersByPhone';
 import { updateOrderStatus as updateOrderStatusAction } from './orders/updateOrderStatus';
@@ -29,7 +29,12 @@ export async function createOrder(order: CreateOrderDTO) {
     paymentInfo: {
       bankAccount: '',
       transferReference: '',
-      paymentStatus: PaymentStatus.PENDING
+      paymentStatus: PaymentStatus.PENDING,
+      paymentLogs: [{
+        status: PaymentStatus.PENDING,
+        statusName: PaymentStatusLabels[PaymentStatus.PENDING],
+        createdAt: new Date()
+      }]
     }
   };
 
