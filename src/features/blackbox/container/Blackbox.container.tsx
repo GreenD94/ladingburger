@@ -11,6 +11,8 @@ import { createBusinessContact } from '@/features/database/actions/businessConta
 import { updateBusinessContact } from '@/features/database/actions/businessContacts/updateBusinessContact';
 import { deleteBusinessContact } from '@/features/database/actions/businessContacts/deleteBusinessContact';
 import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger, BusinessContact } from '@/features/database/types';
+import { login, logout, getCurrentAdmin } from '@/features/database/actions/auth';
+import { getBurgers } from '@/features/database/actions/burgers';
 
 export default function BlackboxContainer() {
   const theme = useTheme();
@@ -63,6 +65,11 @@ export default function BlackboxContainer() {
             transferReference: '123456789',
             paymentStatus: PaymentStatus.PENDING
           },
+          logs: [{
+            status: OrderStatus.WAITING_PAYMENT,
+            statusName: 'Waiting Payment',
+            createdAt: new Date()
+          }]
         };
         const result = await createOrder(order);
         return {
@@ -172,7 +179,7 @@ export default function BlackboxContainer() {
           },
           qrCodeUrl: '/qr-code.png',
           dolarRate: 35.5,
-          dolarRateUpdatedAt: new Date()
+          dolarRateUpdatedAt: new Date().toISOString()
         };
         const result = await createBusinessContact(contact);
         return {
@@ -211,6 +218,90 @@ export default function BlackboxContainer() {
           success: result.success,
           data: { message: `Business contact deleted. Deleted count: ${result.deletedCount}` },
           error: result.error
+        };
+      },
+    },
+    {
+      id: '10',
+      name: 'Admin Login',
+      category: 'database',
+      description: 'Login as admin',
+      run: async () => {
+        const formData = new FormData();
+        formData.append('email', 'admin@example.com');
+        formData.append('password', 'password123');
+        const result = await login(formData);
+        return {
+          success: !('error' in result),
+          data: { message: 'Login successful' },
+          error: 'error' in result ? result.error : undefined
+        };
+      },
+    },
+    {
+      id: '11',
+      name: 'Admin Logout',
+      category: 'database',
+      description: 'Logout admin',
+      run: async () => {
+        const result = await logout();
+        return {
+          success: !('error' in result),
+          data: { message: 'Logout successful' },
+          error: 'error' in result ? result.error : undefined
+        };
+      },
+    },
+    {
+      id: '12',
+      name: 'Get Current Admin',
+      category: 'database',
+      description: 'Get current admin information',
+      run: async () => {
+        const result = await getCurrentAdmin();
+        return {
+          success: !('error' in result),
+          data: { message: 'Admin retrieved successfully' },
+          error: 'error' in result ? result.error : undefined
+        };
+      },
+    },
+    {
+      id: '13',
+      name: 'Get All Burgers',
+      category: 'menu',
+      description: 'Get all burgers including unavailable ones',
+      run: async () => {
+        const burgers = await getBurgers();
+        if (!burgers || burgers.length === 0) {
+          return {
+            success: false,
+            error: 'No burgers found'
+          };
+        }
+        return {
+          success: true,
+          data: burgers as Burger[]
+        };
+      },
+    },
+    {
+      id: '14',
+      name: 'Get Burger by ID',
+      category: 'menu',
+      description: 'Get a specific burger by ID',
+      run: async () => {
+        const burgers = await getBurgers();
+        const burger = burgers?.find(b => b._id === '1');
+        if (!burger) {
+          return {
+            success: false,
+            error: 'Burger not found'
+          };
+        }
+        return {
+          success: true,
+          data: [burger] as Burger[]
         };
       },
     },

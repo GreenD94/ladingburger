@@ -9,7 +9,7 @@ export async function updateBusinessContact(contact: Partial<Omit<BusinessContac
     
     const update = {
       ...contact,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     };
 
     const result = await db.collection<BusinessContact>('businessContacts').updateOne(

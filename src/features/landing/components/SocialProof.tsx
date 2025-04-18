@@ -5,22 +5,8 @@ import { Box, Typography, Avatar, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact';
-
-interface BusinessContact {
-  whatsappLink: string;
-  instagramLink: string;
-  venezuelaPayment: {
-    phoneNumber: string;
-    bankAccount: string;
-    documentNumber: string;
-  };
-  qrCodeUrl: string;
-  dolarRate: number;
-  dolarRateUpdatedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { BusinessContact } from '@/features/database/types';
+import { getBusinessContact } from '@/features/database/actions/businessContacts';
 
 const testimonials = [
   {
@@ -43,23 +29,8 @@ const testimonials = [
   }
 ];
 
-const emptyBusinessContact: BusinessContact = {
-  whatsappLink: 'https://wa.me/584125188174',
-  instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
-  venezuelaPayment: {
-    phoneNumber: '584242424242',
-    bankAccount: '0102-1234-5678-9012',
-    documentNumber: 'V-12345678'
-  },
-  qrCodeUrl: '/qr-code.png',
-  dolarRate: 35.5,
-  dolarRateUpdatedAt: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
-
 const SocialProof: React.FC = () => {
-  const [businessContact, setBusinessContact] = useState<BusinessContact>(emptyBusinessContact);
+  const [businessContact, setBusinessContact] = useState<BusinessContact | null>(null);
 
   useEffect(() => {
     const fetchBusinessContact = async () => {
@@ -92,7 +63,8 @@ const SocialProof: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<WhatsAppIcon />}
-            href={businessContact.whatsappLink}
+            component="a"
+            href={businessContact?.whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -115,7 +87,8 @@ const SocialProof: React.FC = () => {
           <Button
             variant="contained"
             startIcon={<InstagramIcon />}
-            href={businessContact.instagramLink}
+            component="a"
+            href={businessContact?.instagramLink}
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -226,6 +199,55 @@ const SocialProof: React.FC = () => {
             </Box>
           ))}
         </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 4 }}>
+        {businessContact?.whatsappLink && (
+          <Button
+            variant="contained"
+            startIcon={<WhatsAppIcon />}
+            component="a"
+            href={businessContact.whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              bgcolor: '#25D366',
+              '&:hover': { bgcolor: '#128C7E' },
+              color: 'white',
+              borderRadius: '50px',
+              minWidth: '200px',
+              p: 1.5,
+              '& .MuiButton-startIcon': {
+                mr: 1,
+              },
+            }}
+          >
+            WhatsApp
+          </Button>
+        )}
+        {businessContact?.instagramLink && (
+          <Button
+            variant="contained"
+            startIcon={<InstagramIcon />}
+            component="a"
+            href={businessContact.instagramLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              bgcolor: '#E1306C',
+              '&:hover': { bgcolor: '#C13584' },
+              color: 'white',
+              borderRadius: '50px',
+              minWidth: '200px',
+              p: 1.5,
+              '& .MuiButton-startIcon': {
+                mr: 1,
+              },
+            }}
+          >
+            Instagram
+          </Button>
+        )}
       </Box>
     </Box>
   );

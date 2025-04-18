@@ -86,7 +86,7 @@ export interface Burger {
 }
 
 export interface BusinessContact {
-  _id: string;
+  _id?: string;
   whatsappLink: string;
   instagramLink: string;
   venezuelaPayment: {
@@ -99,6 +99,14 @@ export interface BusinessContact {
   dolarRateUpdatedAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Admin {
+  _id?: string;
+  email: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export * from './status';

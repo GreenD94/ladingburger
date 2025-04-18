@@ -9,8 +9,8 @@ export async function createBusinessContact(contact: Omit<BusinessContact, '_id'
     
     const newContact: BusinessContact = {
       ...contact,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const result = await db.collection<BusinessContact>('businessContacts').insertOne(newContact);
