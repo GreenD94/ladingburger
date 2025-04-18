@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, CircularProgress } from '@mui/material';
+import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin';
 
 export default function AdminLayout({
   children,
@@ -15,17 +16,16 @@ export default function AdminLayout({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/admin/me', {
-          credentials: 'include',
-        });
+        const currentAdmin = await getCurrentAdmin();
+console.log({currentAdmin});
+        if (!currentAdmin) {
 
-        if (!response.ok) {
           router.push('/login');
           return;
         }
 
         setLoading(false);
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('Auth check error:', error);
         router.push('/login');
       }

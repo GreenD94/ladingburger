@@ -1,51 +1,55 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-import { AdminModel } from '../../models/admin.model';
+import { sign } from 'jsonwebtoken';
+import { findAdminByEmail } from '../../models/admin.model';
 
-export async function login(formData: FormData) {
+interface LoginResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    email: string;
+  };
+  error?: string;
+}
+
+export async function login(email: string, password: string): Promise<LoginResponse> {
   try {
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const admin = await findAdminByEmail(email);
 
-    // Find admin by email
-    const admin = await AdminModel.findOne({ email });
     if (!admin) {
-      return { error: 'Invalid credentials' };
+      return { success: false, error: 'Invalid credentials' };
     }
 
-    // Check password
-    const isMatch = await admin.comparePassword(password);
-    if (!isMatch) {
-      return { error: 'Invalid credentials' };
+    const isValidPassword = await admin.comparePassword(password);
+
+    if (!isValidPassword) {
+      return { success: false, error: 'Invalid credentials' };
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: admin._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+    const token = sign(
+      { id: admin._id.toString(), email: admin.email },
+      process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
 
-    // Set cookie
     const cookieStore = await cookies();
-    await cookieStore.set('adminToken', token, {
+    cookieStore.set('adminToken', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 // 1 day in seconds
+      maxAge: 60 * 60 * 24 // 1 day
     });
 
     return { 
-      success: true,
-      admin: {
-        id: admin._id,
+      success: true, 
+      data: { 
+        id: admin._id.toString(),
         email: admin.email
-      }
+      } 
     };
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Login error:', error);
-    return { error: 'Server error' };
+    return { success: false, error: 'An error occurred during login' };
   }
 } 

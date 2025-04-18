@@ -1,37 +1,53 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-import { AdminModel } from '../../models/admin.model';
+import { verify } from 'jsonwebtoken';
+import clientPromise from '../../config/mongodb';
 import { redirect } from 'next/navigation';
+import { ObjectId } from 'mongodb';
 
-export async function getCurrentAdmin() {
+interface CurrentAdmin {
+  _id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('adminToken')?.value;
 
     if (!token) {
-      return { error: 'No token provided' };
+      return null;
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
-    const admin = await AdminModel.findById(decoded.id).select('-password');
+    const decoded = verify(token, process.env.JWT_SECRET!) as { id: string; email: string };
+    
+    const client = await clientPromise;
+    const db = client.db('saborea');
+    const admin = await db.collection('admins').findOne({ _id: new ObjectId(decoded.id) });
 
     if (!admin) {
-      return { error: 'Admin not found' };
+      return null;
     }
 
-    return { admin };
-  } catch (error: unknown) {
-    console.error('Get current admin error:', error);
-    return { error: 'Invalid token' };
+    return {
+      _id: admin._id.toString(),
+      email: admin.email,
+      createdAt: admin.createdAt,
+      updatedAt: admin.updatedAt
+    };
+  } catch (error) {
+    console.error('Error getting current admin:', error);
+    return null;
   }
 }
 
 export async function requireAuth() {
   const result = await getCurrentAdmin();
-  if ('error' in result) {
+  if (!result) {
     redirect('/login');
   }
-  return result.admin;
+  return result;
 } 

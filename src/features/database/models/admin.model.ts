@@ -1,44 +1,97 @@
-import { Schema, model, Document } from 'mongoose';
-import { Admin } from '../types/admin';
 import bcrypt from 'bcryptjs';
+import { Admin, CreateAdmin } from '../types/admin';
+import clientPromise from '../config/mongodb';
 
-interface AdminDocument extends Admin, Document {
-  comparePassword(candidatePassword: string): Promise<boolean>;
+// Helper function to create the comparePassword method
+function createComparePassword(password: string) {
+  return async function(candidatePassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, password);
+  };
 }
 
-const adminSchema = new Schema<AdminDocument>({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-  },
-}, {
-  timestamps: true,
-});
-
-// Hash password before saving
-adminSchema.pre('save', async function(this: AdminDocument, next: (err?: Error) => void) {
-  if (!this.isModified('password')) return next();
-  
+export async function findAdminByEmail(email: string): Promise<Admin | null> {
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error: unknown) {
-    next(error as Error);
+    // Normalize email by trimming whitespace and converting to lowercase
+    const normalizedEmail = email.trim().toLowerCase();
+    console.log('Searching for admin with email:', normalizedEmail);
+    
+    const client = await clientPromise;
+    // Explicitly use the 'saborea' database
+    const db = client.db('saborea');
+    
+    // Debug: List all collections
+    const collections = await db.listCollections().toArray();
+    console.log('Available collections:', collections.map(c => c.name));
+    
+    // Debug: Count documents in admins collection
+    const count = await db.collection('admins').countDocuments();
+    console.log('Total documents in admins collection:', count);
+    
+    // Debug: List all admins
+    const allAdmins = await db.collection('admins').find({}).toArray();
+    console.log('All admins in collection:', allAdmins.map(a => ({ 
+      _id: a._id.toString(), 
+      email: a.email 
+    })));
+    
+    // Try a simpler query without any type constraints
+    const admin = await db.collection('admins').findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') } 
+    });
+    
+    console.log('Query result:', admin ? {
+      _id: admin._id.toString(),
+      email: admin.email
+    } : null);
+    
+    if (!admin) {
+      console.log('No admin found with email:', normalizedEmail);
+      return null;
+    }
+
+    // Convert ObjectId to string and create Admin object
+    const result: Admin = {
+      _id: admin._id.toString(),
+      email: admin.email,
+      password: admin.password,
+      createdAt: admin.createdAt,
+      updatedAt: admin.updatedAt,
+      comparePassword: createComparePassword(admin.password)
+    };
+    
+    console.log('Returning admin:', { 
+      _id: result._id,
+      email: result.email,
+      hasPassword: !!result.password,
+      hasComparePassword: !!result.comparePassword
+    });
+    
+    return result;
+  } catch (error) {
+    console.error('Error in findAdminByEmail:', error);
+    return null;
   }
-});
+}
 
-// Method to compare passwords
-adminSchema.methods.comparePassword = async function(this: AdminDocument, candidatePassword: string): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+export async function createAdmin(adminData: Omit<CreateAdmin, 'createdAt' | 'updatedAt'>): Promise<Admin> {
+  const client = await clientPromise;
+  const db = client.db();
+  
+  const hashedPassword = await bcrypt.hash(adminData.password, 10);
+  const now = new Date();
+  const admin: CreateAdmin = {
+    ...adminData,
+    password: hashedPassword,
+    createdAt: now,
+    updatedAt: now
+  };
 
-export const AdminModel = model<AdminDocument>('Admin', adminSchema); 
+  const result = await db.collection('admins').insertOne(admin);
+  
+  // Convert ObjectId to string to match Admin interface
+  return {
+    ...admin,
+    _id: result.insertedId.toString(),
+    comparePassword: createComparePassword(hashedPassword)
+  };
+} 

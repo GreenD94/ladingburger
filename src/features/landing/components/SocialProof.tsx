@@ -201,54 +201,6 @@ const SocialProof: React.FC = () => {
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 4 }}>
-        {businessContact?.whatsappLink && (
-          <Button
-            variant="contained"
-            startIcon={<WhatsAppIcon />}
-            component="a"
-            href={businessContact.whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              bgcolor: '#25D366',
-              '&:hover': { bgcolor: '#128C7E' },
-              color: 'white',
-              borderRadius: '50px',
-              minWidth: '200px',
-              p: 1.5,
-              '& .MuiButton-startIcon': {
-                mr: 1,
-              },
-            }}
-          >
-            WhatsApp
-          </Button>
-        )}
-        {businessContact?.instagramLink && (
-          <Button
-            variant="contained"
-            startIcon={<InstagramIcon />}
-            component="a"
-            href={businessContact.instagramLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              bgcolor: '#E1306C',
-              '&:hover': { bgcolor: '#C13584' },
-              color: 'white',
-              borderRadius: '50px',
-              minWidth: '200px',
-              p: 1.5,
-              '& .MuiButton-startIcon': {
-                mr: 1,
-              },
-            }}
-          >
-            Instagram
-          </Button>
-        )}
-      </Box>
     </Box>
   );
 };

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { AdminModel } from '../models/admin.model';
-import { Admin } from '../types/admin';
+import clientPromise from '../config/mongodb';
+import { ObjectId } from 'mongodb';
 
 export async function authMiddleware(req: NextRequest) {
   try {
@@ -15,7 +15,13 @@ export async function authMiddleware(req: NextRequest) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
-    const admin = await AdminModel.findById(decoded.id).select('-password') as (Admin & { _id: string }) | null;
+    
+    const client = await clientPromise;
+    const db = client.db();
+    const admin = await db.collection('admins').findOne(
+      { _id: new ObjectId(decoded.id) },
+      { projection: { password: 0 } }
+    );
 
     if (!admin) {
       return NextResponse.json(
@@ -26,7 +32,7 @@ export async function authMiddleware(req: NextRequest) {
 
     // Add admin to request headers for downstream use
     const requestHeaders = new Headers(req.headers);
-    requestHeaders.set('x-admin-id', admin._id);
+    requestHeaders.set('x-admin-id', admin._id.toString());
     requestHeaders.set('x-admin-email', admin.email);
 
     return NextResponse.next({

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography, Button, Container } from '@mui/material';
+import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin';
+import { logout } from '@/features/database/actions/auth/logout';
 
 interface Admin {
   id: string;
@@ -16,18 +18,18 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const response = await fetch('/api/admin/me', {
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
+        const currentAdmin = await getCurrentAdmin();
+        
+        if (!currentAdmin) {
           router.push('/login');
           return;
         }
 
-        const data = await response.json();
-        setAdmin(data);
-      } catch (error: unknown) {
+        setAdmin({
+          id: currentAdmin._id,
+          email: currentAdmin.email
+        });
+      } catch (error) {
         console.error('Fetch admin error:', error);
         router.push('/login');
       }
@@ -38,12 +40,9 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await logout();
       router.push('/login');
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Logout error:', error);
     }
   };

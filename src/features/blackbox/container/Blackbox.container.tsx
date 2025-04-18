@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Paper, Typography, Box, useTheme } from '@mui/material';
 import { TestList } from '../components/TestList';
 import { TestResult } from '../components/TestResult';
-import { TestItem, TestResult as TestResultType } from '../types/index';
+import { TestItem, TestResult as TestResultType, TestData } from '../types/index';
 import { createOrder, getOrdersByPhone, updateOrderStatus } from '@/features/database/actions/orders';
 import { getAvailableBurgers, seedDatabase } from '@/features/database/actions/menu';
 import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact';
@@ -226,45 +226,75 @@ export default function BlackboxContainer() {
       name: 'Admin Login',
       category: 'database',
       description: 'Login as admin',
-      run: async () => {
-        const formData = new FormData();
-        formData.append('email', 'admin@example.com');
-        formData.append('password', 'password123');
-        const result = await login(formData);
-        return {
-          success: !('error' in result),
-          data: { message: 'Login successful' },
-          error: 'error' in result ? result.error : undefined
-        };
-      },
+      run: async (): Promise<{ success: boolean; data?: TestData; error?: string; message?: string }> => {
+        try {
+          const result = await login('admin@admin.com', '12345');
+          
+          if (!result) {
+            return {
+              success: false,
+              error: 'Login failed - no response'
+            };
+          }
+          
+          if (result.success && result.data) {
+            return {
+              success: true,
+              data: { message: `Login successful - Admin ID: ${result.data.id}` }
+            };
+          }
+          
+          return {
+            success: false,
+            error: result.error || 'Login failed'
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Login failed'
+          };
+        }
+      }
     },
     {
       id: '11',
       name: 'Admin Logout',
       category: 'database',
       description: 'Logout admin',
-      run: async () => {
+      run: async (): Promise<{ success: boolean; data?: TestData; error?: string; message?: string }> => {
         const result = await logout();
         return {
           success: !('error' in result),
           data: { message: 'Logout successful' },
           error: 'error' in result ? result.error : undefined
         };
-      },
+      }
     },
     {
       id: '12',
       name: 'Get Current Admin',
       category: 'database',
       description: 'Get current admin information',
-      run: async () => {
-        const result = await getCurrentAdmin();
-        return {
-          success: !('error' in result),
-          data: { message: 'Admin retrieved successfully' },
-          error: 'error' in result ? result.error : undefined
-        };
-      },
+      run: async (): Promise<{ success: boolean; data?: TestData; error?: string; message?: string }> => {
+        try {
+          const result = await getCurrentAdmin();
+          if (!result) {
+            return {
+              success: false,
+              error: 'No admin currently logged in'
+            };
+          }
+          return {
+            success: true,
+            data: { message: `Admin retrieved successfully - Email: ${result.email}` }
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get current admin'
+          };
+        }
+      }
     },
     {
       id: '13',

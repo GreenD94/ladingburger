@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { AdminModel } from '../models/admin.model';
+import clientPromise from '../config/mongodb';
+import { ObjectId } from 'mongodb';
+import bcrypt from 'bcryptjs';
 
 export async function login(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
     // Find admin by email
-    const admin = await AdminModel.findOne({ email });
+    const client = await clientPromise;
+    const db = client.db();
+    const admin = await db.collection('admins').findOne({ email });
+
     if (!admin) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
@@ -16,7 +21,7 @@ export async function login(req: NextRequest) {
     }
 
     // Check password
-    const isMatch = await admin.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
@@ -26,7 +31,7 @@ export async function login(req: NextRequest) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: admin._id },
+      { id: admin._id.toString() },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '1d' }
     );
@@ -34,7 +39,7 @@ export async function login(req: NextRequest) {
     const response = NextResponse.json({
       message: 'Login successful',
       admin: {
-        id: admin._id,
+        id: admin._id.toString(),
         email: admin.email
       }
     });
@@ -65,15 +70,23 @@ export async function logout() {
 
 export async function getCurrentAdmin(req: NextRequest) {
   try {
-    const adminId = req.headers.get('x-admin-id');
-    if (!adminId) {
+    const token = req.cookies.get('adminToken')?.value;
+    if (!token) {
       return NextResponse.json(
-        { message: 'Admin not found' },
-        { status: 404 }
+        { message: 'No token provided' },
+        { status: 401 }
       );
     }
 
-    const admin = await AdminModel.findById(adminId).select('-password');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
+    
+    const client = await clientPromise;
+    const db = client.db();
+    const admin = await db.collection('admins').findOne(
+      { _id: new ObjectId(decoded.id) },
+      { projection: { password: 0 } }
+    );
+
     if (!admin) {
       return NextResponse.json(
         { message: 'Admin not found' },
@@ -81,7 +94,10 @@ export async function getCurrentAdmin(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(admin);
+    return NextResponse.json({
+      ...admin,
+      _id: admin._id.toString()
+    });
   } catch (error: unknown) {
     console.error('Get current admin error:', error);
     return NextResponse.json(

@@ -1,85 +1,68 @@
 'use server';
 
+import { createAdmin } from '../../models/admin.model';
 import clientPromise from '../../config/mongodb';
-import { Burger, BusinessContact, Admin } from '../../types/index';
-import bcrypt from 'bcryptjs';
+import { Burger, BURGER_IMAGES } from '../../types/burger';
 
-const initialBurgers: Omit<Burger, '_id'>[] = [
+const burgers: Omit<Burger, '_id'>[] = [
   {
-    name: 'Hamburguesa Clásica',
-    description: 'Una hamburguesa clásica de carne con lechuga, tomate y nuestra salsa especial',
+    name: 'Classic Burger',
+    description: 'Our signature beef patty with lettuce, tomato, and special sauce',
+    price: 8.99,
+    image: BURGER_IMAGES.CLASSIC,
+    category: 'classic',
+    ingredients: ['Beef patty', 'Lettuce', 'Tomato', 'Special sauce', 'Bun'],
+    isAvailable: true
+  },
+  {
+    name: 'Cheeseburger',
+    description: 'Classic burger with melted cheddar cheese',
+    price: 9.99,
+    image: BURGER_IMAGES.DOUBLE_CHEESE,
+    category: 'cheese',
+    ingredients: ['Beef patty', 'Cheddar cheese', 'Lettuce', 'Tomato', 'Special sauce', 'Bun'],
+    isAvailable: true
+  },
+  {
+    name: 'Bacon Burger',
+    description: 'Classic burger with crispy bacon strips',
     price: 10.99,
-    category: 'hamburguesas',
-    isAvailable: true,
-    image: '/media/burgers/classic-burger.jpg',
-    ingredients: ['carne de res', 'lechuga', 'tomate', 'salsa especial'],
-  },
-  {
-    name: 'Hamburguesa con Queso',
-    description: 'Nuestra hamburguesa clásica con una rebanada de queso cheddar derretido',
-    price: 11.99,
-    category: 'hamburguesas',
-    isAvailable: true,
-    image: '/media/burgers/double-cheese.jpg',
-    ingredients: ['carne de res', 'queso cheddar', 'lechuga', 'tomate', 'salsa especial'],
-  },
-  {
-    name: 'Hamburguesa con Tocino',
-    description: 'Hamburguesa clásica con tiras de tocino crujiente',
-    price: 12.99,
-    category: 'hamburguesas',
-    isAvailable: true,
-    image: '/media/burgers/double-cheese.jpg',
-    ingredients: ['carne de res', 'tocino', 'lechuga', 'tomate', 'salsa especial'],
-  },
+    image: BURGER_IMAGES.DOUBLE_CHEESE,
+    category: 'bacon',
+    ingredients: ['Beef patty', 'Bacon', 'Lettuce', 'Tomato', 'Special sauce', 'Bun'],
+    isAvailable: true
+  }
 ];
-
-const businessContact: Omit<BusinessContact, '_id'> = {
-  whatsappLink: 'https://wa.me/584125188174',
-  instagramLink: 'https://www.instagram.com/jesusg_sanchez/',
-  venezuelaPayment: {
-    phoneNumber: '584242424242',
-    bankAccount: '0102-1234-5678-9012',
-    documentNumber: 'V-12345678'
-  },
-  qrCodeUrl: '/qr-code.png',
-  dolarRate: 35.5,
-  dolarRateUpdatedAt: new Date().toISOString(),
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-};
-
-const admin: Omit<Admin, '_id'> = {
-  email: 'admin@admin.com',
-  password: bcrypt.hashSync('12345', 10),
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
 
 export async function seedDatabase() {
   try {
-    const client = await clientPromise;
-    const db = client.db('saborea');
+    console.log('Starting database seeding...');
     
-    // Clear existing data
+    // Create admin user
+    console.log('Creating admin user...');
+    await createAdmin({
+      email: 'admin@admin.com',
+      password: '12345'
+    });
+    console.log('Admin user created successfully');
+
+    // Seed burgers
+    console.log('Seeding burgers...');
+    const client = await clientPromise;
+    const db = client.db();
+    
+    // Clear existing burgers
     await db.collection('burgers').deleteMany({});
-    await db.collection('businessContacts').deleteMany({});
-    await db.collection('admins').deleteMany({});
+    console.log('Cleared existing burgers');
 
-    // Insert new data
-    const burgersResult = await db.collection<Burger>('burgers').insertMany(initialBurgers);
-    await db.collection<Omit<BusinessContact, '_id'>>('businessContacts').insertOne(businessContact);
-    await db.collection<Omit<Admin, '_id'>>('admins').insertOne(admin);
+    // Insert new burgers
+    const result = await db.collection('burgers').insertMany(burgers);
+    console.log('Inserted burgers:', result.insertedCount);
 
-    return {
-      success: true,
-      message: `Base de datos sembrada exitosamente con ${burgersResult.insertedCount} hamburguesas y un administrador`,
-    };
+    console.log('Database seeding completed successfully');
+    return { success: true, message: 'Database seeded successfully' };
   } catch (error) {
-    console.error('Error al sembrar la base de datos:', error);
-    return {
-      success: false,
-      error: 'Error al sembrar la base de datos',
-    };
+    console.error('Error seeding database:', error);
+    return { success: false, error: 'Failed to seed database' };
   }
 } 

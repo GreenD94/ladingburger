@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Box, Container } from '@mui/material';
+import { TopBar } from '@/features/landing/components/TopBar';
 import { OrdersList } from '../components/OrdersList';
 import { PaymentInfoDialog } from '../components/PaymentInfoDialog';
 import { FloatingButtons } from '../components/FloatingButtons';
@@ -30,18 +31,22 @@ export const OrdersContainer = () => {
 
   if (!phoneNumber) {
     return (
-      <Container maxWidth="sm">
-        <Box
-          sx={{
-            minHeight: '80vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <PhoneInput onSubmit={handlePhoneSubmit} />
-        </Box>
-      </Container>
+      <Box>
+        <TopBar />
+        <Container maxWidth="sm">
+          <Box
+            sx={{
+              minHeight: '80vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pt: 8,
+            }}
+          >
+            <PhoneInput onSubmit={handlePhoneSubmit} />
+          </Box>
+        </Container>
+      </Box>
     );
   }
 
@@ -50,22 +55,25 @@ export const OrdersContainer = () => {
   }
 
   return (
-    <Container>
-      <Box py={4}>
-        <OrdersList 
-          orders={orders} 
-          isLoading={loading}
-        />
-        <FloatingButtons 
-          businessContact={businessContact} 
-          onPaymentClick={() => setShowPaymentInfo(true)} 
-        />
-        <PaymentInfoDialog 
-          open={showPaymentInfo} 
-          onClose={() => setShowPaymentInfo(false)} 
-          businessContact={businessContact} 
-        />
-      </Box>
-    </Container>
+    <Box>
+      <TopBar />
+      <Container>
+        <Box py={4} sx={{ pt: 8 }} mt={10}>
+          <OrdersList 
+            orders={orders} 
+            isLoading={loading}
+          />
+          <FloatingButtons 
+            businessContact={businessContact} 
+            onPaymentClick={() => setShowPaymentInfo(true)} 
+          />
+          <PaymentInfoDialog 
+            open={showPaymentInfo} 
+            onClose={() => setShowPaymentInfo(false)} 
+            businessContact={businessContact} 
+          />
+        </Box>
+      </Container>
+    </Box>
   );
 }; 

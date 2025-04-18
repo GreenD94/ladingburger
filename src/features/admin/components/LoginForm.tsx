@@ -1,43 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
 
-export const LoginForm: React.FC = () => {
-  const router = useRouter();
+interface LoginFormProps {
+  onLogin: (email: string, password: string) => Promise<void>;
+  error: string;
+  loading: boolean;
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, error, loading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      router.push('/admin');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
-    }
+    await onLogin(email, password);
   };
 
   return (
