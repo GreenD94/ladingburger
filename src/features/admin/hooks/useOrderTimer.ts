@@ -15,10 +15,14 @@ export function useOrderTimer(startTime: string): TimerInfo {
 
   useEffect(() => {
     const startDate = new Date(startTime);
+    const now = new Date();
+    
+    // If the start date is in the future, use current time instead
+    const effectiveStartDate = startDate > now ? now : startDate;
     
     const timer = setInterval(() => {
-      const now = new Date();
-      const diff = now.getTime() - startDate.getTime();
+      const currentTime = new Date();
+      const diff = currentTime.getTime() - effectiveStartDate.getTime();
       
       const seconds = Math.floor(diff / 1000);
       const minutes = Math.floor(seconds / 60);

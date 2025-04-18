@@ -5,11 +5,18 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useOrderTimer } from '@/features/admin/hooks/useOrderTimer';
 
 interface OrderTimerProps {
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export function OrderTimer({ createdAt }: OrderTimerProps) {
-  const { timeString, color } = useOrderTimer(createdAt.toISOString());
+  console.log('OrderTimer - createdAt:', createdAt);
+  console.log('OrderTimer - createdAt type:', typeof createdAt);
+  console.log('OrderTimer - createdAt value:', createdAt);
+  
+  const dateString = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
+  console.log('OrderTimer - dateString:', dateString);
+  
+  const { timeString, color } = useOrderTimer(dateString);
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>

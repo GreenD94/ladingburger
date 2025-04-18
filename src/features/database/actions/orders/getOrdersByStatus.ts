@@ -10,23 +10,17 @@ export interface GetOrdersByStatusResponse {
   error?: string;
 }
 
-function convertToPlainObject(doc: any): any {
-  if (doc === null || doc === undefined) return doc;
-  if (typeof doc !== 'object') return doc;
-  
-  if (doc instanceof ObjectId) {
-    return doc.toString();
-  }
-  
-  if (Array.isArray(doc)) {
-    return doc.map(item => convertToPlainObject(item));
-  }
-  
-  const plainObject: any = {};
-  for (const [key, value] of Object.entries(doc)) {
-    plainObject[key] = convertToPlainObject(value);
-  }
-  return plainObject;
+function convertToPlainObject(doc: any) {
+  return {
+    ...doc,
+    _id: doc._id.toString(),
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    items: doc.items.map((item: any) => ({
+      ...item,
+      burgerId: item.burgerId.toString()
+    }))
+  };
 }
 
 export async function getOrdersByStatus(status: OrderStatusType): Promise<GetOrdersByStatusResponse> {
