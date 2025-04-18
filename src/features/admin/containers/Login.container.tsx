@@ -20,7 +20,7 @@ export const LoginContainer: React.FC = () => {
       if (!result.success) {
         throw new Error(result.error || 'Login failed');
       }
-console.log({result});
+
       router.push('/admin');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
