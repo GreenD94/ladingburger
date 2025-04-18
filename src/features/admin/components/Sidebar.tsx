@@ -15,16 +15,13 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import {
-
   ChevronLeft as ChevronLeftIcon,
   ShoppingCart as OrdersIcon,
   Restaurant as MenuIcon,
   Business as BusinessIcon,
   Person as AdminIcon,
   Group as UsersIcon,
-  Logout as LogoutIcon,
 } from '@mui/icons-material';
-import { logout } from '@/features/database/actions/auth/logout';
 
 const drawerWidth = 240;
 
@@ -37,11 +34,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
-  };
 
   const menuItems = [
     { text: 'Orders', icon: <OrdersIcon />, path: '/admin/orders' },
@@ -81,17 +73,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
-      <Divider />
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
-            <ListItemIcon>
-              <LogoutIcon />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItemButton>
-        </ListItem>
       </List>
     </Drawer>
   );

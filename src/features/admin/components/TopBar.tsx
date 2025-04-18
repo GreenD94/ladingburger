@@ -1,14 +1,22 @@
 'use client';
 
-import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Box, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useRouter } from 'next/navigation';
+import { logout } from '@/features/database/actions/auth/logout';
 
 interface TopBarProps {
   onMenuClick: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
- 
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
 
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -26,6 +34,13 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
           Admin Dashboard
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
+        <Button
+          color="inherit"
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   );

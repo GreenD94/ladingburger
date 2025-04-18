@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Typography, Button, Container } from '@mui/material';
+import { Box, Typography, Container } from '@mui/material';
 import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin';
-import { logout } from '@/features/database/actions/auth/logout';
 
 interface Admin {
   id: string;
@@ -38,15 +37,6 @@ export default function AdminDashboard() {
     fetchAdmin();
   }, [router]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   if (!admin) {
     return null;
   }
@@ -54,21 +44,11 @@ export default function AdminDashboard() {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h4" component="h1">
-            Admin Dashboard
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Box>
-
-        <Typography variant="body1">
+        <Typography variant="h4" component="h1" gutterBottom>
           Welcome, {admin.email}
+        </Typography>
+        <Typography variant="body1">
+          Select a module from the sidebar to get started.
         </Typography>
       </Box>
     </Container>
