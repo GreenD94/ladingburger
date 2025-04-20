@@ -2,13 +2,16 @@
 
 import React from 'react';
 import { Box, Fab } from '@mui/material';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import PaymentIcon from '@mui/icons-material/Payment';
-import { BusinessContact } from '@/features/database/types';
+import { WhatsApp as WhatsAppIcon, Instagram as InstagramIcon, Payment as PaymentIcon } from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import { useOrders } from '../hooks/useOrders';
+import { useSearchParams } from 'next/navigation';
 
 interface FloatingButtonsProps {
-  businessContact: BusinessContact;
+  businessContact: {
+    whatsappLink: string;
+    instagramLink: string;
+  };
   onPaymentClick: () => void;
 }
 
@@ -16,6 +19,11 @@ export const FloatingButtons: React.FC<FloatingButtonsProps> = ({
   businessContact,
   onPaymentClick,
 }) => {
+  const searchParams = useSearchParams();
+  const phoneNumber = searchParams.get('phoneNumber');
+  const { orders } = useOrders(phoneNumber || '');
+  const hasPendingOrders = orders.some(order => order.status !== 5); // 5 is COMPLETED status
+
   return (
     <Box
       sx={{
@@ -58,20 +66,34 @@ export const FloatingButtons: React.FC<FloatingButtonsProps> = ({
       >
         <InstagramIcon />
       </Fab>
-      <Fab
-        color="primary"
-        aria-label="payment info"
-        onClick={onPaymentClick}
-        sx={{
-          bgcolor: '#FF6B00',
-          '&:hover': {
-            bgcolor: '#E55C00',
-          },
-          boxShadow: '0 4px 12px rgba(255,107,0,0.3)',
-        }}
-      >
-        <PaymentIcon />
-      </Fab>
+      {hasPendingOrders && (
+        <motion.div
+          animate={{
+            rotate: [0, -10, 10, -10, 10, 0],
+            scale: [1, 1.2, 1, 1.2, 1, 1],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <Fab
+            color="primary"
+            aria-label="payment info"
+            onClick={onPaymentClick}
+            sx={{
+              bgcolor: '#FF6B00',
+              '&:hover': {
+                bgcolor: '#E55C00',
+              },
+              boxShadow: '0 4px 12px rgba(255,107,0,0.3)',
+            }}
+          >
+            <PaymentIcon />
+          </Fab>
+        </motion.div>
+      )}
     </Box>
   );
 }; 

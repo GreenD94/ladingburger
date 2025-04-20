@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Card, CardContent, Typography, Button, Stack, Chip, Divider, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Stack, Chip, Divider, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import { Order, OrderStatus, OrderStatusType, PaymentStatus } from '@/features/database/types';
 import { OrderStatusLabels } from '@/features/database/types';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import NoteIcon from '@mui/icons-material/Note';
 import PaymentIcon from '@mui/icons-material/Payment';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { OrderTimer } from './OrderTimer';
 import PaymentModal from './PaymentModal';
 import { IssueModal } from './IssueModal';
@@ -89,14 +90,36 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
             </Typography>
             <OrderTimer createdAt={order.createdAt} />
           </Box>
-          <Chip
-            label={OrderStatusLabels[order.status]}
-            sx={{
-              backgroundColor: getStatusColor(order.status),
-              color: 'white',
-              fontWeight: 'bold'
-            }}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+           
+            <IconButton
+              color="success"
+              href={`https://wa.me/${order.customerPhone.replace(/\D/g, '')}`}
+              target="_blank"
+              sx={{
+                bgcolor: '#25D366',
+                color: 'white',
+                '&:hover': {
+                  bgcolor: '#128C7E',
+                  transform: 'scale(1.1)',
+                },
+                transition: 'all 0.2s ease-in-out',
+                boxShadow: '0 4px 12px rgba(37,211,102,0.3)',
+                '&:active': {
+                  transform: 'scale(0.95)',
+                },
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                marginLeft: 1,
+              }}
+            >
+              <WhatsAppIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+          </Box>
         </Box>
 
         {(order.status === OrderStatus.ISSUE || order.status === OrderStatus.COMPLETED) && (
