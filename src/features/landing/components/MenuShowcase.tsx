@@ -1,37 +1,31 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, CardMedia, Button, Chip, useTheme, useMediaQuery, Skeleton } from '@mui/material';
 import { motion } from 'framer-motion';
-import { getAvailableBurgers } from '@/features/database/actions/menu';
 import { Burger } from '@/features/database/types';
 import { useRouter } from 'next/navigation';
 
-export const MenuShowcase = () => {
+interface MenuShowcaseProps {
+  initialBurgers?: Burger[];
+}
+
+export const MenuShowcase: React.FC<MenuShowcaseProps> = ({ initialBurgers = [] }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [burgers, setBurgers] = useState<Burger[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [burgers, setBurgers] = useState<Burger[]>(initialBurgers);
+  const [loading, setLoading] = useState(initialBurgers.length === 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const fetchBurgers = async () => {
-      try {
-        const availableBurgers = await getAvailableBurgers();
-        if (availableBurgers) {
-          setBurgers(availableBurgers);
-        }
-      } catch (error) {
-        console.error('Error al cargar el menú:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBurgers();
-  }, []);
+    // Update burgers if initialBurgers changes
+    if (initialBurgers.length > 0) {
+      setBurgers(initialBurgers);
+      setLoading(false);
+    }
+  }, [initialBurgers]);
 
   useEffect(() => {
     if (!isMobile || !scrollContainerRef.current || burgers.length === 0) return;

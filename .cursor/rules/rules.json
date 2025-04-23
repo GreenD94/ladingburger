@@ -1,0 +1,156 @@
+{
+  "cursorSettings": {
+    "packageManager": {
+      "preferred": "npm",
+      "cleanup": {
+        "yarn": {
+          "filesToRemove": [
+            "yarn.lock",
+            ".yarn",
+            ".yarnrc.yml"
+          ],
+          "commands": [
+            {
+              "description": "Desinstalar Yarn globalmente",
+              "command": "npm uninstall -g yarn"
+            },
+            {
+              "description": "Limpiar caché de Yarn",
+              "command": "yarn cache clean"
+            },
+            {
+              "description": "Eliminar node_modules",
+              "command": "Remove-Item -Recurse -Force node_modules"
+            },
+            {
+              "description": "Reinstalar con npm",
+              "command": "npm install"
+            }
+          ],
+          "verificationSteps": [
+            "Verificar ausencia de archivos Yarn",
+            "Verificar package-lock.json",
+            "Verificar funcionamiento con npm run dev"
+          ]
+        }
+      }
+    },
+    "componentStructure": {
+      "containers": {
+        "required_imports": [
+          "'use client'",
+          "React imports",
+          "Material-UI components",
+          "Local components",
+          "Types and utilities"
+        ],
+        "layout_structure": {
+          "root": {
+            "component": "Box",
+            "required_props": {
+              "sx": {
+                "minHeight": "100vh",
+                "display": "flex",
+                "flexDirection": "column"
+              }
+            }
+          },
+          "header": {
+            "component": "TopBar",
+            "position": "first_child",
+            "required": true
+          },
+          "content": {
+            "component": "Box",
+            "required_props": {
+              "sx": {
+                "pt": 8,
+                "px": { "xs": 2, "sm": 3, "md": 4 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cursorAutomation": {
+      "fileTemplates": {
+        "container": {
+          "filename": "${name}.container.tsx",
+          "template": [
+            "'use client';",
+            "",
+            "import React from 'react';",
+            "import { Box } from '@mui/material';",
+            "import { TopBar } from '@/features/landing/components/TopBar';",
+            "",
+            "export const ${name}Container: React.FC = () => {",
+            "  return (",
+            "    <Box>",
+            "      <TopBar />",
+            "      <Box sx={{ pt: 8 }}>",
+            "        {/* Content goes here */}",
+            "      </Box>",
+            "    </Box>",
+            "  );",
+            "};"
+          ]
+        }
+      },
+      "snippets": {
+        "boxWrapper": {
+          "prefix": "box-wrapper",
+          "body": [
+            "<Box>",
+            "  <TopBar />",
+            "  <Box sx={{ pt: 8 }}>",
+            "    $0",
+            "  </Box>",
+            "</Box>"
+          ]
+        }
+      },
+      "formatOnSave": {
+        "enabled": true,
+        "rules": {
+          "imports": {
+            "order": [
+              "'use client'",
+              "react",
+              "@mui/*",
+              "local-components",
+              "local-utils"
+            ],
+            "newlineBetweenGroups": true
+          }
+        }
+      }
+    },
+    "validation": {
+      "preCommit": {
+        "checkPackageManager": {
+          "allowed": ["npm"],
+          "forbidden": ["yarn"]
+        },
+        "checkStructure": {
+          "containers": {
+            "mustInclude": [
+              "TopBar",
+              "Box wrapper",
+              "proper spacing"
+            ]
+          }
+        }
+      }
+    },
+    "uiLibraryRules": {
+      "pathPatterns": {
+        "menu": {
+          "pattern": "src/features/*/components/menu/**/*.{ts,tsx}",
+          "allowedLibraries": ["tailwindcss"],
+          "forbiddenLibraries": ["@mui/*"],
+          "errorMessage": "Menu components must use TailwindUI instead of MaterialUI"
+        }
+      }
+    }
+  }
+}
