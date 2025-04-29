@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Box, Container } from '@mui/material';
 import { TopBar } from '@/features/admin/components/TopBar';
 import { MenuManager } from '@/features/admin/components/menu/MenuManager';
 
@@ -10,13 +11,20 @@ export const MenuContainer: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <Box 
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: '#f9fafb', // Equivalente a bg-gray-50
+      }}
+    >
       <TopBar onMenuClick={handleMenuClick} />
-      <main className="flex-grow pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Box component="main" sx={{ flexGrow: 1, pt: 0 }}>
+        <Container maxWidth="lg" sx={{ pt: 1, pb: 4 }}>
           <MenuManager />
-        </div>
-      </main>
-    </div>
+        </Container>
+      </Box>
+    </Box>
   );
 }; 

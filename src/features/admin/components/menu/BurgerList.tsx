@@ -1,7 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Box, 
+  Grid, 
+  Card, 
+  CardMedia, 
+  CardContent, 
+  Typography, 
+  Chip, 
+  IconButton, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button, 
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Alert,
+  Stack,
+  Fab,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
+  Paper,
+  Divider,
+  InputAdornment
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import { Burger } from '@/features/database/types';
+import { INGREDIENT_COSTS, calculateTotalCost, formatIngredientCosts } from '@/features/admin/utils/ingredientCosts';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
 const COMMON_INGREDIENTS = [
@@ -36,13 +68,24 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   onDelete, 
   onUpdateIngredients 
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  
   const [editingIngredientsFor, setEditingIngredientsFor] = useState<string | null>(null);
   const [tempIngredients, setTempIngredients] = useState<string[]>([]);
   const [customIngredient, setCustomIngredient] = useState('');
+  const [customIngredientPrice, setCustomIngredientPrice] = useState<number>(0);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  // Calcular el costo total de los ingredientes temporales
+  const tempTotalCost = useMemo(() => {
+    return calculateTotalCost(tempIngredients);
+  }, [tempIngredients]);
 
   // Obtener la hamburguesa que se está editando actualmente (si hay alguna)
   const currentBurger = editingIngredientsFor 
@@ -52,11 +95,9 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   // Abrir el diálogo de edición de ingredientes
   const handleOpenIngredientsEditor = (burger: Burger) => {
     if (burger._id) {
-      console.log('Opening ingredients editor for burger:', burger);
       setEditingIngredientsFor(burger._id.toString());
       setTempIngredients([...burger.ingredients]);
     } else {
-      console.error('Cannot edit ingredients: burger has no ID');
       showSnackbar('Error: No se puede editar los ingredientes', 'error');
     }
   };
@@ -66,6 +107,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
     setEditingIngredientsFor(null);
     setTempIngredients([]);
     setCustomIngredient('');
+    setCustomIngredientPrice(0);
     setSaving(false);
   };
 
@@ -79,27 +121,20 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   // Guardar los cambios en los ingredientes
   const handleSaveIngredients = async () => {
     if (!editingIngredientsFor || !onUpdateIngredients) {
-      console.error('Cannot save ingredients: missing burger ID or update function');
       return;
     }
 
     try {
       setSaving(true);
-      console.log('Saving ingredients for burger:', editingIngredientsFor);
-      console.log('Ingredients to save:', tempIngredients);
-      
       const result = await onUpdateIngredients(editingIngredientsFor, tempIngredients);
-      console.log('Save result:', result);
       
       if (result.success) {
         showSnackbar('Ingredientes actualizados con éxito', 'success');
         handleCloseIngredientsEditor();
       } else {
-        console.error('Failed to update ingredients:', result.error);
         showSnackbar(`Error: ${result.error || 'No se pudieron actualizar los ingredientes'}`, 'error');
       }
     } catch (error) {
-      console.error('Error saving ingredients:', error);
       showSnackbar('Error al guardar los ingredientes', 'error');
     } finally {
       setSaving(false);
@@ -108,7 +143,6 @@ export const BurgerList: React.FC<BurgerListProps> = ({
 
   // Manejar la selección/deselección de ingredientes
   const handleIngredientToggle = (ingredient: string) => {
-    console.log('Toggling ingredient:', ingredient);
     if (tempIngredients.includes(ingredient)) {
       setTempIngredients(prev => prev.filter(ing => ing !== ingredient));
     } else {
@@ -120,176 +154,687 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   const handleAddCustomIngredient = () => {
     if (customIngredient.trim() === '') return;
     
-    console.log('Adding custom ingredient:', customIngredient);
     if (!tempIngredients.includes(customIngredient.trim())) {
       setTempIngredients(prev => [...prev, customIngredient.trim()]);
+      
+      const updatedCosts = {...INGREDIENT_COSTS};
+      updatedCosts[customIngredient.trim() as keyof typeof INGREDIENT_COSTS] = customIngredientPrice;
+      
       setCustomIngredient('');
+      setCustomIngredientPrice(0);
     }
   };
 
   // Eliminar un ingrediente
   const handleRemoveIngredient = (ingredient: string) => {
-    console.log('Removing ingredient:', ingredient);
     setTempIngredients(prev => prev.filter(ing => ing !== ingredient));
+  };
+
+  // Función para renderizar una tarjeta de hamburguesa según la imagen
+  const renderBurgerCard = (burger: Burger, index: number) => {
+    // Calcular el costo total de los ingredientes
+    const totalCost = calculateTotalCost(burger.ingredients);
+    
+    // Formatear los costos de ingredientes para mostrar
+    const ingredientCostsText = formatIngredientCosts(burger.ingredients);
+    
+    return (
+      <Grid item xs={12} sm={6} md={4} key={burger._id?.toString() || index}>
+        <Card sx={{ 
+          height: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          position: 'relative',
+          boxShadow: 2
+        }}>
+          <Box sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'white', borderRadius: '16px', px: 1, py: 0.5 }}>
+            <Typography variant="caption">hamburguesa</Typography>
+          </Box>
+          
+          <CardMedia
+            component="img"
+            height={isMobile ? "150" : "200"}
+            image={burger.image || 'https://via.placeholder.com/400x300?text=Hamburguesa'}
+            alt={burger.name}
+            sx={{ objectFit: 'cover' }}
+          />
+          
+          <CardContent sx={{ 
+            flexGrow: 1, 
+            pb: 1,
+            pt: 2,
+            px: 2
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              mb: 1
+            }}>
+              <Box sx={{ 
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                width: '100%',
+                mb: 0.5
+              }}>
+                <Typography 
+                  variant="h6" 
+                  component="h3" 
+                  sx={{ 
+                    lineHeight: 1.2,
+                    wordBreak: 'break-word',
+                    hyphens: 'auto',
+                    width: 'calc(100% - 80px)',
+                    fontSize: {
+                      xs: burger.name.length > 15 ? '1rem' : '1.1rem',
+                      sm: burger.name.length > 20 ? '1rem' : '1.15rem',
+                      md: burger.name.length > 25 ? '1rem' : '1.2rem'
+                    },
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {burger.name}
+                </Typography>
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  ml: 1, 
+                  gap: 1,
+                }}>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => onEdit(burger)}
+                    color="primary"
+                    sx={{ 
+                      border: '1px solid',
+                      borderColor: 'primary.main',
+                      padding: '4px',
+                      '&:hover': {
+                        bgcolor: 'primary.50'
+                      }
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  
+                  <IconButton 
+                    size="small" 
+                    onClick={() => setConfirmDelete(burger._id?.toString() || '')}
+                    color="error"
+                    sx={{ 
+                      border: '1px solid',
+                      borderColor: 'error.main',
+                      padding: '4px',
+                      '&:hover': {
+                        bgcolor: 'error.50'
+                      }
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            </Box>
+            
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                mb: 1, 
+                overflow: 'hidden', 
+                textOverflow: 'ellipsis', 
+                display: '-webkit-box', 
+                WebkitLineClamp: 2, 
+                WebkitBoxOrient: 'vertical',
+                height: '40px',
+                lineHeight: '1.3'
+              }}
+            >
+              {burger.description}
+            </Typography>
+            
+            <Typography 
+              variant="h6" 
+              color="primary" 
+              sx={{ 
+                mb: 1,
+                fontWeight: 'bold',
+                fontSize: '1.1rem'
+              }}
+            >
+              ${burger.price.toFixed(2)}
+            </Typography>
+            
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+              {burger.ingredients.slice(0, isMobile ? 3 : 5).map((ingredient, index) => (
+                <Chip 
+                  key={index} 
+                  label={ingredient} 
+                  size="small" 
+                  variant="outlined"
+                  color="primary"
+                  sx={{ margin: '2px' }}
+                />
+              ))}
+              {burger.ingredients.length > (isMobile ? 3 : 5) && (
+                <Chip 
+                  label={`+${burger.ingredients.length - (isMobile ? 3 : 5)}`} 
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  onClick={() => handleOpenIngredientsEditor(burger)}
+                  sx={{ cursor: 'pointer' }}
+                />
+              )}
+            </Box>
+          </CardContent>
+          
+          <Box sx={{ 
+            p: isMobile ? 1 : 1.5, 
+            borderTop: '1px solid', 
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Typography variant="caption" sx={{ display: 'block' }}>
+              Costo: {ingredientCostsText}{burger.ingredients.length > 3 ? '...' : ''}
+            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mt: 0.5
+            }}>
+              <Typography variant="subtitle2" fontWeight="bold">
+                Costo total: ${totalCost.toFixed(2)}
+              </Typography>
+              <Button 
+                size="small" 
+                variant="text" 
+                color="primary"
+                onClick={() => handleOpenIngredientsEditor(burger)}
+              >
+                Editar Ing.
+              </Button>
+            </Box>
+          </Box>
+        </Card>
+      </Grid>
+    );
   };
 
   return (
     <>
-      <div className="divide-y divide-gray-200">
-        {burgers.map((burger) => (
-          <div key={burger._id?.toString()} className="p-6">
-            <div className="flex justify-between items-start">
-              <div className="space-y-4 flex-1">
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="form-checkbox rounded border-gray-300 text-orange-brand focus:ring-orange-brand" />
-                  <h3 className="text-lg font-medium text-gray-dark">{burger.name}</h3>
-                </div>
-                
-                <p className="text-sm text-gray-text">{burger.description}</p>
-                
-                <p className="text-orange-brand font-medium">${burger.price.toFixed(2)}</p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {burger.ingredients.map((ingredient, index) => (
-                    <span 
-                      key={index} 
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-brand"
-                    >
-                      {ingredient}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="flex space-x-2 ml-4">
-                <button 
-                  onClick={() => onEdit(burger)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
-                <button 
-                  onClick={() => onDelete(burger._id!.toString())}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Grid container spacing={isMobile ? 2 : 3}>
+        {burgers.map((burger, index) => renderBurgerCard(burger, index))}
+      </Grid>
 
-      {/* Modal de edición de ingredientes */}
-      {editingIngredientsFor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-dark">Editar Ingredientes</h3>
-              <button 
-                onClick={handleCloseIngredientsEditor}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {tempIngredients.map(ingredient => (
-                  <span 
+      {/* Dialog para editar ingredientes */}
+      <Dialog 
+        open={editingIngredientsFor !== null} 
+        onClose={handleCloseIngredientsEditor}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            m: isMobile ? 1 : 3,
+            width: isMobile ? 'calc(100% - 16px)' : undefined
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          pb: 1
+        }}>
+          <Typography variant="h6">Editar Ingredientes</Typography>
+          <IconButton 
+            size="large" 
+            onClick={handleCloseIngredientsEditor}
+            sx={{ p: 1 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent dividers sx={{ px: isMobile ? 2 : 3, py: 3 }}>
+          {/* Chips de ingredientes seleccionados con precio */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: 1.5,
+              mb: 2 
+            }}>
+              {tempIngredients.length > 0 ? (
+                tempIngredients.map(ingredient => {
+                  const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+                  return (
+                    <Chip 
                     key={ingredient} 
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-brand"
-                  >
-                    {ingredient}
-                    <button 
-                      onClick={() => handleRemoveIngredient(ingredient)}
-                      className="ml-1 text-orange-brand hover:text-orange-hover"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
+                      label={`${ingredient} ($${cost.toFixed(1)})`}
+                      onDelete={() => handleRemoveIngredient(ingredient)}
+                      color="primary"
+                      variant="outlined"
+                      size="medium"
+                      deleteIcon={<CloseIcon />}
+                      sx={{ 
+                        borderRadius: '16px',
+                        height: 36,
+                        fontSize: '0.95rem',
+                        '& .MuiChip-deleteIcon': {
+                          fontSize: '1.2rem',
+                          color: 'inherit',
+                          '&:hover': {
+                            color: 'error.main'
+                          }
+                        }
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                  No hay ingredientes seleccionados
+                </Typography>
+              )}
+            </Box>
+            
+            {/* Panel de costo actual */}
+            <Paper 
+              variant="outlined" 
+              sx={{ 
+                p: 2, 
+                bgcolor: 'background.default', 
+                borderRadius: 2,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <Typography variant="subtitle1">Costo de ingredientes:</Typography>
+              <Typography 
+                variant="h6" 
+                color="primary.main" 
+                fontWeight="bold"
+              >
+                ${tempTotalCost.toFixed(2)}
+              </Typography>
+            </Paper>
+          </Box>
+          
+          <Divider sx={{ my: 2 }} />
+          
+          {/* Lista de ingredientes categorizada */}
+          <Typography variant="subtitle1" gutterBottom>
+            Seleccionar ingredientes:
+          </Typography>
+          
+          <Grid container spacing={1} sx={{ mb: 3 }}>
+            {/* Primera categoría: Proteínas y básicos */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
+                Básicos:
+              </Typography>
+            </Grid>
+            {['Carne', 'Pan', 'Huevo', 'Bacon'].map(ingredient => {
+              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              return (
+                <Grid item xs={6} key={ingredient}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox 
+                        checked={tempIngredients.includes(ingredient)} 
+                        onChange={() => handleIngredientToggle(ingredient)}
+                        color="primary"
+                        sx={{ padding: isMobile ? '12px 9px' : '9px' }}
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <Typography variant="body2">{ingredient}</Typography>
+                        <Typography variant="body2" color="primary.main" fontWeight="medium">${cost.toFixed(1)}</Typography>
+                      </Box>
+                    }
+                    sx={{ 
+                      width: '100%',
+                      margin: 0,
+                      padding: '4px 8px',
+                      borderRadius: 1,
+                      '&:hover': {
+                        bgcolor: 'action.hover'
+                      }
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+            
+            {/* Segunda categoría: Quesos */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 0.5 }}>
+                Quesos:
+              </Typography>
+            </Grid>
+            {['Queso Cheddar', 'Queso Crema'].map(ingredient => {
+              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              return (
+                <Grid item xs={6} key={ingredient}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox 
+                        checked={tempIngredients.includes(ingredient)} 
+                        onChange={() => handleIngredientToggle(ingredient)}
+                        color="primary"
+                        sx={{ padding: isMobile ? '12px 9px' : '9px' }}
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <Typography variant="body2">{ingredient}</Typography>
+                        <Typography variant="body2" color="primary.main" fontWeight="medium">${cost.toFixed(1)}</Typography>
+                      </Box>
+                    }
+                    sx={{ 
+                      width: '100%',
+                      margin: 0,
+                      padding: '4px 8px',
+                      borderRadius: 1,
+                      '&:hover': {
+                        bgcolor: 'action.hover'
+                      }
+                    }}
+                  />
+                </Grid>
+              );
+            })}
 
-              <div className="grid grid-cols-2 gap-2">
-                {COMMON_INGREDIENTS.map(ingredient => (
-                  <label key={ingredient} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
+            {/* Tercera categoría: Vegetales */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 0.5 }}>
+                Vegetales:
+              </Typography>
+            </Grid>
+            {['Tomate', 'Lechuga', 'Cebolla', 'Cebolla Caramelizada', 'Aguacate', 'Champiñones', 'Pepinillos', 'Maíz'].map(ingredient => {
+              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              return (
+                <Grid item xs={6} key={ingredient}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox 
+                        checked={tempIngredients.includes(ingredient)} 
+                        onChange={() => handleIngredientToggle(ingredient)}
+                        color="primary"
+                        sx={{ padding: isMobile ? '12px 9px' : '9px' }}
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <Typography variant="body2">{ingredient}</Typography>
+                        <Typography variant="body2" color="primary.main" fontWeight="medium">${cost.toFixed(1)}</Typography>
+                      </Box>
+                    }
+                    sx={{ 
+                      width: '100%',
+                      margin: 0,
+                      padding: '4px 8px',
+                      borderRadius: 1,
+                      '&:hover': {
+                        bgcolor: 'action.hover'
+                      }
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+
+            {/* Cuarta categoría: Salsas */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 0.5 }}>
+                Salsas:
+              </Typography>
+            </Grid>
+            {['BBQ', 'Salsa Especial'].map(ingredient => {
+              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              return (
+                <Grid item xs={6} key={ingredient}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox 
                       checked={tempIngredients.includes(ingredient)}
                       onChange={() => handleIngredientToggle(ingredient)}
-                      className="form-checkbox rounded border-gray-300 text-orange-brand focus:ring-orange-brand"
-                    />
-                    <span className="text-sm text-gray-text">{ingredient}</span>
-                  </label>
-                ))}
-              </div>
-
-              <div className="flex gap-2">
-                <input
-                  type="text"
+                        color="primary"
+                        sx={{ padding: isMobile ? '12px 9px' : '9px' }}
+                      />
+                    }
+                    label={
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                        <Typography variant="body2">{ingredient}</Typography>
+                        <Typography variant="body2" color="primary.main" fontWeight="medium">${cost.toFixed(1)}</Typography>
+                      </Box>
+                    }
+                    sx={{ 
+                      width: '100%',
+                      margin: 0,
+                      padding: '4px 8px',
+                      borderRadius: 1,
+                      '&:hover': {
+                        bgcolor: 'action.hover'
+                      }
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
+          
+          <Divider sx={{ my: 2 }} />
+          
+          {/* Agregar ingrediente personalizado con campo de precio */}
+          <Typography variant="subtitle1" gutterBottom>
+            Agregar ingrediente personalizado:
+          </Typography>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: 1,
+            alignItems: 'flex-start'
+          }}>
+            <TextField
                   value={customIngredient}
                   onChange={(e) => setCustomIngredient(e.target.value)}
-                  placeholder="Agregar ingrediente personalizado"
-                  className="form-input flex-1 rounded-md border-gray-300 shadow-sm focus:border-orange-brand focus:ring-orange-brand text-sm"
-                />
-                <button 
+              placeholder="Nombre del ingrediente"
+              variant="outlined"
+              fullWidth
+              size={isMobile ? "medium" : "small"}
+              sx={{ flex: 2 }}
+            />
+            
+            {/* Nuevo: Campo para precio del ingrediente personalizado */}
+            <TextField
+              type="number"
+              placeholder="Precio"
+              variant="outlined"
+              size={isMobile ? "medium" : "small"}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+              }}
+              sx={{ 
+                flex: 1,
+                minWidth: isMobile ? '100%' : '120px'
+              }}
+            />
+            
+            <Button 
+              variant="contained" 
+              color="primary" 
                   onClick={handleAddCustomIngredient}
-                  className="px-4 py-2 bg-orange-brand text-white rounded-md text-sm font-medium hover:bg-orange-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+              sx={{ 
+                height: isMobile ? '48px' : '40px',
+                minWidth: isMobile ? '100%' : '100px'
+              }}
                 >
                   Agregar
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-              <button
-                onClick={handleCloseIngredientsEditor}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-text hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+            </Button>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions 
+          sx={{ 
+            padding: isMobile ? '16px' : '16px 24px',
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            flexDirection: 'column',
+            alignItems: 'stretch'
+          }}
+        >
+          {/* Resumen visual del costo con barra de progreso */}
+          <Box sx={{ width: '100%', mb: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              mb: 1 
+            }}>
+              <Typography variant="subtitle1">Costo Total:</Typography>
+              <Typography 
+                variant="h5" 
+                color="primary.main" 
+                fontWeight="bold"
+              >
+                ${tempTotalCost.toFixed(2)}
+              </Typography>
+            </Box>
+            
+            {/* Barra de progreso visual */}
+            <Box 
+              sx={{ 
+                width: '100%', 
+                height: '8px', 
+                bgcolor: 'grey.200',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                mb: 2
+              }}
+            >
+              <Box 
+                sx={{ 
+                  width: `${Math.min(tempTotalCost / 15 * 100, 100)}%`, 
+                  height: '100%', 
+                  bgcolor: 'primary.main',
+                  transition: 'width 0.5s ease-in-out'
+                }}
+              />
+            </Box>
+          </Box>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            gap: 2,
+            width: '100%',
+            flexDirection: isMobile ? 'column' : 'row'
+          }}>
+            <Button 
+              onClick={handleCloseIngredientsEditor} 
+              color="inherit"
+              size="large"
+              variant="outlined"
+              fullWidth={isMobile}
+              sx={{ py: isMobile ? 1.5 : 1 }}
               >
                 Cancelar
-              </button>
-              <button
+            </Button>
+            <Button 
                 onClick={handleSaveIngredients}
+              color="primary" 
+              variant="contained" 
                 disabled={saving}
-                className="px-4 py-2 bg-orange-brand text-white rounded-md text-sm font-medium hover:bg-orange-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+              size="large"
+              fullWidth={isMobile}
+              sx={{ py: isMobile ? 1.5 : 1 }}
               >
                 {saving ? 'Guardando...' : 'Guardar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
 
-      {/* Snackbar */}
-      {snackbarOpen && (
-        <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg ${
-          snackbarSeverity === 'success' ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'
-        } border`}>
-          <div className="flex items-center gap-2">
-            <span className={snackbarSeverity === 'success' ? 'text-green-700' : 'text-red-700'}>
+      {/* Diálogo de confirmación para eliminar */}
+      <Dialog
+        open={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ bgcolor: 'error.light', color: 'error.contrastText' }}>
+          Confirmar eliminación
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <DeleteIcon color="error" fontSize="large" sx={{ mr: 2 }} />
+            <Typography variant="body1">
+              ¿Estás seguro de que deseas eliminar esta hamburguesa?
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary" fontWeight="medium">
+            Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ 
+          padding: isMobile ? '16px' : '8px 16px',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}>
+          <Button 
+            onClick={() => setConfirmDelete(null)} 
+            color="inherit"
+            variant="outlined"
+            size="large"
+            sx={{ minWidth: '120px' }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={() => {
+              if (confirmDelete) {
+                onDelete(confirmDelete);
+                setConfirmDelete(null);
+              }
+            }} 
+            color="error" 
+            variant="contained"
+            size="large"
+            sx={{ minWidth: '120px' }}
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar para notificaciones */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ 
+          vertical: isMobile ? 'bottom' : 'bottom', 
+          horizontal: isMobile ? 'center' : 'right' 
+        }}
+      >
+        <Alert 
+          onClose={() => setSnackbarOpen(false)} 
+          severity={snackbarSeverity} 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
               {snackbarMessage}
-            </span>
-            <button 
-              onClick={() => setSnackbarOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+        </Alert>
+      </Snackbar>
     </>
   );
 }; 
