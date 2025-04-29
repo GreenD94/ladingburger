@@ -2,20 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  Stack, 
-  Typography, 
-  FormControlLabel, 
-  Checkbox,
-  FormGroup,
-  FormLabel,
-  Grid,
-  Chip,
-  Paper
-} from '@mui/material';
 import { Burger } from '@/features/database/types';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
@@ -139,282 +125,180 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ maxWidth: 600, margin: '0 auto' }}>
-      <Typography variant="h5" gutterBottom>
-        {burger ? 'Editar Hamburguesa' : 'Nueva Hamburguesa'}
-      </Typography>
-
-      <Stack spacing={3}>
-        <Controller
-          name="name"
-          control={control}
-          rules={{ required: "El nombre es obligatorio" }}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="name">Nombre*</label>
-              <input
-                id="name"
-                type="text"
-                {...field}
-                required
-                style={{ 
-                  width: '100%', 
-                  padding: '10px',
-                  border: errors.name ? '1px solid red' : '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-              {errors.name && (
-                <p style={{ color: 'red', margin: '4px 0' }}>{errors.name.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          name="description"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="description">Descripción</label>
-              <textarea
-                id="description"
-                {...field}
-                rows={3}
-                style={{ 
-                  width: '100%', 
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <Controller
-          name="price"
-          control={control}
-          rules={{ 
-            required: "El precio es obligatorio", 
-            min: { value: 0, message: "El precio debe ser mayor a 0" }
-          }}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="price">Precio*</label>
-              <input
-                id="price"
-                type="number"
-                step="0.01"
-                value={field.value}
-                onChange={handlePriceChange}
-                required
-                style={{ 
-                  width: '100%', 
-                  padding: '10px',
-                  border: errors.price ? '1px solid red' : '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-              {errors.price && (
-                <p style={{ color: 'red', margin: '4px 0' }}>{errors.price.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        {/* Sección de ingredientes seleccionados */}
-        <div>
-          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Ingredientes seleccionados:</p>
-          <div 
-            style={{ 
-              padding: '16px', 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: '8px',
-              minHeight: '50px',
-              marginBottom: '16px',
-              border: '1px solid #ccc',
-              borderRadius: '4px'
-            }}
-          >
-            {currentIngredients.length > 0 ? (
-              currentIngredients.map(ingredient => (
-                <div
-                  key={ingredient}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '4px 8px',
-                    borderRadius: '16px',
-                    border: '1px solid #FF6B00',
-                    color: '#FF6B00',
-                    background: 'white'
-                  }}
-                >
-                  {ingredient}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveIngredient(ingredient)}
-                    style={{
-                      marginLeft: '4px',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: '#FF6B00',
-                      padding: '2px'
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p style={{ color: '#666' }}>
-                No hay ingredientes seleccionados
-              </p>
-            )}
+    <div className="bg-white rounded-lg p-6 mx-auto max-w-3xl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          {burger ? 'Editar Hamburguesa' : 'Agregar Nueva Hamburguesa'}
+        </h2>
+        <button
+          onClick={onCancel}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={nameValue}
+              onChange={(e) => setValue('name', e.target.value)}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+            />
           </div>
-        </div>
-
-        {/* Selección de ingredientes comunes */}
-        <div>
-          <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Selecciona los ingredientes:</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            {COMMON_INGREDIENTS.map(ingredient => (
-              <div key={ingredient} style={{ display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="checkbox"
-                  id={`ingredient-${ingredient}`}
-                  checked={currentIngredients.includes(ingredient)}
-                  onChange={() => handleIngredientToggle(ingredient)}
-                  style={{ marginRight: '8px' }}
-                />
-                <label htmlFor={`ingredient-${ingredient}`}>{ingredient}</label>
+          
+          <div>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+              Precio
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm">$</span>
               </div>
-            ))}
+              <input
+                type="number"
+                id="price"
+                name="price"
+                min="0"
+                step="0.01"
+                value={priceValue}
+                onChange={(e) => setValue('price', parseFloat(e.target.value))}
+                required
+                className="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+              />
+            </div>
           </div>
         </div>
-
-        {/* Campo para añadir ingredientes personalizados */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input
-            type="text"
-            placeholder="Ingrediente personalizado"
-            value={customIngredient}
-            onChange={(e) => setCustomIngredient(e.target.value)}
-            style={{ 
-              flexGrow: 1,
-              padding: '10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px'
-            }}
+        
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            Descripción
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={3}
+            value={descriptionValue}
+            onChange={(e) => setValue('description', e.target.value)}
+            required
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
           />
-          <button 
-            type="button"
-            onClick={handleAddCustomIngredient}
-            style={{ 
-              background: '#FF6B00', 
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '0 16px',
-              cursor: 'pointer',
-              minWidth: '120px'
-            }}
-          >
-            Añadir
-          </button>
         </div>
-
-        <Controller
-          name="image"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="image">URL de la imagen</label>
+        
+        <div>
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+            URL de la imagen
+          </label>
+          <input
+            type="url"
+            id="image"
+            name="image"
+            value={imageValue}
+            onChange={(e) => setValue('image', e.target.value)}
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+          />
+        </div>
+        
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label htmlFor="ingredients" className="block text-sm font-medium text-gray-700">
+              Ingredientes
+            </label>
+            <span className="text-xs text-gray-500">Selecciona o agrega ingredientes</span>
+          </div>
+          
+          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            {/* Ingredientes seleccionados */}
+            <div className="mb-4">
+              <div className="flex flex-wrap gap-2">
+                {currentIngredients.length > 0 ? (
+                  currentIngredients.map((ingredient) => (
+                    <span
+                      key={ingredient}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700"
+                    >
+                      {ingredient}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveIngredient(ingredient)}
+                        className="ml-1 text-orange-700 hover:text-orange-900"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-gray-500 text-sm">No hay ingredientes seleccionados</span>
+                )}
+              </div>
+            </div>
+            
+            {/* Ingredientes comunes */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2 text-gray-700">Ingredientes comunes:</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {COMMON_INGREDIENTS.map((ingredient) => (
+                  <label key={ingredient} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={currentIngredients.includes(ingredient)}
+                      onChange={() => handleIngredientToggle(ingredient)}
+                      className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{ingredient}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            {/* Campo para agregar ingredientes personalizados */}
+            <div className="flex gap-2">
               <input
-                id="image"
                 type="text"
-                {...field}
-                style={{ 
-                  width: '100%', 
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
+                value={customIngredient}
+                onChange={(e) => setCustomIngredient(e.target.value)}
+                placeholder="Ingrediente personalizado"
+                className="block flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
               />
+              <button
+                type="button"
+                onClick={handleAddCustomIngredient}
+                className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              >
+                Añadir
+              </button>
             </div>
-          )}
-        />
-
-        <Controller
-          name="category"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="category">Categoría</label>
-              <input
-                id="category"
-                type="text"
-                {...field}
-                style={{ 
-                  width: '100%', 
-                  padding: '10px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <Controller
-          name="isAvailable"
-          control={control}
-          render={({ field }) => (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <input
-                id="isAvailable"
-                type="checkbox"
-                checked={field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-                style={{ marginRight: '8px' }}
-              />
-              <label htmlFor="isAvailable">Disponible</label>
-            </div>
-          )}
-        />
-
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px' }}>
+          </div>
+        </div>
+        
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
           <button
             type="button"
             onClick={onCancel}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              background: 'white',
-              cursor: 'pointer'
-            }}
+            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
           >
             Cancelar
           </button>
-          <button 
-            type="submit" 
-            style={{ 
-              padding: '8px 16px',
-              borderRadius: '4px',
-              border: 'none',
-              background: '#FF6B00', 
-              color: 'white',
-              cursor: 'pointer'
-            }}
+          <button
+            type="submit"
+            className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
           >
-            Guardar
+            {burger ? 'Actualizar' : 'Crear'}
           </button>
         </div>
-      </Stack>
-    </form>
+      </form>
+    </div>
   );
 }; 

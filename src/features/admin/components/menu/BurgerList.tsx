@@ -1,31 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
-  IconButton, 
-  Stack, 
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Chip,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  TextField,
-  Paper,
-  Snackbar,
-  Alert
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { Burger } from '@/features/database/types';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
@@ -160,217 +135,161 @@ export const BurgerList: React.FC<BurgerListProps> = ({
 
   return (
     <>
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 3 }}>
+      <div className="divide-y divide-gray-200">
         {burgers.map((burger) => (
-          <Card key={burger._id?.toString()} sx={{ position: 'relative' }}>
-            <CardContent>
-              <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
-                <IconButton 
-                  onClick={() => onEdit(burger)}
-                  title="Editar hamburguesa"
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton 
-                  onClick={() => burger._id && onDelete(burger._id.toString())}
-                  title="Eliminar hamburguesa"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-              
-              <Typography variant="h6" gutterBottom>
-                {burger.name}
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary" paragraph>
-                {burger.description}
-              </Typography>
-              
-              <Typography variant="h6" color="primary">
-                ${burger.price.toFixed(2)}
-              </Typography>
-              
-              <Box sx={{ mt: 2, position: 'relative' }}>
-                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, pr: 5 }}>
-                  {burger.ingredients.map((ingredient) => (
-                    <Typography
-                      key={ingredient}
-                      variant="caption"
-                      sx={{
-                        bgcolor: '#FFF8F0',
-                        color: '#FF6B00',
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: 1
-                      }}
+          <div key={burger._id?.toString()} className="p-6">
+            <div className="flex justify-between items-start">
+              <div className="space-y-4 flex-1">
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="form-checkbox rounded border-gray-300 text-orange-brand focus:ring-orange-brand" />
+                  <h3 className="text-lg font-medium text-gray-dark">{burger.name}</h3>
+                </div>
+                
+                <p className="text-sm text-gray-text">{burger.description}</p>
+                
+                <p className="text-orange-brand font-medium">${burger.price.toFixed(2)}</p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {burger.ingredients.map((ingredient, index) => (
+                    <span 
+                      key={index} 
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-brand"
                     >
                       {ingredient}
-                    </Typography>
+                    </span>
                   ))}
-                </Stack>
-                <IconButton 
-                  onClick={() => handleOpenIngredientsEditor(burger)}
-                  title="Editar ingredientes"
-                  sx={{ 
-                    color: '#FF6B00',
-                    position: 'absolute',
-                    right: -8,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    backgroundColor: 'rgba(255, 248, 240, 0.7)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 248, 240, 1)'
-                    },
-                    width: 36,
-                    height: 36,
-                    border: '1px solid #FF6B00',
-                  }}
+                </div>
+              </div>
+              
+              <div className="flex space-x-2 ml-4">
+                <button 
+                  onClick={() => onEdit(burger)}
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  <RestaurantIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </CardContent>
-          </Card>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+                <button 
+                  onClick={() => onDelete(burger._id!.toString())}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
-      </Box>
+      </div>
 
-      {/* Diálogo para editar ingredientes */}
-      <Dialog 
-        open={!!editingIngredientsFor} 
-        onClose={handleCloseIngredientsEditor}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>
-          Editar Ingredientes: {currentBurger?.name}
-        </DialogTitle>
-        <DialogContent>
-          {/* Sección de ingredientes seleccionados */}
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Ingredientes seleccionados:
-            </Typography>
-            <Paper 
-              variant="outlined" 
-              sx={{ 
-                p: 2, 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: 1,
-                minHeight: '50px',
-              }}
-            >
-              {tempIngredients.length > 0 ? (
-                tempIngredients.map(ingredient => (
-                  <Chip
-                    key={ingredient}
-                    label={ingredient}
-                    onDelete={() => handleRemoveIngredient(ingredient)}
-                    color="primary"
-                    variant="outlined"
-                    sx={{ 
-                      borderColor: '#FF6B00', 
-                      color: '#FF6B00',
-                      '& .MuiChip-deleteIcon': {
-                        color: '#FF6B00',
-                        '&:hover': {
-                          color: '#E55C00'
-                        }
-                      }
-                    }}
-                  />
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No hay ingredientes seleccionados
-                </Typography>
-              )}
-            </Paper>
-          </Box>
+      {/* Modal de edición de ingredientes */}
+      {editingIngredientsFor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-dark">Editar Ingredientes</h3>
+              <button 
+                onClick={handleCloseIngredientsEditor}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-          {/* Selección de ingredientes comunes */}
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Ingredientes comunes:
-            </Typography>
-            <FormGroup>
-              <Grid container spacing={1}>
-                {COMMON_INGREDIENTS.map(ingredient => (
-                  <Grid item xs={6} sm={4} key={ingredient}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={tempIngredients.includes(ingredient)}
-                          onChange={() => handleIngredientToggle(ingredient)}
-                          sx={{
-                            color: '#FF6B00',
-                            '&.Mui-checked': {
-                              color: '#FF6B00',
-                            },
-                          }}
-                        />
-                      }
-                      label={ingredient}
-                    />
-                  </Grid>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {tempIngredients.map(ingredient => (
+                  <span 
+                    key={ingredient} 
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-brand"
+                  >
+                    {ingredient}
+                    <button 
+                      onClick={() => handleRemoveIngredient(ingredient)}
+                      className="ml-1 text-orange-brand hover:text-orange-hover"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
                 ))}
-              </Grid>
-            </FormGroup>
-          </Box>
+              </div>
 
-          {/* Campo para añadir ingredientes personalizados */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField
-              label="Ingrediente personalizado"
-              value={customIngredient}
-              onChange={(e) => setCustomIngredient(e.target.value)}
-              fullWidth
-              size="small"
-            />
-            <Button 
-              variant="contained" 
-              onClick={handleAddCustomIngredient}
-              sx={{ 
-                bgcolor: '#FF6B00', 
-                '&:hover': { bgcolor: '#E55C00' },
-                minWidth: '120px'
-              }}
+              <div className="grid grid-cols-2 gap-2">
+                {COMMON_INGREDIENTS.map(ingredient => (
+                  <label key={ingredient} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={tempIngredients.includes(ingredient)}
+                      onChange={() => handleIngredientToggle(ingredient)}
+                      className="form-checkbox rounded border-gray-300 text-orange-brand focus:ring-orange-brand"
+                    />
+                    <span className="text-sm text-gray-text">{ingredient}</span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customIngredient}
+                  onChange={(e) => setCustomIngredient(e.target.value)}
+                  placeholder="Agregar ingrediente personalizado"
+                  className="form-input flex-1 rounded-md border-gray-300 shadow-sm focus:border-orange-brand focus:ring-orange-brand text-sm"
+                />
+                <button 
+                  onClick={handleAddCustomIngredient}
+                  className="px-4 py-2 bg-orange-brand text-white rounded-md text-sm font-medium hover:bg-orange-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <button
+                onClick={handleCloseIngredientsEditor}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-text hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveIngredients}
+                disabled={saving}
+                className="px-4 py-2 bg-orange-brand text-white rounded-md text-sm font-medium hover:bg-orange-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
+              >
+                {saving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Snackbar */}
+      {snackbarOpen && (
+        <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg ${
+          snackbarSeverity === 'success' ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'
+        } border`}>
+          <div className="flex items-center gap-2">
+            <span className={snackbarSeverity === 'success' ? 'text-green-700' : 'text-red-700'}>
+              {snackbarMessage}
+            </span>
+            <button 
+              onClick={() => setSnackbarOpen(false)}
+              className="text-gray-400 hover:text-gray-600"
             >
-              Añadir
-            </Button>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseIngredientsEditor}>
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleSaveIngredients}
-            variant="contained"
-            disabled={saving}
-            sx={{ bgcolor: '#FF6B00', '&:hover': { bgcolor: '#E55C00' } }}
-          >
-            {saving ? 'Guardando...' : 'Guardar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      
-      {/* Notificación de estado */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }; 

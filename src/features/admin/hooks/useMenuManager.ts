@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Burger } from '@/features/database/types';
 import { createBurger, updateBurger, deleteBurger, getAvailableBurgers } from '@/features/database/actions/menu';
 
+export type EditingBurger = Omit<Burger, '_id'> & { _id?: string };
+
 export function useMenuManager() {
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,11 +18,12 @@ export function useMenuManager() {
   const loadBurgers = useCallback(async () => {
     setLoading(true);
     setError(null);
+    
     try {
-      const burgerData = await getAvailableBurgers() as Burger[];
-      setBurgers(burgerData);
-    } catch (error) {
-      console.error('Error loading burgers:', error);
+      const loadedBurgers = await getAvailableBurgers();
+      setBurgers(loadedBurgers || []);
+    } catch (err) {
+      console.error('Error loading burgers:', err);
       setError('Failed to load burgers');
       setBurgers([]);
     } finally {

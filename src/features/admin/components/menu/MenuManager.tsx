@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
 import { BurgerList } from './BurgerList';
 import { BurgerForm } from './BurgerForm';
-import { useMenuManager } from '../../hooks/useMenuManager';
+import { useMenuManager } from '@/features/admin/hooks/useMenuManager';
 
 export const MenuManager: React.FC = () => {
   const {
@@ -20,17 +19,16 @@ export const MenuManager: React.FC = () => {
   } = useMenuManager();
 
   return (
-    <Box sx={{ maxWidth: '1200px', mx: 'auto', p: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
-        <Typography variant="h4">Gestión del Menú</Typography>
-        <Button 
-          variant="contained" 
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold text-gray-dark">Gestión del Menú</h1>
+        <button 
           onClick={handleAddNew}
-          sx={{ bgcolor: '#FF6B00', '&:hover': { bgcolor: '#E55C00' } }}
+          className="inline-flex items-center px-4 py-2 bg-orange-brand text-white text-sm font-medium rounded-md hover:bg-orange-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-brand"
         >
           Agregar Nueva Hamburguesa
-        </Button>
-      </Box>
+        </button>
+      </div>
 
       {isEditing ? (
         <BurgerForm 
@@ -39,13 +37,15 @@ export const MenuManager: React.FC = () => {
           onCancel={handleCancel}
         />
       ) : (
-        <BurgerList 
-          burgers={burgers}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onUpdateIngredients={handleUpdateIngredients}
-        />
+        <div className="bg-white rounded-lg shadow">
+          <BurgerList 
+            burgers={burgers}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onUpdateIngredients={handleUpdateIngredients}
+          />
+        </div>
       )}
-    </Box>
+    </div>
   );
-}; 
+};
