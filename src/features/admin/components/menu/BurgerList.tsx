@@ -34,6 +34,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { Burger } from '@/features/database/types/burger';
 import { INGREDIENT_COSTS, calculateTotalCost, formatIngredientCosts } from '@/features/admin/utils/ingredientCosts';
+import { useIngredients } from '@/features/admin/hooks/useIngredients';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
 const COMMON_INGREDIENTS = [
@@ -87,6 +88,8 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   const [localBurgers, setLocalBurgers] = useState<Burger[]>(burgers);
   // Estado para mantener los costos personalizados
   const [customIngredientCosts, setCustomIngredientCosts] = useState<Record<string, number>>({});
+  const { ingredients: dbIngredients, loading: loadingIngredients } = useIngredients();
+  const getDbCost = (ingredient: string) => dbIngredients.find(i => i.name === ingredient)?.cost ?? 0;
 
   // Calcular el costo total de los ingredientes temporales utilizando costos personalizados
   const tempTotalCost = useMemo(() => {
@@ -94,10 +97,10 @@ export const BurgerList: React.FC<BurgerListProps> = ({
       // Primero buscar en costos personalizados, luego en INGREDIENT_COSTS
       const cost = customIngredientCosts[ingredient] !== undefined 
         ? customIngredientCosts[ingredient]
-        : (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+        : getDbCost(ingredient);
       return total + cost;
     }, 0);
-  }, [tempIngredients, customIngredientCosts]);
+  }, [tempIngredients, customIngredientCosts, getDbCost]);
 
   // Obtener la hamburguesa que se está editando actualmente (si hay alguna)
   const currentBurger = editingIngredientsFor 
@@ -116,7 +119,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
     } 
     // Finalmente usar los costos predefinidos
     else {
-      return INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+      return getDbCost(ingredient);
     }
   };
 
@@ -319,7 +322,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
       } 
       // Finalmente usar los costos predefinidos
       else {
-        return total + (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+        return total + getDbCost(ingredient);
       }
     }, 0);
     
@@ -342,7 +345,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
         } 
         // Finalmente usar los costos predefinidos
         else {
-          const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+          const cost = getDbCost(ingredient);
           return `${ingredient}:$${cost.toFixed(1)}`;
         }
       })
@@ -712,7 +715,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
               </Typography>
             </Grid>
             {['Carne', 'Pan', 'Huevo', 'Bacon'].map(ingredient => {
-              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              const cost = getDbCost(ingredient);
               return (
                 <Grid item xs={6} key={ingredient}>
                   <FormControlLabel
@@ -751,7 +754,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
               </Typography>
             </Grid>
             {['Queso Cheddar', 'Queso Crema'].map(ingredient => {
-              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              const cost = getDbCost(ingredient);
               return (
                 <Grid item xs={6} key={ingredient}>
                   <FormControlLabel
@@ -790,7 +793,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
               </Typography>
             </Grid>
             {['Tomate', 'Lechuga', 'Cebolla', 'Cebolla Caramelizada', 'Aguacate', 'Champiñones', 'Pepinillos', 'Maíz'].map(ingredient => {
-              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              const cost = getDbCost(ingredient);
               return (
                 <Grid item xs={6} key={ingredient}>
                   <FormControlLabel
@@ -829,7 +832,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
               </Typography>
             </Grid>
             {['BBQ', 'Salsa Especial'].map(ingredient => {
-              const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+              const cost = getDbCost(ingredient);
               return (
                 <Grid item xs={6} key={ingredient}>
                   <FormControlLabel

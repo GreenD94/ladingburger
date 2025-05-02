@@ -17,11 +17,16 @@ import {
   useMediaQuery,
   useTheme,
   Snackbar,
-  Alert
+  Alert,
+  IconButton
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { Burger, BURGER_IMAGES } from '@/features/database/types/burger';
 import { INGREDIENT_COSTS, calculateTotalCost, calculateTotalCostWithOthers } from '@/features/admin/utils/ingredientCosts';
+import { useIngredients } from '@/features/admin/hooks/useIngredients';
+import { IngredientsAdmin } from '@/features/admin/components/ingredients/IngredientsAdmin';
+import Dialog from '@mui/material/Dialog';
+import EditIcon from '@mui/icons-material/Edit';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
 const COMMON_INGREDIENTS = [
@@ -110,6 +115,9 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
     }
   }, [burger]);
 
+  const { ingredients: dbIngredients, loading: loadingIngredients } = useIngredients();
+  const getDbCost = (ingredient: string) => dbIngredients.find(i => i.name === ingredient)?.cost ?? 0;
+
   // Calcular el costo de ingredientes
   const ingredientsCost = currentIngredients.reduce((total, ingredient) => {
     // Primero buscar en los costos personalizados
@@ -118,7 +126,7 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
     } 
     // Luego usar los costos predefinidos
     else {
-      return total + (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+      return total + getDbCost(ingredient);
     }
   }, 0);
 
@@ -229,6 +237,8 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
       totalCost
     });
   }, [currentIngredients, otherCostsValue]);
+
+  const [openIngredientsAdmin, setOpenIngredientsAdmin] = useState(false);
 
   return (
     <>
@@ -378,6 +388,9 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
             <Grid item xs={12}>
               <Typography variant="subtitle1" gutterBottom sx={{ mt: 1 }}>
                 Ingredientes
+                <IconButton size="small" onClick={() => setOpenIngredientsAdmin(true)} sx={{ ml: 1 }} title="Editar ingredientes">
+                  <EditIcon fontSize="small" />
+                </IconButton>
               </Typography>
               
               <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f5f5f5' }}>
@@ -388,7 +401,7 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
                         // Obtener el precio del ingrediente
                         const cost = customIngredientCosts[ingredient] !== undefined
                           ? customIngredientCosts[ingredient]
-                          : (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+                          : getDbCost(ingredient);
                           
                         return (
                           <Chip
@@ -417,7 +430,7 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
                     </Typography>
                     <Grid container spacing={1}>
                       {COMMON_INGREDIENTS.map((ingredient) => {
-                        const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+                        const cost = getDbCost(ingredient);
                         return (
                           <Grid item xs={6} sm={4} key={ingredient}>
                             <FormControlLabel
@@ -582,6 +595,10 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({ burger, onSave, onCancel
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      <Dialog open={openIngredientsAdmin} onClose={() => setOpenIngredientsAdmin(false)} maxWidth="sm" fullWidth>
+        <IngredientsAdmin />
+      </Dialog>
     </>
   );
 }; 

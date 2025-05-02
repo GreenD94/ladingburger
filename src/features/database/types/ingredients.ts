@@ -41,3 +41,12 @@ export const calculateProfit = (price: number, cost: number): number => {
   if (cost <= 0 || price <= 0) return 0;
   return Math.round(((price - cost) / price) * 100);
 };
+
+export interface Ingredient {
+  _id?: string; // MongoDB ObjectId como string
+  name: string;
+  cost: number;
+  unit?: string;
+  category?: string;
+  // Puedes agregar más campos si lo necesitas, como unidad, categoría, etc.
+}

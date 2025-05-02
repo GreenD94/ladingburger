@@ -12,7 +12,7 @@ export interface Burger {
   name: string;
   description: string;
   price: number;
-  ingredients: string[];
+  ingredients: string[]; // IDs de ingredientes
   image: BurgerImage;
   category: string;
   isAvailable: boolean;
