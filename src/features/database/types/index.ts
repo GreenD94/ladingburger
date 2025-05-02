@@ -92,6 +92,7 @@ export interface Burger {
   image: string;
   category: string;
   isAvailable: boolean;
+  otherCosts?: number;
 }
 
 export interface BusinessContact {

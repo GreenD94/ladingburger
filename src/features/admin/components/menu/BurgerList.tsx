@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Box, 
   Grid, 
@@ -32,7 +32,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
-import { Burger } from '@/features/database/types';
+import { Burger } from '@/features/database/types/burger';
 import { INGREDIENT_COSTS, calculateTotalCost, formatIngredientCosts } from '@/features/admin/utils/ingredientCosts';
 
 // Lista predefinida de ingredientes comunes para hamburguesas
@@ -59,14 +59,16 @@ interface BurgerListProps {
   burgers: Burger[];
   onEdit: (burger: Burger) => void;
   onDelete: (burgerId: string) => void;
-  onUpdateIngredients?: (burgerId: string, ingredients: string[]) => Promise<{ success: boolean; error?: string }>;
+  onUpdateIngredients?: (burgerId: string, ingredients: string[], ingredientCosts?: Record<string, number>) => Promise<{ success: boolean; error?: string }>;
+  onUpdatePrice?: (burgerId: string, price: number) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const BurgerList: React.FC<BurgerListProps> = ({ 
   burgers, 
   onEdit, 
   onDelete, 
-  onUpdateIngredients 
+  onUpdateIngredients,
+  onUpdatePrice
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -76,27 +78,67 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   const [tempIngredients, setTempIngredients] = useState<string[]>([]);
   const [customIngredient, setCustomIngredient] = useState('');
   const [customIngredientPrice, setCustomIngredientPrice] = useState<number>(0);
+  const [tempPrice, setTempPrice] = useState<number>(0);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [localBurgers, setLocalBurgers] = useState<Burger[]>(burgers);
+  // Estado para mantener los costos personalizados
+  const [customIngredientCosts, setCustomIngredientCosts] = useState<Record<string, number>>({});
 
-  // Calcular el costo total de los ingredientes temporales
+  // Calcular el costo total de los ingredientes temporales utilizando costos personalizados
   const tempTotalCost = useMemo(() => {
-    return calculateTotalCost(tempIngredients);
-  }, [tempIngredients]);
+    return tempIngredients.reduce((total, ingredient) => {
+      // Primero buscar en costos personalizados, luego en INGREDIENT_COSTS
+      const cost = customIngredientCosts[ingredient] !== undefined 
+        ? customIngredientCosts[ingredient]
+        : (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+      return total + cost;
+    }, 0);
+  }, [tempIngredients, customIngredientCosts]);
 
   // Obtener la hamburguesa que se está editando actualmente (si hay alguna)
   const currentBurger = editingIngredientsFor 
-    ? burgers.find(b => b._id && b._id.toString() === editingIngredientsFor) 
+    ? localBurgers.find(b => b._id && b._id.toString() === editingIngredientsFor) 
     : null;
+
+  // Función auxiliar para obtener el costo de un ingrediente
+  const getIngredientCost = (ingredient: string, burgerSpecificCosts?: Record<string, number> | null) => {
+    // Buscar primero en los costos específicos de la hamburguesa si se proporcionaron
+    if (burgerSpecificCosts && burgerSpecificCosts[ingredient] !== undefined) {
+      return burgerSpecificCosts[ingredient];
+    } 
+    // Luego buscar en los costos personalizados locales
+    else if (customIngredientCosts[ingredient] !== undefined) {
+      return customIngredientCosts[ingredient];
+    } 
+    // Finalmente usar los costos predefinidos
+    else {
+      return INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+    }
+  };
 
   // Abrir el diálogo de edición de ingredientes
   const handleOpenIngredientsEditor = (burger: Burger) => {
     if (burger._id) {
       setEditingIngredientsFor(burger._id.toString());
       setTempIngredients([...burger.ingredients]);
+      setTempPrice(burger.price);
+      
+      // Cargar los costos personalizados de ingredientes si existen
+      // Usar type assertion para evitar errores de linter
+      const burgerWithCosts = burger as Burger & { ingredientCosts?: Record<string, number> };
+      if (burgerWithCosts.ingredientCosts) {
+        console.log('Cargando costos personalizados:', burgerWithCosts.ingredientCosts);
+        setCustomIngredientCosts(burgerWithCosts.ingredientCosts);
+      } else {
+        // Limpiar los costos personalizados si no hay ninguno
+        setCustomIngredientCosts({});
+      }
+      
+      setCustomIngredientPrice(0);
     } else {
       showSnackbar('Error: No se puede editar los ingredientes', 'error');
     }
@@ -108,6 +150,7 @@ export const BurgerList: React.FC<BurgerListProps> = ({
     setTempIngredients([]);
     setCustomIngredient('');
     setCustomIngredientPrice(0);
+    setTempPrice(0);
     setSaving(false);
   };
 
@@ -126,18 +169,77 @@ export const BurgerList: React.FC<BurgerListProps> = ({
 
     try {
       setSaving(true);
-      const result = await onUpdateIngredients(editingIngredientsFor, tempIngredients);
+      
+      // Filtrar el objeto customIngredientCosts para incluir solo los ingredientes que están en tempIngredients
+      const relevantCosts: Record<string, number> = {};
+      tempIngredients.forEach(ingredient => {
+        if (customIngredientCosts[ingredient] !== undefined) {
+          relevantCosts[ingredient] = customIngredientCosts[ingredient];
+        }
+      });
+      
+      console.log('Guardando ingredientes con costos personalizados:', relevantCosts);
+      
+      const result = await onUpdateIngredients(
+        editingIngredientsFor, 
+        tempIngredients,
+        relevantCosts // Enviar los costos personalizados
+      );
+      
+      // Si hay cambios en el precio, guardamos esos también
+      if (result.success && onUpdatePrice && editingIngredientsFor) {
+        await handleSavePrice();
+      }
       
       if (result.success) {
-        showSnackbar('Ingredientes actualizados con éxito', 'success');
+        // Actualizar también los costos de ingredientes a nivel local
+        setLocalBurgers(prevBurgers => 
+          prevBurgers.map(burger => 
+            burger._id && burger._id.toString() === editingIngredientsFor
+              ? {...burger, ingredients: tempIngredients, ingredientCosts: relevantCosts}
+              : burger
+          )
+        );
+        
+        showSnackbar('Hamburguesa actualizada con éxito', 'success');
         handleCloseIngredientsEditor();
       } else {
-        showSnackbar(`Error: ${result.error || 'No se pudieron actualizar los ingredientes'}`, 'error');
+        showSnackbar(`Error: ${result.error || 'No se pudo actualizar la hamburguesa'}`, 'error');
       }
     } catch (error) {
-      showSnackbar('Error al guardar los ingredientes', 'error');
+      showSnackbar('Error al guardar los cambios', 'error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Guardar los cambios en el precio
+  const handleSavePrice = async () => {
+    if (!editingIngredientsFor || !onUpdatePrice) {
+      return { success: false, error: 'No se puede actualizar el precio' };
+    }
+
+    try {
+      const result = await onUpdatePrice(
+        editingIngredientsFor,
+        tempPrice
+      );
+      
+      // Actualizamos el precio a nivel local inmediatamente
+      if (result.success) {
+        setLocalBurgers(prevBurgers => 
+          prevBurgers.map(burger => 
+            burger._id && burger._id.toString() === editingIngredientsFor
+              ? {...burger, price: tempPrice}
+              : burger
+          )
+        );
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error al actualizar el precio:', error);
+      return { success: false, error: 'Error al actualizar el precio' };
     }
   };
 
@@ -154,12 +256,21 @@ export const BurgerList: React.FC<BurgerListProps> = ({
   const handleAddCustomIngredient = () => {
     if (customIngredient.trim() === '') return;
     
-    if (!tempIngredients.includes(customIngredient.trim())) {
-      setTempIngredients(prev => [...prev, customIngredient.trim()]);
+    const trimmedIngredient = customIngredient.trim();
+    
+    if (!tempIngredients.includes(trimmedIngredient)) {
+      // Añadir a los ingredientes temporales
+      setTempIngredients(prev => [...prev, trimmedIngredient]);
       
-      const updatedCosts = {...INGREDIENT_COSTS};
-      updatedCosts[customIngredient.trim() as keyof typeof INGREDIENT_COSTS] = customIngredientPrice;
+      // Guardar el costo personalizado en el estado
+      setCustomIngredientCosts(prev => ({
+        ...prev,
+        [trimmedIngredient]: customIngredientPrice
+      }));
       
+      console.log(`Añadido ingrediente personalizado: ${trimmedIngredient} con precio: ${customIngredientPrice}`);
+      
+      // Limpiar los campos de entrada
       setCustomIngredient('');
       setCustomIngredientPrice(0);
     }
@@ -170,13 +281,72 @@ export const BurgerList: React.FC<BurgerListProps> = ({
     setTempIngredients(prev => prev.filter(ing => ing !== ingredient));
   };
 
+  // Función para actualizar ingredientes y costos
+  const handleUpdateBurgerCosts = async (burgerId: string, ingredients: string[], newOtherCosts: number, price?: number) => {
+    // Actualización local inmediata
+    setLocalBurgers(prevBurgers => 
+      prevBurgers.map(burger => 
+        burger._id && burger._id.toString() === burgerId 
+          ? {...burger, ingredients, otherCosts: newOtherCosts, price: price || burger.price}
+          : burger
+      )
+    );
+    
+    // Actualización en base de datos (en paralelo)
+    try {
+      if (onUpdateIngredients) {
+        await onUpdateIngredients(burgerId, ingredients);
+      }
+    } catch (error) {
+      console.error("Error al actualizar en base de datos:", error);
+    }
+  };
+
   // Función para renderizar una tarjeta de hamburguesa según la imagen
   const renderBurgerCard = (burger: Burger, index: number) => {
-    // Calcular el costo total de los ingredientes
-    const totalCost = calculateTotalCost(burger.ingredients);
+    // Type assertion para acceder a ingredientCosts
+    const burgerWithCosts = burger as Burger & { ingredientCosts?: Record<string, number> };
+    
+    // Calcular el costo total de los ingredientes usando también los costos personalizados
+    const ingredientsCost = burger.ingredients.reduce((total, ingredient) => {
+      // Buscar primero en los costos personalizados de la hamburguesa específica
+      if (burgerWithCosts.ingredientCosts && burgerWithCosts.ingredientCosts[ingredient] !== undefined) {
+        return total + burgerWithCosts.ingredientCosts[ingredient];
+      } 
+      // Luego buscar en los costos personalizados locales
+      else if (customIngredientCosts[ingredient] !== undefined) {
+        return total + customIngredientCosts[ingredient];
+      } 
+      // Finalmente usar los costos predefinidos
+      else {
+        return total + (INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0);
+      }
+    }, 0);
+    
+    // Obtener otros costos (si existen) y convertirlo a número
+    const otherCosts = Number(burger.otherCosts || 0);
+    
+    // Calcular el costo total incluyendo otros costos 
+    const totalCost = ingredientsCost + otherCosts;
     
     // Formatear los costos de ingredientes para mostrar
-    const ingredientCostsText = formatIngredientCosts(burger.ingredients);
+    const ingredientCostsText = burger.ingredients.slice(0, 3)
+      .map(ingredient => {
+        // Buscar primero en los costos personalizados de la hamburguesa específica
+        if (burgerWithCosts.ingredientCosts && burgerWithCosts.ingredientCosts[ingredient] !== undefined) {
+          return `${ingredient}:$${burgerWithCosts.ingredientCosts[ingredient].toFixed(1)}`;
+        } 
+        // Luego buscar en los costos personalizados locales
+        else if (customIngredientCosts[ingredient] !== undefined) {
+          return `${ingredient}:$${customIngredientCosts[ingredient].toFixed(1)}`;
+        } 
+        // Finalmente usar los costos predefinidos
+        else {
+          const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+          return `${ingredient}:$${cost.toFixed(1)}`;
+        }
+      })
+      .join(', ');
     
     return (
       <Grid item xs={12} sm={6} md={4} key={burger._id?.toString() || index}>
@@ -193,10 +363,17 @@ export const BurgerList: React.FC<BurgerListProps> = ({
           
           <CardMedia
             component="img"
-            height={isMobile ? "150" : "200"}
+            height={isMobile ? "200" : "260"}
             image={burger.image || 'https://via.placeholder.com/400x300?text=Hamburguesa'}
             alt={burger.name}
-            sx={{ objectFit: 'cover' }}
+            sx={{ 
+              objectFit: 'cover',
+              objectPosition: 'center',
+              backgroundColor: '#fafafa',
+              width: '100%',
+              maxHeight: isMobile ? '200px' : '260px',
+              p: 0
+            }}
           />
           
           <CardContent sx={{ 
@@ -306,16 +483,19 @@ export const BurgerList: React.FC<BurgerListProps> = ({
             </Typography>
             
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-              {burger.ingredients.slice(0, isMobile ? 3 : 5).map((ingredient, index) => (
-                <Chip 
-                  key={index} 
-                  label={ingredient} 
-                  size="small" 
-                  variant="outlined"
-                  color="primary"
-                  sx={{ margin: '2px' }}
-                />
-              ))}
+              {burger.ingredients.slice(0, isMobile ? 3 : 5).map((ingredient, index) => {
+                const cost = getIngredientCost(ingredient, burgerWithCosts.ingredientCosts);
+                return (
+                  <Chip 
+                    key={index} 
+                    label={`${ingredient} ($${cost.toFixed(1)})`}
+                    size="small" 
+                    variant="outlined"
+                    color="primary"
+                    sx={{ margin: '2px' }}
+                  />
+                );
+              })}
               {burger.ingredients.length > (isMobile ? 3 : 5) && (
                 <Chip 
                   label={`+${burger.ingredients.length - (isMobile ? 3 : 5)}`} 
@@ -336,18 +516,33 @@ export const BurgerList: React.FC<BurgerListProps> = ({
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <Typography variant="caption" sx={{ display: 'block' }}>
-              Costo: {ingredientCostsText}{burger.ingredients.length > 3 ? '...' : ''}
-            </Typography>
+            <Box>
+              <Typography variant="caption" sx={{ display: 'block' }}>
+                <strong>Costos de producción:</strong>
+              </Typography>
+              <Typography variant="caption" sx={{ display: 'block', pl: 1 }}>
+                • Ingredientes: {ingredientCostsText}{burger.ingredients.length > 3 ? '...' : ''}
+              </Typography>
+              {otherCosts > 0 && (
+                <Typography variant="caption" sx={{ display: 'block', pl: 1 }}>
+                  • Adicionales: {"$" + Number(otherCosts).toFixed(2)}
+                </Typography>
+              )}
+            </Box>
             <Box sx={{ 
               display: 'flex', 
               justifyContent: 'space-between',
               alignItems: 'center',
               mt: 0.5
             }}>
-              <Typography variant="subtitle2" fontWeight="bold">
-                Costo total: ${totalCost.toFixed(2)}
-              </Typography>
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  Costo total: ${Number(totalCost).toFixed(2)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Precio venta: <span style={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>${burger.price.toFixed(2)}</span>
+                </Typography>
+              </Box>
               <Button 
                 size="small" 
                 variant="text" 
@@ -363,10 +558,15 @@ export const BurgerList: React.FC<BurgerListProps> = ({
     );
   };
 
+  // Sincronizar localBurgers con las props burgers
+  useEffect(() => {
+    setLocalBurgers(burgers);
+  }, [burgers]);
+
   return (
     <>
       <Grid container spacing={isMobile ? 2 : 3}>
-        {burgers.map((burger, index) => renderBurgerCard(burger, index))}
+        {localBurgers.map((burger, index) => renderBurgerCard(burger, index))}
       </Grid>
 
       {/* Dialog para editar ingredientes */}
@@ -411,10 +611,10 @@ export const BurgerList: React.FC<BurgerListProps> = ({
             }}>
               {tempIngredients.length > 0 ? (
                 tempIngredients.map(ingredient => {
-                  const cost = INGREDIENT_COSTS[ingredient as keyof typeof INGREDIENT_COSTS] || 0;
+                  const cost = getIngredientCost(ingredient, null);
                   return (
                     <Chip 
-                    key={ingredient} 
+                      key={ingredient} 
                       label={`${ingredient} ($${cost.toFixed(1)})`}
                       onDelete={() => handleRemoveIngredient(ingredient)}
                       color="primary"
@@ -452,7 +652,8 @@ export const BurgerList: React.FC<BurgerListProps> = ({
                 borderRadius: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                mb: 2
               }}
             >
               <Typography variant="subtitle1">Costo de ingredientes:</Typography>
@@ -464,6 +665,36 @@ export const BurgerList: React.FC<BurgerListProps> = ({
                 ${tempTotalCost.toFixed(2)}
               </Typography>
             </Paper>
+
+            {/* Campo para editar el precio de venta */}
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Typography variant="subtitle1" color="primary" fontWeight="medium" gutterBottom>
+                Precio de venta al público:
+              </Typography>
+              <TextField
+                type="number"
+                value={tempPrice}
+                onChange={(e) => setTempPrice(Number(e.target.value))}
+                placeholder="Precio de venta"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                }}
+                sx={{ 
+                  "& .MuiOutlinedInput-root": {
+                    borderWidth: "2px",
+                    borderColor: theme.palette.primary.main,
+                    "&:hover": {
+                      borderColor: theme.palette.primary.dark
+                    }
+                  }
+                }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                Este precio se mostrará a los clientes y es independiente del costo de producción.
+              </Typography>
+            </Box>
           </Box>
           
           <Divider sx={{ my: 2 }} />
@@ -654,9 +885,10 @@ export const BurgerList: React.FC<BurgerListProps> = ({
               sx={{ flex: 2 }}
             />
             
-            {/* Nuevo: Campo para precio del ingrediente personalizado */}
             <TextField
               type="number"
+              value={customIngredientPrice}
+              onChange={(e) => setCustomIngredientPrice(Number(e.target.value))}
               placeholder="Precio"
               variant="outlined"
               size={isMobile ? "medium" : "small"}
@@ -832,7 +1064,8 @@ export const BurgerList: React.FC<BurgerListProps> = ({
           variant="filled"
           sx={{ width: '100%' }}
         >
-              {snackbarMessage}
+          {/* Solo mostrar mensajes que NO sean de eliminación */}
+          {snackbarMessage.includes('eliminad') ? null : snackbarMessage}
         </Alert>
       </Snackbar>
     </>

@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Button, Typography, Box, useMediaQuery, useTheme, Fab, Paper } from '@mui/material';
+import { Button, Typography, Box, useMediaQuery, useTheme, Fab, Paper, Snackbar, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { BurgerList } from './BurgerList';
 import { BurgerForm } from './BurgerForm';
 import { useMenuManager } from '@/features/admin/hooks/useMenuManager';
+import { Burger } from '@/features/database/types/burger';
 
 export const MenuManager: React.FC = () => {
   const theme = useTheme();
@@ -15,12 +16,14 @@ export const MenuManager: React.FC = () => {
     burgers,
     isEditing,
     selectedBurger,
+    notification,
     handleAddNew,
     handleEdit,
     handleDelete,
     handleSave,
     handleCancel,
-    handleUpdateIngredients
+    handleUpdateIngredients,
+    handleUpdatePrice
   } = useMenuManager();
 
   return (
@@ -78,6 +81,7 @@ export const MenuManager: React.FC = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onUpdateIngredients={handleUpdateIngredients}
+            onUpdatePrice={handleUpdatePrice}
           />
         </Box>
       )}
@@ -99,6 +103,20 @@ export const MenuManager: React.FC = () => {
           <AddIcon />
         </Fab>
       )}
+
+      <Snackbar
+        open={!!notification}
+        autoHideDuration={4000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          severity={notification?.severity || 'success'}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {notification?.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

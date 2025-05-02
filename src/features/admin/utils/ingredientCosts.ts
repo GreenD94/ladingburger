@@ -25,6 +25,12 @@ export const calculateTotalCost = (ingredients: string[]): number => {
   }, 0);
 };
 
+// Función para calcular el costo total incluyendo otros costos
+export const calculateTotalCostWithOthers = (ingredients: string[], otherCosts: number = 0): number => {
+  const ingredientsCost = calculateTotalCost(ingredients);
+  return ingredientsCost + (otherCosts || 0);
+};
+
 // Función para formatear el costo en formato legible
 export const formatIngredientCosts = (ingredients: string[]): string => {
   return ingredients.slice(0, 3)

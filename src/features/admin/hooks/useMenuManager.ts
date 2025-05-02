@@ -1,8 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Burger } from '@/features/database/types';
+import { Burger, BURGER_IMAGES, BurgerImage } from '@/features/database/types/burger';
 import { createBurger, updateBurger, deleteBurger, getAvailableBurgers } from '@/features/database/actions/menu';
 
 export type EditingBurger = Omit<Burger, '_id'> & { _id?: string };
+
+interface Notification {
+  message: string;
+  severity: 'success' | 'error' | 'info' | 'warning';
+}
+
+const normalizeImage = (img: string): BurgerImage =>
+  (Object.values(BURGER_IMAGES) as string[]).includes(img)
+    ? (img as BurgerImage)
+    : BURGER_IMAGES.CLASSIC;
 
 export function useMenuManager() {
   const [burgers, setBurgers] = useState<Burger[]>([]);
@@ -10,6 +20,14 @@ export function useMenuManager() {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedBurger, setSelectedBurger] = useState<Burger | null>(null);
+  const [notification, setNotification] = useState<Notification | null>(null);
+
+  // Función para mostrar notificaciones
+  const showNotification = (message: string, severity: Notification['severity'] = 'success') => {
+    setNotification({ message, severity });
+    // Limpiar la notificación después de 4 segundos
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   useEffect(() => {
     loadBurgers();
@@ -21,7 +39,12 @@ export function useMenuManager() {
     
     try {
       const loadedBurgers = await getAvailableBurgers();
-      setBurgers(loadedBurgers || []);
+      setBurgers(
+        (loadedBurgers || []).map(b => ({
+          ...b,
+          image: normalizeImage(b.image),
+        }))
+      );
     } catch (err) {
       console.error('Error loading burgers:', err);
       setError('Failed to load burgers');
@@ -42,20 +65,40 @@ export function useMenuManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta hamburguesa?')) {
-      await removeBurger(id);
+    const result = await removeBurger(id);
+    if (result.success) {
+      showNotification('Hamburguesa eliminada exitosamente');
+    } else {
+      showNotification(result.error || 'Error al eliminar la hamburguesa', 'error');
     }
   };
 
   const handleSave = async (burger: Omit<Burger, '_id'> | Burger) => {
-    if ('_id' in burger && burger._id) {
-      const { _id, ...burgerData } = burger;
-      await editBurger(_id.toString(), burgerData);
-    } else {
-      await addBurger(burger as Omit<Burger, '_id'>);
+    try {
+      if ('_id' in burger && burger._id) {
+        const { _id, ...burgerData } = burger;
+        const result = await editBurger(_id.toString(), burgerData);
+        if (result.success) {
+          showNotification('Hamburguesa actualizada exitosamente');
+        } else {
+          showNotification(result.error || 'Error al actualizar la hamburguesa', 'error');
+          return;
+        }
+      } else {
+        const result = await addBurger(burger as Omit<Burger, '_id'>);
+        if (result.success) {
+          showNotification('Nueva hamburguesa creada exitosamente');
+        } else {
+          showNotification(result.error || 'Error al crear la hamburguesa', 'error');
+          return;
+        }
+      }
+      setIsEditing(false);
+      setSelectedBurger(null);
+      await loadBurgers();
+    } catch (err) {
+      showNotification('Error al guardar la hamburguesa', 'error');
     }
-    setIsEditing(false);
-    setSelectedBurger(null);
   };
 
   const handleCancel = () => {
@@ -63,10 +106,11 @@ export function useMenuManager() {
     setSelectedBurger(null);
   };
 
-  const handleUpdateIngredients = async (burgerId: string, ingredients: string[]) => {
+  const handleUpdateIngredients = async (burgerId: string, ingredients: string[], ingredientCosts?: Record<string, number>) => {
     try {
       console.log('Updating ingredients for burger:', burgerId);
       console.log('New ingredients list:', ingredients);
+      console.log('Custom ingredient costs:', ingredientCosts);
       
       // Verificar que el ID y los ingredientes sean válidos
       if (!burgerId || !burgerId.trim()) {
@@ -79,7 +123,20 @@ export function useMenuManager() {
         return { success: false, error: 'Invalid ingredients format' };
       }
       
-      const result = await updateBurger(burgerId, { ingredients });
+      // Preparar los datos para actualizar
+      const updateData: {
+        ingredients: string[];
+        ingredientCosts?: Record<string, number>;
+      } = {
+        ingredients
+      };
+      
+      // Añadir los costos personalizados si existen
+      if (ingredientCosts && Object.keys(ingredientCosts).length > 0) {
+        updateData.ingredientCosts = ingredientCosts;
+      }
+      
+      const result = await updateBurger(burgerId, updateData);
       console.log('Update result:', result);
       
       if (!result.success) {
@@ -96,6 +153,41 @@ export function useMenuManager() {
     }
   };
 
+  // Nueva función para actualizar el precio de forma independiente
+  const handleUpdatePrice = async (burgerId: string, price: number) => {
+    try {
+      console.log('Updating price for burger:', burgerId);
+      console.log('New price:', price);
+      
+      // Verificar que el ID sea válido
+      if (!burgerId || !burgerId.trim()) {
+        console.error('Invalid burger ID:', burgerId);
+        return { success: false, error: 'Invalid burger ID' };
+      }
+      
+      // Verificar que el precio sea válido
+      if (isNaN(Number(price))) {
+        console.error('Invalid price value:', price);
+        return { success: false, error: 'Invalid price value' };
+      }
+      
+      const result = await updateBurger(burgerId, { price: Number(price) });
+      console.log('Update price result:', result);
+      
+      if (!result.success) {
+        console.error('Price update failed with error:', result.error);
+        throw new Error(result.error);
+      }
+      
+      console.log('Price update successful, reloading burgers...');
+      await loadBurgers();
+      return { success: true };
+    } catch (err) {
+      console.error('Error updating price:', err);
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to update price' };
+    }
+  };
+
   const addBurger = async (burger: Omit<Burger, '_id'>) => {
     try {
       const result = await createBurger(burger);
@@ -105,33 +197,28 @@ export function useMenuManager() {
       await loadBurgers();
       return { success: true };
     } catch (err) {
-      console.error(err);
-      return { success: false, error: 'Failed to add burger' };
+      console.error('Error creating burger:', err);
+      return { 
+        success: false, 
+        error: err instanceof Error ? err.message : 'Failed to create burger' 
+      };
     }
   };
 
   const editBurger = async (id: string, burger: Partial<Omit<Burger, '_id'>>) => {
     try {
-      console.log('Updating burger with ID:', id);
-      console.log('Update data:', burger);
-      
-      // Asegurarse de que el precio sea un número
-      if (burger.price !== undefined && isNaN(Number(burger.price))) {
-        console.error('Invalid price:', burger.price);
-        throw new Error('Invalid price value');
-      }
-      
       const result = await updateBurger(id, burger);
-      console.log('Update result:', result);
-      
       if (!result.success) {
         throw new Error(result.error);
       }
       await loadBurgers();
       return { success: true };
     } catch (err) {
-      console.error(err);
-      return { success: false, error: 'Failed to update burger' };
+      console.error('Error updating burger:', err);
+      return { 
+        success: false, 
+        error: err instanceof Error ? err.message : 'Failed to update burger' 
+      };
     }
   };
 
@@ -155,12 +242,14 @@ export function useMenuManager() {
     error,
     isEditing,
     selectedBurger,
+    notification,
     handleAddNew,
     handleEdit,
     handleDelete,
     handleSave,
     handleCancel,
     handleUpdateIngredients,
+    handleUpdatePrice,
     addBurger,
     editBurger,
     removeBurger

@@ -12,7 +12,8 @@ const burgers: Omit<Burger, '_id'>[] = [
     image: BURGER_IMAGES.CLASSIC,
     category: 'classic',
     ingredients: ['Beef patty', 'Lettuce', 'Tomato', 'Special sauce', 'Bun'],
-    isAvailable: true
+    isAvailable: true,
+    otherCosts: 0.5
   },
   {
     name: 'Cheeseburger',

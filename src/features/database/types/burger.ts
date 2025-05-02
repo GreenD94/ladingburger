@@ -16,4 +16,6 @@ export interface Burger {
   image: BurgerImage;
   category: string;
   isAvailable: boolean;
+  otherCosts?: number;
+  ingredientCosts?: Record<string, number>;
 };
