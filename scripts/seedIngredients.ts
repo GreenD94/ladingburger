@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 
-const uri = 'mongodb+srv://hernandomiguel1994micuenta:ZprJFDl68ifz9CZB@cluster0.ubglb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Cambia esto si tu URI es diferente
-const dbName = 'saborea'; // Cambia esto si tu base de datos tiene otro nombre
+const uri = 'mongodb+'; // Cambia esto si tu URI es diferente
+const dbName = 'c'; // Cambia esto si tu base de datos tiene otro nombre
 
 const ingredients = [
   { name: 'Carne', cost: 2 },
