@@ -2,7 +2,8 @@
 
 import { createAdmin } from '../../models/admin.model';
 import clientPromise from '../../config/mongodb';
-import { Burger, BURGER_IMAGES } from '../../types/burger';
+import { Burger } from '../../types';
+import { BURGER_IMAGES } from '../../types/burger';
 
 const burgers: Omit<Burger, '_id'>[] = [
   {

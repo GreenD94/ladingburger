@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Burger } from '@/features/database/types/burger';
+import { Burger } from '@/features/database/types';
 
 interface BurgerRowProps {
   burger: Burger;

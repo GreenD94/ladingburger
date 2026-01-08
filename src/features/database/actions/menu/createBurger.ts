@@ -1,7 +1,7 @@
 'use server';
 
 import { connectToDatabase } from '../connect';
-import { Burger } from '../../types/burger';
+import { Burger } from '../../types';
 import { ObjectId } from 'mongodb';
 
 export interface CreateBurgerInput {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Typography, Stack } from '@mui/material';
-import { Burger } from '@/features/database/types/burger';
+import { Burger } from '@/features/database/types';
 import { BurgerRow } from './BurgerRow';
 import LoadingState from '@/features/analytics/components/LoadingState';
 import ErrorState from '@/features/analytics/components/ErrorState';

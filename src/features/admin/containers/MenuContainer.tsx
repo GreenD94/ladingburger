@@ -10,7 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { Burger } from '@/features/database/types/burger';
+import { Burger } from '@/features/database/types';
 import { getAllMenuItems, createBurger, updateBurger, deleteBurger } from '@/features/database/actions/menu';
 import { MenuList } from '../components/menu/MenuList';
 import { BurgerForm } from '../components/menu/BurgerForm';

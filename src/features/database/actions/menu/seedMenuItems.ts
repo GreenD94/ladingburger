@@ -1,7 +1,8 @@
 'use server';
 
 import clientPromise from '../../config/mongodb';
-import { Burger, BURGER_IMAGES } from '../../types/burger';
+import { Burger } from '../../types';
+import { BURGER_IMAGES } from '../../types/burger';
 
 const menuItems: Omit<Burger, '_id'>[] = [
   {

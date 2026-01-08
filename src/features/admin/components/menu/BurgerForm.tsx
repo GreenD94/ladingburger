@@ -20,7 +20,8 @@ import {
   IconButton,
   Stack,
 } from '@mui/material';
-import { Burger, BURGER_IMAGES } from '@/features/database/types/burger';
+import { Burger } from '@/features/database/types';
+import { BURGER_IMAGES } from '@/features/database/types/burger';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -101,7 +102,7 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({
         description,
         price,
         category,
-        image: finalImage as typeof BURGER_IMAGES[keyof typeof BURGER_IMAGES],
+        image: finalImage,
         isAvailable,
         ingredients,
       });
