@@ -41,7 +41,7 @@ export const MenuList: React.FC<MenuListProps> = ({
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={{ xs: 1.5, sm: 2 }}>
       {burgers.map((burger) => (
         <BurgerRow
           key={burger._id?.toString()}

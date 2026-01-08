@@ -24,7 +24,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
     <Box
       sx={{
         width: '100%',
-        height: '72vh',
+        height: '100vh',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
@@ -39,6 +39,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
         px: { xs: 3, md: 4 },
         pt: { xs: 4, md: 6 },
         pb: { xs: 4, md: 6 },
+        borderRadius: '10px',
+        py: '5px',
       }}
     >
       <Box

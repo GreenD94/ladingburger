@@ -7,11 +7,6 @@ export default function MenuPage() {
   return (
     <Box
       sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
         width: '100%',
         overflowY: 'scroll',
         overflowX: 'hidden',
@@ -24,7 +19,9 @@ export default function MenuPage() {
         scrollbarWidth: 'none',
       }}
     >
-      <MenuList />
+      <Box sx={{ pt: '5px', px: '10px', pb: '5px' }}>
+        <MenuList />
+      </Box>
     </Box>
   );
 }

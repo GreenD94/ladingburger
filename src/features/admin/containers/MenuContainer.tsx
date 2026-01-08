@@ -139,16 +139,32 @@ export const MenuContainer: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
+    <Box sx={{ px: { xs: 1, sm: 0 } }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: { xs: 2, sm: 3 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 2, sm: 0 },
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, width: { xs: '100%', sm: 'auto' } }}
+        >
           Gestión de Menú
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleCreate}
-          sx={{ display: { xs: 'none', sm: 'flex' } }}
+          sx={{
+            display: { xs: 'none', sm: 'flex' },
+            width: { xs: '100%', sm: 'auto' },
+          }}
         >
           Nueva Hamburguesa
         </Button>
