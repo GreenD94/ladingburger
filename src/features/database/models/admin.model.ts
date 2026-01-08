@@ -75,7 +75,7 @@ export async function findAdminByEmail(email: string): Promise<Admin | null> {
 
 export async function createAdmin(adminData: Omit<CreateAdmin, 'createdAt' | 'updatedAt'>): Promise<Admin> {
   const client = await clientPromise;
-  const db = client.db();
+  const db = client.db('saborea');
   
   const hashedPassword = await bcrypt.hash(adminData.password, 10);
   const now = new Date();

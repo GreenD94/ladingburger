@@ -1,16 +1,15 @@
 'use server';
 
-import { createAdmin } from '../../models/admin.model';
 import clientPromise from '../../config/mongodb';
 import { Burger, BURGER_IMAGES } from '../../types/burger';
 
-const burgers: Omit<Burger, '_id'>[] = [
+const menuItems: Omit<Burger, '_id'>[] = [
   {
-    name: 'Classic Burger',
+    name: 'Hamburguesa Clásica',
     description: 'Carne blend 150g (80% solomo 20% cerdo) Lechuga, tomate, queso americano, tocineta, pan brioche y 120 gramos de papas.',
     price: 5,
     image: BURGER_IMAGES.CLASSIC,
-    category: 'classic',
+    category: 'clásica',
     ingredients: [
       'Carne blend 150g (80% solomo 20% cerdo)',
       'Lechuga',
@@ -23,11 +22,11 @@ const burgers: Omit<Burger, '_id'>[] = [
     isAvailable: true
   },
   {
-    name: 'Crispy Burger',
+    name: 'Hamburguesa Crispy',
     description: '140g de pollo Crispy, lechuga, tomate, queso cheddar, tocineta, pan brioche y 120 gramos de papas.',
     price: 5,
     image: BURGER_IMAGES.CLASSIC,
-    category: 'specialty',
+    category: 'especialidad',
     ingredients: [
       'Pollo Crispy 140g',
       'Lechuga',
@@ -40,11 +39,11 @@ const burgers: Omit<Burger, '_id'>[] = [
     isAvailable: true
   },
   {
-    name: 'Cheeseburger',
+    name: 'Hamburguesa con Queso',
     description: '120 gramos de carne blend x2 tocineta, queso americano, queso cheddar, pepinillos, salsa BBQ De la casa y pan brioche y 120 gramos de papas.',
     price: 7,
     image: BURGER_IMAGES.DOUBLE_CHEESE,
-    category: 'cheese',
+    category: 'queso',
     ingredients: [
       'Carne blend 120g x2',
       'Tocineta',
@@ -62,7 +61,7 @@ const burgers: Omit<Burger, '_id'>[] = [
     description: '140gramos de pollo crispy, 150 de carne blend, tocineta, salsa BBQ de la casa, lechuga, tomate y 120 gramos de papas.',
     price: 8,
     image: BURGER_IMAGES.DOUBLE_CHEESE,
-    category: 'specialty',
+    category: 'especialidad',
     ingredients: [
       'Pollo crispy 140g',
       'Carne blend 150g',
@@ -76,35 +75,32 @@ const burgers: Omit<Burger, '_id'>[] = [
   }
 ];
 
-export async function seedDatabase() {
+export async function seedMenuItems() {
   try {
-    console.log('Starting database seeding...');
+    console.log('Starting menu items seeding...');
     
-    // Create admin user
-    console.log('Creating admin user...');
-    await createAdmin({
-      email: 'admin@admin.com',
-      password: '12345'
-    });
-    console.log('Admin user created successfully');
-
-    // Seed burgers
-    console.log('Seeding burgers...');
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db('saborea');
     
-    // Clear existing burgers
-    await db.collection('burgers').deleteMany({});
-    console.log('Cleared existing burgers');
-
-    // Insert new burgers
-    const result = await db.collection('burgers').insertMany(burgers);
-    console.log('Inserted burgers:', result.insertedCount);
-
-    console.log('Database seeding completed successfully');
-    return { success: true, message: 'Database seeded successfully' };
+    // Clear ALL existing burgers from the database
+    const deleteResult = await db.collection('burgers').deleteMany({});
+    console.log(`Cleared ${deleteResult.deletedCount} existing burgers`);
+    
+    // Insert new menu items
+    const result = await db.collection('burgers').insertMany(menuItems);
+    console.log(`Inserted ${result.insertedCount} menu items`);
+    
+    console.log('Menu items seeding completed successfully');
+    return { 
+      success: true, 
+      message: `Successfully seeded ${result.insertedCount} menu items. Cleared ${deleteResult.deletedCount} old items.` 
+    };
   } catch (error) {
-    console.error('Error seeding database:', error);
-    return { success: false, error: 'Failed to seed database' };
+    console.error('Error seeding menu items:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to seed menu items' 
+    };
   }
-} 
+}
+

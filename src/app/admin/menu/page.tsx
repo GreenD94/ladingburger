@@ -1,11 +1,7 @@
 'use client';
 
-import { Typography } from '@mui/material';
+import { MenuContainer } from '@/features/admin/containers/MenuContainer';
 
 export default function MenuPage() {
-  return (
-    <Typography variant="h4" component="h1">
-      Menu Management
-    </Typography>
-  );
+  return <MenuContainer />;
 } 
