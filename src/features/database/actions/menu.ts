@@ -1,5 +1,5 @@
 import { getBurgers } from './menu/getBurgers';
-import { seedDatabase as seedDatabaseAction } from './menu/seedDatabase';
+// import { seedDatabase as seedDatabaseAction } from './menu/seedDatabase';
 import { createBurger } from './menu/createBurger';
 import { updateBurger } from './menu/updateBurger';
 import { deleteBurger } from './menu/deleteBurger';
@@ -18,15 +18,15 @@ export async function getAllMenuItems() {
   return burgers || [];
 }
 
-export async function seedDatabase(): Promise<{ success: boolean; message: string; error?: string }> {
-  const result = await seedDatabaseAction();
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to seed database');
-  }
-  return {
-    success: true,
-    message: result.message || 'Database seeded successfully'
-  };
-}
+// export async function seedDatabase(): Promise<{ success: boolean; message: string; error?: string }> {
+//   const result = await seedDatabaseAction();
+//   if (!result.success) {
+//     throw new Error(result.error || 'Failed to seed database');
+//   }
+//   return {
+//     success: true,
+//     message: result.message || 'Database seeded successfully'
+//   };
+// }
 
 export { createBurger, updateBurger, deleteBurger }; 

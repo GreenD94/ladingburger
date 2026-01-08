@@ -5,7 +5,8 @@ import { TestList } from '../components/TestList';
 import { TestResult } from '../components/TestResult';
 import { TestItem, TestResult as TestResultType, TestData } from '../types/index';
 import { createOrder, getOrdersByPhone, updateOrderStatus } from '@/features/database/actions/orders';
-import { getAvailableBurgers, seedDatabase } from '@/features/database/actions/menu';
+import { getAvailableBurgers } from '@/features/database/actions/menu';
+// import { seedDatabase } from '@/features/database/actions/menu';
 import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact';
 import { createBusinessContact } from '@/features/database/actions/businessContacts/createBusinessContact';
 import { updateBusinessContact } from '@/features/database/actions/businessContacts/updateBusinessContact';
@@ -136,19 +137,19 @@ export default function BlackboxContainer() {
         };
       },
     },
-    {
-      id: '5',
-      name: 'Seed Database',
-      category: 'database',
-      description: 'Seed database with initial data',
-      run: async () => {
-        const result = await seedDatabase();
-        return {
-          success: true,
-          data: { message: result.message }
-        };
-      },
-    },
+    // {
+    //   id: '5',
+    //   name: 'Seed Database',
+    //   category: 'database',
+    //   description: 'Seed database with initial data',
+    //   run: async () => {
+    //     const result = await seedDatabase();
+    //     return {
+    //       success: true,
+    //       data: { message: result.message }
+    //     };
+    //   },
+    // },
     {
       id: '6',
       name: 'Get Business Contact',

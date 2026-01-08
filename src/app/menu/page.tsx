@@ -1,28 +1,36 @@
 'use client';
 
-import { Box } from '@mui/material';
 import { MenuList } from '@/features/menu/components/MenuList';
 
 export default function MenuPage() {
   return (
-    <Box
-      sx={{
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         width: '100%',
+        height: '100vh',
         overflowY: 'scroll',
         overflowX: 'hidden',
         scrollSnapType: 'y mandatory',
         scrollBehavior: 'smooth',
         WebkitOverflowScrolling: 'touch',
-        '&::-webkit-scrollbar': {
-          display: 'none',
-        },
         scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
       }}
+      className="menu-scroll-container"
     >
-      <Box sx={{ pt: '5px', px: '10px', pb: '5px' }}>
+      <style jsx>{`
+        .menu-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      <div style={{ paddingTop: '5px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '5px' }}>
         <MenuList />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
-

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Skeleton, CircularProgress } from '@mui/material';
 import { getAvailableBurgers } from '@/features/database/actions/menu/getAvailableBurgers';
 import { Burger } from '@/features/database/types';
 import { MenuItem } from './MenuItem';
@@ -34,55 +33,76 @@ export const MenuList: React.FC = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
+      <div
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          py: 8,
+          paddingTop: '64px',
+          paddingBottom: '64px',
         }}
       >
-        <CircularProgress sx={{ color: '#FF6B00', mb: 2 }} />
-        <Typography variant="h6" sx={{ color: '#2C1810' }}>
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #FF6B00',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginBottom: '16px',
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        <h6 style={{ color: '#2C1810', margin: 0, fontSize: '1.25rem', fontWeight: 500 }}>
           Cargando nuestro menú...
-        </Typography>
-      </Box>
+        </h6>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box
-        sx={{
+      <div
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          py: 8,
-          px: 3,
+          paddingTop: '64px',
+          paddingBottom: '64px',
+          paddingLeft: '24px',
+          paddingRight: '24px',
         }}
       >
-        <Typography variant="h6" sx={{ color: '#d32f2f', textAlign: 'center' }}>
+        <h6 style={{ color: '#d32f2f', textAlign: 'center', margin: 0, fontSize: '1.25rem', fontWeight: 500 }}>
           {error}
-        </Typography>
-      </Box>
+        </h6>
+      </div>
     );
   }
 
   if (burgers.length === 0) {
     return (
-      <Box
-        sx={{
+      <div
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          py: 8,
-          px: 3,
+          paddingTop: '64px',
+          paddingBottom: '64px',
+          paddingLeft: '24px',
+          paddingRight: '24px',
         }}
       >
-        <Typography variant="h6" sx={{ color: '#2C1810', textAlign: 'center' }}>
+        <h6 style={{ color: '#2C1810', textAlign: 'center', margin: 0, fontSize: '1.25rem', fontWeight: 500 }}>
           No hay productos disponibles en este momento
-        </Typography>
-      </Box>
+        </h6>
+      </div>
     );
   }
 
@@ -91,8 +111,8 @@ export const MenuList: React.FC = () => {
       {burgers.map((burger, index) => (
         <MenuItem key={burger._id?.toString() || index} burger={burger} index={index} />
       ))}
-      <Box
-        sx={{
+      <div
+        style={{
           width: '100%',
           height: '72vh',
           boxSizing: 'border-box',
@@ -101,4 +121,3 @@ export const MenuList: React.FC = () => {
     </>
   );
 };
-
