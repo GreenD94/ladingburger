@@ -8,16 +8,10 @@ interface MenuItemProps {
   index: number;
 }
 
-const BACKGROUND_COLORS = [
-  '#a98de6',
-  '#47c2eb',
-  '#a5dc67',
-  '#ed5063',
-  '#ed5063',
-];
+const DARK_GREEN = '#1a4d3a';
+const ORANGE = '#FF6B35';
 
 export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
-  const backgroundColor = BACKGROUND_COLORS[index % BACKGROUND_COLORS.length];
   const [isVisible, setIsVisible] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
 
@@ -47,6 +41,53 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
       }
     };
   }, []);
+
+  const getDisplayParts = () => {
+    const name = burger.name.trim();
+    const lowerName = name.toLowerCase();
+    
+    let burgerPart = 'BURGER';
+    let restPart = '';
+    
+    if (lowerName.startsWith('hamburguesa')) {
+      burgerPart = 'BURGER';
+      restPart = name.substring('hamburguesa'.length).trim();
+    } else if (lowerName.startsWith('burger')) {
+      burgerPart = 'BURGER';
+      restPart = name.substring('burger'.length).trim();
+    } else {
+      burgerPart = 'BURGER';
+      restPart = name;
+    }
+    
+    return { burgerPart, restPart: restPart || 'CLÁSICA' };
+  };
+  
+  const { burgerPart, restPart } = getDisplayParts();
+
+  const ingredientsText = burger.ingredients && burger.ingredients.length > 0
+    ? burger.ingredients.join(', ').toUpperCase()
+    : burger.description.toUpperCase();
+
+  const starburstPoints = 16;
+  const starburstSize = 'clamp(300px, 50vw, 500px)';
+  
+  const generateStarburstPath = () => {
+    const center = 100;
+    const outerRadius = 100;
+    const innerRadius = 70;
+    const points: string[] = [];
+    
+    for (let i = 0; i < starburstPoints * 2; i++) {
+      const angle = (i * Math.PI) / starburstPoints;
+      const radius = i % 2 === 0 ? outerRadius : innerRadius;
+      const x = center + radius * Math.cos(angle - Math.PI / 2);
+      const y = center + radius * Math.sin(angle - Math.PI / 2);
+      points.push(`${x},${y}`);
+    }
+    
+    return points.join(' ');
+  };
 
   return (
     <>
@@ -101,108 +142,147 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
-          backgroundColor: backgroundColor,
+          backgroundColor: DARK_GREEN,
           scrollSnapAlign: 'start',
           scrollSnapStop: 'always',
           position: 'relative',
           overflow: 'hidden',
           margin: 0,
-          paddingLeft: 'clamp(24px, 4vw, 32px)',
-          paddingRight: 'clamp(24px, 4vw, 32px)',
-          paddingTop: 'clamp(32px, 6vw, 48px)',
-          paddingBottom: 'clamp(32px, 6vw, 48px)',
-          borderRadius: '10px',
+          padding: 'clamp(24px, 5vw, 48px)',
+          paddingTop: 'clamp(48px, 8vw, 96px)',
+          paddingBottom: 'clamp(32px, 6vw, 64px)',
         }}
       >
         <div
           style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             width: '100%',
-            flexShrink: 0,
+            marginBottom: 'clamp(16px, 3vw, 32px)',
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateX(0)' : 'translateX(-100px)',
+            animation: isVisible ? 'slideInFromLeft 0.8s ease-out forwards' : 'none',
           }}
         >
           <div
             style={{
-              width: '100%',
-              marginTop: 0,
-              marginBottom: 'clamp(12px, 2vw, 16px)',
-            }}
-          >
-            {burger.name
-              .split(' ')
-              .map(word => word.toLowerCase() === 'hamburguesa' ? 'burger' : word)
-              .map((word, wordIndex) => (
-                <div
-                  key={wordIndex}
-                  style={{
-                    fontSize: 'clamp(3.5rem, 8vw, 5rem)',
-                    fontWeight: 400,
-                    fontFamily: 'var(--font-bebas-neue), Impact, "Arial Black", sans-serif',
-                    color: 'white',
-                    textAlign: 'center',
-                    textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
-                    letterSpacing: '0.02em',
-                    lineHeight: 1,
-                    textTransform: 'uppercase',
-                    display: 'block',
-                    marginBottom: 0,
-                    marginTop: 0,
-                    opacity: 0,
-                    transform: isVisible ? 'translateX(0)' : 'translateX(-100px)',
-                    animation: isVisible ? `slideInFromLeft 0.8s ease-out ${wordIndex * 0.1}s forwards` : 'none',
-                  }}
-                >
-                  {word}
-                </div>
-              ))}
-          </div>
-
-          <div
-            style={{
-              fontSize: 'clamp(4.5rem, 10vw, 7rem)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 'clamp(4px, 1vw, 8px)',
+              fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
               fontWeight: 400,
               fontFamily: 'var(--font-bebas-neue), Impact, "Arial Black", sans-serif',
-              color: 'white',
-              textAlign: 'center',
-              marginBottom: '2px',
-              marginTop: 'clamp(4px, 1vw, 8px)',
-              textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
-              letterSpacing: '0.02em',
-              lineHeight: 1,
-              width: '100%',
-              opacity: 0,
-              transform: isVisible ? 'translateX(0)' : 'translateX(100px)',
-              animation: isVisible ? 'slideInFromRight 0.8s ease-out 0.3s forwards' : 'none',
+              color: ORANGE,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
             }}
           >
-            ${burger.price.toFixed(2)}
+            {burgerPart.split('').map((letter, index) => {
+              const totalLetters = burgerPart.length;
+              const arcRadius = 30;
+              const angle = ((index - (totalLetters - 1) / 2) * 15) * (Math.PI / 180);
+              const x = Math.sin(angle) * arcRadius;
+              const y = -Math.abs(Math.cos(angle) * arcRadius);
+              const rotation = (index - (totalLetters - 1) / 2) * 8;
+              
+              return (
+                <span
+                  key={index}
+                  style={{
+                    display: 'inline-block',
+                    transform: `translate(${x}px, ${y}px) rotate(${rotation}deg)`,
+                    transformOrigin: 'center center',
+                  }}
+                >
+                  {letter === ' ' ? '\u00A0' : letter}
+                </span>
+              );
+            })}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              gap: 'clamp(12px, 2vw, 24px)',
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                height: '2px',
+                backgroundColor: ORANGE,
+                maxWidth: 'clamp(60px, 15vw, 120px)',
+              }}
+            />
+            <div
+              style={{
+                fontSize: 'clamp(4rem, 10vw, 7.5rem)',
+                fontWeight: 700,
+                fontFamily: 'var(--font-playfair-display), "Playfair Display", "Times New Roman", serif',
+                color: ORANGE,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                lineHeight: 0.9,
+                fontStyle: 'italic',
+                textAlign: 'center',
+              }}
+            >
+              {restPart.toUpperCase()}
+            </div>
+            <div
+              style={{
+                flex: 1,
+                height: '2px',
+                backgroundColor: ORANGE,
+                maxWidth: 'clamp(60px, 15vw, 120px)',
+              }}
+            />
           </div>
         </div>
 
         <div
           style={{
-            marginTop: '2px',
-            marginBottom: '2px',
-            alignSelf: 'center',
+            flex: '1 1 0',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            flex: '1 1 0',
+            position: 'relative',
             minHeight: 0,
-            width: '100%',
-            overflow: 'hidden',
+            marginBottom: 'clamp(16px, 3vw, 32px)',
           }}
         >
+          <svg
+            style={{
+              position: 'absolute',
+              width: starburstSize,
+              height: starburstSize,
+              zIndex: 0,
+              opacity: isVisible ? 1 : 0,
+              animation: isVisible ? 'fadeIn 1s ease-out 0.4s forwards' : 'none',
+            }}
+            viewBox="0 0 200 200"
+          >
+            <polygon
+              points={generateStarburstPath()}
+              fill={ORANGE}
+            />
+          </svg>
           <img
             src={burger.image}
             alt={burger.name}
             style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
+              maxWidth: 'clamp(200px, 35vw, 350px)',
+              maxHeight: 'clamp(200px, 35vw, 350px)',
               width: 'auto',
               height: 'auto',
               display: 'block',
               objectFit: 'contain',
+              position: 'relative',
+              zIndex: 1,
               opacity: 0,
               animation: isVisible ? 'fadeIn 1s ease-out 0.5s forwards' : 'none',
             }}
@@ -211,27 +291,51 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
 
         <div
           style={{
-            fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',
-            fontWeight: 400,
-            fontFamily: '"Times New Roman", Times, serif',
-            color: 'white',
-            textAlign: 'center',
-            maxWidth: 'clamp(100%, 800px, 800px)',
-            textShadow: '1px 1px 4px rgba(0,0,0,0.3)',
-            lineHeight: 1.6,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
             width: '100%',
-            flexShrink: 0,
-            marginTop: 'auto',
-            marginBottom: 0,
-            alignSelf: 'center',
-            opacity: 0,
-            transform: isVisible ? 'translateY(0)' : 'translateY(-50px)',
-            animation: isVisible ? 'slideInFromTop 0.8s ease-out 0.7s forwards' : 'none',
+            gap: 'clamp(16px, 3vw, 32px)',
           }}
         >
-          {burger.description}
+          <div
+            style={{
+              flex: 1,
+              fontSize: 'clamp(0.875rem, 1.8vw, 1.25rem)',
+              fontWeight: 400,
+              fontFamily: 'var(--font-bebas-neue), Impact, "Arial Black", sans-serif',
+              color: ORANGE,
+              textTransform: 'uppercase',
+              lineHeight: 1.6,
+              letterSpacing: '0.05em',
+              textAlign: 'left',
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateY(0)' : 'translateY(50px)',
+              animation: isVisible ? 'slideInFromTop 0.8s ease-out 0.7s forwards' : 'none',
+            }}
+          >
+            {ingredientsText}
+          </div>
+          <div
+            style={{
+              fontSize: 'clamp(3.5rem, 8vw, 6rem)',
+              fontWeight: 700,
+              fontFamily: 'var(--font-playfair-display), "Playfair Display", "Times New Roman", serif',
+              color: ORANGE,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontStyle: 'italic',
+              flexShrink: 0,
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0)' : 'translateX(100px)',
+              animation: isVisible ? 'slideInFromRight 0.8s ease-out 0.6s forwards' : 'none',
+            }}
+          >
+            {burger.price.toFixed(0)}$
+          </div>
         </div>
       </div>
     </>
   );
 };
+

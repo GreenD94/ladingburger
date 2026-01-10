@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "extract-frames": "node scripts/extractFrames.js",
+    "make-transparent": "node scripts/makeTransparent.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
@@ -31,9 +33,13 @@
     "react-phone-number-input": "^3.3.1",
     "react-swipeable": "^7.0.2",
     "recharts": "^2.15.3",
+    "sharp": "^0.34.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -41,6 +47,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "fluent-ffmpeg": "^2.1.3",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"

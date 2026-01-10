@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Bebas_Neue } from 'next/font/google';
+import { Inter, Bebas_Neue, Playfair_Display } from 'next/font/google';
 import "./globals.css";
 import { Providers } from "./providers";
 import { Box } from '@mui/material';
@@ -9,6 +9,12 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-bebas-neue',
+});
+const playfairDisplay = Playfair_Display({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-playfair-display',
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
@@ -23,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${bebasNeue.variable}`}>
+      <body className={`${inter.className} ${bebasNeue.variable} ${playfairDisplay.variable}`}>
         <Providers>
           <Box
             sx={{
