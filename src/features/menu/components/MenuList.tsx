@@ -16,6 +16,9 @@ export const MenuList: React.FC = () => {
 
   useEffect(() => {
     const fetchBurgers = async () => {
+      const startTime = Date.now();
+      const minLoadingTime = 2000; // Minimum 2 seconds
+      
       try {
         setLoading(true);
         const availableBurgers = await getAvailableBurgers();
@@ -28,13 +31,19 @@ export const MenuList: React.FC = () => {
         console.error('Error al cargar el menú:', err);
         setError('Error al cargar el menú');
       } finally {
-        setLoading(false);
-        // Start exit animation
-        setIsExiting(true);
-        // Remove loader after animation completes
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
+        // Wait for minimum loading time if needed
         setTimeout(() => {
-          setShowLoader(false);
-        }, 600); // Match animation duration
+          setLoading(false);
+          // Start exit animation
+          setIsExiting(true);
+          // Remove loader after animation completes
+          setTimeout(() => {
+            setShowLoader(false);
+          }, 600); // Match animation duration
+        }, remainingTime);
       }
     };
 

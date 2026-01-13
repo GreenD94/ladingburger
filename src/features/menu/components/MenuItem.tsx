@@ -53,6 +53,24 @@ const MenuAnimations = () => (
         transform: translateY(0);
       }
     }
+
+    @keyframes slideInFromLeftNoFade {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInFromRightNoFade {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
   `}</style>
 );
 
@@ -159,6 +177,7 @@ const parseBurgerName = (name: string) => {
 export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
   const { theme } = useMenuTheme();
   const [isVisible, setIsVisible] = useState(false);
+  const [hasAnimatedCheckers, setHasAnimatedCheckers] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -182,6 +201,20 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
       }
     };
   }, []);
+
+  // Animate checkers only once when component mounts (first item only)
+  useEffect(() => {
+    if (index === 0) {
+      setHasAnimatedCheckers(true);
+    }
+  }, [index]);
+
+  // Calculate delays: long delays only for first item with checkerboard animation, short for others
+  const isFirstItemWithCheckers = index === 0 && hasAnimatedCheckers;
+  const titleDelay = isFirstItemWithCheckers ? '1s' : '0s';
+  const imageDelay = isFirstItemWithCheckers ? '1.2s' : '0.2s';
+  const priceDelay = isFirstItemWithCheckers ? '1.7s' : '0.7s';
+  const ingredientsDelay = isFirstItemWithCheckers ? '1.7s' : '0.7s';
 
   const { burgerPart, restPart } = parseBurgerName(burger.name);
   
@@ -235,6 +268,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
             paddingLeft={paddingLeft}
             paddingRight={paddingRight}
             zIndex={0}
+            shouldAnimate={hasAnimatedCheckers && index === 0}
           />
           
           <div
@@ -260,7 +294,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
                 display: 'block',
                 objectFit: 'contain',
                 opacity: 0,
-                animation: isVisible ? 'fadeIn 1s ease-out 1s forwards' : 'none',
+                animation: isVisible ? `fadeIn 0.5s ease-out ${imageDelay} forwards` : 'none',
               }}
             />
           </div>
@@ -279,9 +313,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
             marginBottom: '0px',
             paddingBottom: '0px',
             backgroundColor: theme.backgroundColor,
-            opacity: isVisible ? 1 : 0,
-            transform: isVisible ? 'translateX(0)' : 'translateX(-100px)',
-            animation: isVisible ? 'slideInFromLeft 1s ease-out forwards' : 'none',
+            opacity: 0,
+            transform: 'translateX(-100px)',
+            animation: isVisible ? `slideInFromLeft 0.8s ease-out ${titleDelay} forwards` : 'none',
           }}
         >
           <BurgerNameDisplay burgerPart={burgerPart} />
@@ -319,7 +353,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
               textAlign: 'left',
               opacity: 0,
               transform: 'translateY(50px)',
-              animation: isVisible ? 'slideInFromTop 1s ease-out 2.5s forwards' : 'none',
+              animation: isVisible ? `slideInFromTop 0.5s ease-out ${ingredientsDelay} forwards` : 'none',
             }}
           >
             {ingredientsText}
@@ -339,7 +373,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
               flexShrink: 0,
               opacity: 0,
               transform: 'translateX(100px)',
-              animation: isVisible ? 'slideInFromRight 1s ease-out 1.5s forwards' : 'none',
+              animation: isVisible ? `slideInFromRight 0.5s ease-out ${priceDelay} forwards` : 'none',
             }}
           >
             {burger.price.toFixed(0)}$
@@ -354,6 +388,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
           paddingLeft={paddingLeft}
           paddingRight={paddingRight}
           zIndex={0}
+          shouldAnimate={hasAnimatedCheckers && index === 0}
         />
       </div>
     </>

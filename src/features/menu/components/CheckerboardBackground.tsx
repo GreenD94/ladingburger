@@ -9,6 +9,7 @@ interface CheckerboardBackgroundProps {
   paddingLeft?: string;
   paddingRight?: string;
   zIndex?: number;
+  shouldAnimate?: boolean;
 }
 
 export const CheckerboardBackground: React.FC<CheckerboardBackgroundProps> = ({
@@ -18,6 +19,7 @@ export const CheckerboardBackground: React.FC<CheckerboardBackgroundProps> = ({
   paddingLeft = '0px',
   paddingRight = '0px',
   zIndex = 0,
+  shouldAnimate = false,
 }) => {
   const squareSize = 'clamp(70px, 12vw, 120px)';
   
@@ -42,6 +44,14 @@ export const CheckerboardBackground: React.FC<CheckerboardBackgroundProps> = ({
     }
   }
 
+  const animationName = shouldAnimate 
+    ? (position === 'top' ? 'slideInFromLeftNoFade' : 'slideInFromRightNoFade')
+    : 'none';
+  
+  const initialTransform = shouldAnimate
+    ? (position === 'top' ? 'translateX(-100%)' : 'translateX(100%)')
+    : 'translateX(0)';
+
   return (
     <div
       style={{
@@ -57,6 +67,8 @@ export const CheckerboardBackground: React.FC<CheckerboardBackgroundProps> = ({
         backgroundColor,
         zIndex,
         overflow: 'hidden',
+        transform: initialTransform,
+        animation: shouldAnimate ? `${animationName} 1s ease-out forwards` : 'none',
       }}
     >
       {squares}
