@@ -124,12 +124,22 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
 
         {(order.status === OrderStatus.ISSUE || order.status === OrderStatus.COMPLETED) && (
           <Box sx={{ 
-            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            backgroundColor: (theme) => theme.palette.mode === 'dark' 
+              ? 'rgba(239, 83, 80, 0.12)' 
+              : 'rgba(244, 67, 54, 0.1)', 
             p: 2, 
             borderRadius: 1,
             mb: 2
           }}>
-            <Typography variant="body1" sx={{ color: '#f44336', fontWeight: 'bold' }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: (theme) => theme.palette.mode === 'dark' 
+                  ? theme.palette.error.light 
+                  : theme.palette.error.main, 
+                fontWeight: 'bold' 
+              }}
+            >
               Problema reportado:
             </Typography>
             <Typography variant="body2" sx={{ color: '#f44336', mt: 1 }}>

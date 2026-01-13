@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { getAvailableBurgers } from '@/features/database/actions/menu/getAvailableBurgers';
 import { Burger } from '@/features/database/types';
 import { MenuItem } from './MenuItem';
+import { useMenuTheme } from '../hooks/useMenuTheme';
 
 export const MenuList: React.FC = () => {
+  const { theme } = useMenuTheme();
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -69,7 +71,7 @@ export const MenuList: React.FC = () => {
             bottom: 0,
             width: '100vw',
             height: '100vh',
-            backgroundColor: '#1a4d3a',
+            backgroundColor: theme.loadingScreenBackgroundColor,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -111,29 +113,31 @@ export const MenuList: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && burgers.length === 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            paddingTop: '64px',
-            paddingBottom: '64px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
-          }}
-        >
-          <h6 style={{ color: '#2C1810', textAlign: 'center', margin: 0, fontSize: '1.25rem', fontWeight: 500 }}>
-            No hay productos disponibles en este momento
-          </h6>
-        </div>
-      )}
-
-      {!loading && !error && burgers.length > 0 && (
+      {!loading && !error && (
         <>
-          {burgers.map((burger, index) => (
-            <MenuItem key={burger._id?.toString() || index} burger={burger} index={index} />
-          ))}
+          {burgers.length > 0 ? (
+            <>
+              {burgers.map((burger, index) => (
+                <MenuItem key={burger._id?.toString() || index} burger={burger} index={index} />
+              ))}
+            </>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                paddingTop: '64px',
+                paddingBottom: '64px',
+                paddingLeft: '24px',
+                paddingRight: '24px',
+              }}
+            >
+              <h6 style={{ color: '#2C1810', textAlign: 'center', margin: 0, fontSize: '1.25rem', fontWeight: 500 }}>
+                No hay productos disponibles en este momento
+              </h6>
+            </div>
+          )}
           <div
             style={{
               width: '100%',

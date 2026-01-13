@@ -22,7 +22,10 @@ import {
   Person as AdminIcon,
   Group as UsersIcon,
   Analytics as AnalyticsIcon,
+  Palette as ThemeIcon,
+  Settings as ConfigIcon,
 } from '@mui/icons-material';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage';
 
 const drawerWidth = 240;
 
@@ -36,14 +39,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'pers
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t } = useLanguage();
 
   const menuItems = [
-    { text: 'Analytics', icon: <AnalyticsIcon />, path: '/admin/analytics' },
-    { text: 'Orders', icon: <OrdersIcon />, path: '/admin/orders' },
-    { text: 'Menu', icon: <MenuIcon />, path: '/admin/menu' },
-    { text: 'Business', icon: <BusinessIcon />, path: '/admin/business' },
-    { text: 'Admin', icon: <AdminIcon />, path: '/admin/settings' },
-    { text: 'Users', icon: <UsersIcon />, path: '/admin/users' },
+    { text: t('analytics'), icon: <AnalyticsIcon />, path: '/admin/analytics' },
+    { text: t('orders'), icon: <OrdersIcon />, path: '/admin/orders' },
+    { text: t('menu'), icon: <MenuIcon />, path: '/admin/menu' },
+    { text: t('business'), icon: <BusinessIcon />, path: '/admin/business' },
+    { text: t('theme'), icon: <ThemeIcon />, path: '/admin/theme' },
+    { text: t('config'), icon: <ConfigIcon />, path: '/admin/config' },
+    { text: t('admin'), icon: <AdminIcon />, path: '/admin/settings' },
+    { text: t('users'), icon: <UsersIcon />, path: '/admin/users' },
   ];
 
   return (
