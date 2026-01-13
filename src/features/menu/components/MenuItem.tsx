@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Burger } from '@/features/database/types';
 import { useMenuTheme } from '../hooks/useMenuTheme';
+import { useCart } from '../contexts/CartContext';
 import { CheckerboardBackground } from './CheckerboardBackground';
 
 interface MenuItemProps {
@@ -176,9 +177,11 @@ const parseBurgerName = (name: string) => {
 
 export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
   const { theme } = useMenuTheme();
+  const { openCart, addItem, getTotalItems } = useCart();
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimatedCheckers, setHasAnimatedCheckers] = useState(false);
   const itemRef = useRef<HTMLDivElement>(null);
+  const itemCount = getTotalItems();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -233,6 +236,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
       <MenuAnimations />
       <div
         ref={itemRef}
+        data-menu-item={index}
         style={{
           width: '100%',
           height: '100dvh',
@@ -379,6 +383,71 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
             {burger.price.toFixed(0)}$
           </div>
         </div>
+
+        {/* Add to Cart Button - Fixed position on right side */}
+        <button
+          onClick={() => {
+            addItem(burger, 1);
+            openCart();
+          }}
+          style={{
+            position: 'fixed',
+            right: 0,
+            top: 'calc(50% - 18px)',
+            width: 'clamp(56px, 14vw, 72px)',
+            height: 'clamp(56px, 14vw, 72px)',
+            borderRadius: '50%',
+            backgroundColor: theme.backgroundColor,
+            border: '3px solid #FFFFFF',
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9997,
+            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)',
+            padding: 0,
+            margin: 0,
+            opacity: 0,
+            transform: 'translateX(100px) translateY(-50%)',
+            animation: isVisible ? `slideInFromRight 0.5s ease-out ${priceDelay} forwards` : 'none',
+            transition: 'all 0.2s ease-in-out',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateX(0) translateY(-50%) scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateX(0) translateY(-50%) scale(1)';
+          }}
+          onTouchStart={(e) => {
+            e.currentTarget.style.transform = 'translateX(0) translateY(-50%) scale(0.95)';
+          }}
+          onTouchEnd={(e) => {
+            e.currentTarget.style.transform = 'translateX(0) translateY(-50%) scale(1)';
+          }}
+          onAnimationEnd={(e) => {
+            // Ensure transform is correct after animation
+            e.currentTarget.style.transform = 'translateX(0) translateY(-50%)';
+          }}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              width: 'clamp(32px, 8vw, 40px)',
+              height: 'clamp(32px, 8vw, 40px)',
+            }}
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
 
         {/* Checkerboard Background at Bottom - Half Height */}
         <CheckerboardBackground

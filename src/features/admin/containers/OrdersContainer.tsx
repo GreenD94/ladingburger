@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Typography, Stack } from '@mui/material';
-import { OrderStatus } from '@/features/database/types';
+import { useState, useEffect, useMemo } from 'react';
+import { Box, Stack } from '@mui/material';
+import { OrderStatus, OrderStatusType, PaymentStatus } from '@/features/database/types';
 import { TabPanel } from '@/features/admin/components/orders/TabPanel';
 import { OrderTabs } from '@/features/admin/components/orders/OrderTabs';
-import { RefreshTimer } from '@/features/admin/components/orders/RefreshTimer';
 import OrdersList from '@/features/admin/components/orders/OrdersList';
 import { OrderSkeletonList } from '@/features/admin/components/orders/OrderSkeletonList';
+import { OrdersDashboardHeader } from '@/features/admin/components/orders/OrdersDashboardHeader';
+import { OrdersFilters, OrdersFiltersState } from '@/features/admin/components/orders/OrdersFilters';
 import { useOrders } from '@/features/admin/hooks/useOrders';
-import { useRefreshTimer } from '@/features/admin/hooks/useRefreshTimer';
+import { Order } from '@/features/database/types';
 
 const getStatusBackgroundColor = (status: number) => {
   switch (status) {
@@ -32,12 +33,35 @@ const getStatusBackgroundColor = (status: number) => {
 
 export default function OrdersContainer() {
   const [activeTab, setActiveTab] = useState(0);
-  const { orders, loading, refetchOrders } = useOrders();
-  const { timeLeft, isDisabled, handleRefresh } = useRefreshTimer({
-    onRefresh: refetchOrders,
-    initialTime: 30,
-    cooldownTime: 10
+  const [searchQuery, setSearchQuery] = useState('');
+  const [quickFilter, setQuickFilter] = useState<'all' | 'pending' | 'unpaid' | 'urgent'>('all');
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [filters, setFilters] = useState<OrdersFiltersState>({
+    dateRange: { start: null, end: null },
+    statuses: [],
+    paymentStatuses: [],
+    amountRange: { min: null, max: null },
   });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { orders, loading, refetchOrders } = useOrders();
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      refetchOrders();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, refetchOrders]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetchOrders();
+    setIsRefreshing(false);
+  };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -49,20 +73,121 @@ export default function OrdersContainer() {
     return acc;
   }, {} as Record<typeof OrderStatus[keyof typeof OrderStatus], number>);
 
+  // Filter and search logic
+  const filterOrders = (ordersToFilter: Order[]): Order[] => {
+    let filtered = [...ordersToFilter];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((order) => {
+        const orderId = order._id?.toString().toLowerCase() || '';
+        const phone = order.customerPhone.toLowerCase();
+        const customerName = (order as any).customerName?.toLowerCase() || '';
+        return orderId.includes(query) || phone.includes(query) || customerName.includes(query);
+      });
+    }
+
+    // Date range filter
+    if (filters.dateRange.start) {
+      filtered = filtered.filter((order) => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= filters.dateRange.start!;
+      });
+    }
+    if (filters.dateRange.end) {
+      filtered = filtered.filter((order) => {
+        const orderDate = new Date(order.createdAt);
+        const endDate = new Date(filters.dateRange.end!);
+        endDate.setHours(23, 59, 59, 999);
+        return orderDate <= endDate;
+      });
+    }
+
+    // Status filter
+    if (filters.statuses.length > 0) {
+      filtered = filtered.filter((order) => filters.statuses.includes(order.status));
+    }
+
+    // Payment status filter
+    if (filters.paymentStatuses.length > 0) {
+      filtered = filtered.filter((order) =>
+        filters.paymentStatuses.includes(order.paymentInfo.paymentStatus)
+      );
+    }
+
+    // Amount range filter
+    if (filters.amountRange.min !== null) {
+      filtered = filtered.filter((order) => order.totalPrice >= filters.amountRange.min!);
+    }
+    if (filters.amountRange.max !== null) {
+      filtered = filtered.filter((order) => order.totalPrice <= filters.amountRange.max!);
+    }
+
+    // Quick filters
+    if (quickFilter === 'pending') {
+      filtered = filtered.filter((order) =>
+        [OrderStatus.WAITING_PAYMENT, OrderStatus.COOKING, OrderStatus.IN_TRANSIT, OrderStatus.WAITING_PICKUP].includes(order.status)
+      );
+    } else if (quickFilter === 'unpaid') {
+      filtered = filtered.filter((order) =>
+        order.status === OrderStatus.WAITING_PAYMENT && order.paymentInfo.paymentStatus === PaymentStatus.PENDING
+      );
+    } else if (quickFilter === 'urgent') {
+      filtered = filtered.filter((order) => order.status === OrderStatus.ISSUE);
+    }
+
+    return filtered;
+  };
+
+  // Apply filters to all orders
+  const filteredOrdersByStatus = useMemo(() => {
+    const result: Record<OrderStatusType, Order[]> = {
+      [OrderStatus.WAITING_PAYMENT]: [],
+      [OrderStatus.COOKING]: [],
+      [OrderStatus.IN_TRANSIT]: [],
+      [OrderStatus.WAITING_PICKUP]: [],
+      [OrderStatus.COMPLETED]: [],
+      [OrderStatus.ISSUE]: [],
+    };
+
+    Object.values(OrderStatus).forEach((status) => {
+      result[status] = filterOrders(orders[status] || []);
+    });
+
+    return result;
+  }, [orders, searchQuery, filters, quickFilter]);
+
   if (loading) {
     return <OrderSkeletonList />;
   }
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          Gestión de Órdenes
-        </Typography>
-        <RefreshTimer
-          timeLeft={timeLeft}
-          isDisabled={isDisabled}
-          onRefresh={handleRefresh}
+      <OrdersDashboardHeader
+        orderCounts={orderCounts}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
+        quickFilter={quickFilter}
+        onQuickFilterChange={setQuickFilter}
+        autoRefresh={autoRefresh}
+        onAutoRefreshToggle={setAutoRefresh}
+      />
+
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <OrdersFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          onClear={() => {
+            setFilters({
+              dateRange: { start: null, end: null },
+              statuses: [],
+              paymentStatuses: [],
+              amountRange: { min: null, max: null },
+            });
+          }}
         />
       </Stack>
 
@@ -85,7 +210,7 @@ export default function OrdersContainer() {
           }}
         >
           <OrdersList 
-            orders={orders[status]} 
+            orders={filteredOrdersByStatus[status]} 
             onStatusChange={refetchOrders}
             onPaymentUpdate={refetchOrders}
           />

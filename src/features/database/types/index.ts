@@ -79,6 +79,13 @@ export interface Order {
   updatedAt: Date;
   paymentInfo: PaymentInfo;
   logs: OrderLog[];
+  priority?: 'normal' | 'high' | 'urgent';
+  assignedTo?: string; // staff ID (future)
+  internalNotes?: string;
+  estimatedPrepTime?: number; // minutes
+  actualPrepTime?: number; // minutes
+  problemCategory?: string;
+  customerName?: string; // from User if available
 }
 
 export type CreateOrderDTO = Omit<Order, '_id' | 'createdAt' | 'updatedAt' | 'userId'>;

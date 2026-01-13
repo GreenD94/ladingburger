@@ -1,18 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Card, CardContent, Typography, Button, Stack, Chip, Divider, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Stack, Chip, Divider, List, ListItem, ListItemText, useTheme, useMediaQuery } from '@mui/material';
 import { Order, OrderStatus, OrderStatusType, PaymentStatus } from '@/features/database/types';
 import { OrderStatusLabels } from '@/features/database/types';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import NoteIcon from '@mui/icons-material/Note';
 import PaymentIcon from '@mui/icons-material/Payment';
-import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { OrderTimer } from './OrderTimer';
 import PaymentModal from './PaymentModal';
 import { IssueModal } from './IssueModal';
 import { ConfirmCompleteModal } from './ConfirmCompleteModal';
 import { ConfirmNextStatusModal } from './ConfirmNextStatusModal';
+import { CustomerInfo } from './CustomerInfo';
+import { CustomerHistoryModal } from './CustomerHistoryModal';
+import { OrderPriorityComponent } from './OrderPriority';
+import { OrderNotes } from './OrderNotes';
+import { WhatsAppActions } from './WhatsAppActions';
+import { updateOrderPriority } from '@/features/database/actions/orders/updateOrderPriority';
+import { updateOrderNotes } from '@/features/database/actions/orders/updateOrderNotes';
 
 interface OrderCardProps {
   order: Order;
@@ -27,6 +33,12 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
   const [issueModalOpen, setIssueModalOpen] = useState(false);
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [nextStatusModalOpen, setNextStatusModalOpen] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [updatingPriority, setUpdatingPriority] = useState(false);
+  const [updatingNotes, setUpdatingNotes] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const getStatusColor = (status: OrderStatusType) => {
     switch (status) {
@@ -80,46 +92,73 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
     }
   };
 
+  const handlePriorityChange = async (orderId: string, priority: 'normal' | 'high' | 'urgent') => {
+    try {
+      setUpdatingPriority(true);
+      const result = await updateOrderPriority(orderId, priority);
+      if (result.success) {
+        onPaymentUpdate(); // Refresh orders
+      }
+    } catch (error) {
+      console.error('Error updating priority:', error);
+    } finally {
+      setUpdatingPriority(false);
+    }
+  };
+
+  const handleNotesChange = async (orderId: string, notes: string) => {
+    try {
+      setUpdatingNotes(true);
+      const result = await updateOrderNotes(orderId, notes);
+      if (result.success) {
+        onPaymentUpdate(); // Refresh orders
+      }
+    } catch (error) {
+      console.error('Error updating notes:', error);
+    } finally {
+      setUpdatingNotes(false);
+    }
+  };
+
   return (
     <Card>
       <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        {/* Customer Info Section */}
+        <Box sx={{ mb: 2 }}>
+          <CustomerInfo
+            phoneNumber={order.customerPhone}
+            customerName={order.customerName}
+            onViewHistory={() => setHistoryModalOpen(true)}
+          />
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Order Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 2 }}>
           <Box>
             <Typography variant="h6">
               Orden #{order._id?.toString().slice(-6)}
             </Typography>
             <OrderTimer createdAt={order.createdAt} />
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-           
-            <IconButton
-              color="success"
-              href={`https://wa.me/${order.customerPhone.replace(/\D/g, '')}`}
-              target="_blank"
-              sx={{
-                bgcolor: '#25D366',
-                color: 'white',
-                '&:hover': {
-                  bgcolor: '#128C7E',
-                  transform: 'scale(1.1)',
-                },
-                transition: 'all 0.2s ease-in-out',
-                boxShadow: '0 4px 12px rgba(37,211,102,0.3)',
-                '&:active': {
-                  transform: 'scale(0.95)',
-                },
-                width: 40,
-                height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
-                marginLeft: 1,
-              }}
-            >
-              <WhatsAppIcon sx={{ fontSize: 24 }} />
-            </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <WhatsAppActions
+              phoneNumber={order.customerPhone}
+              orderId={order._id!.toString()}
+              customerName={order.customerName}
+              disabled={updatingStatus[order._id!.toString()]}
+            />
           </Box>
+        </Box>
+
+        {/* Priority */}
+        <Box sx={{ mb: 2 }}>
+          <OrderPriorityComponent
+            order={order}
+            onPriorityChange={handlePriorityChange}
+            updating={updatingPriority}
+          />
         </Box>
 
         {(order.status === OrderStatus.ISSUE || order.status === OrderStatus.COMPLETED) && (
@@ -150,10 +189,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
           </Box>
         )}
 
+        {/* Order Details */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" color="text.secondary">
-            Cliente: {order.customerPhone}
-          </Typography>
           <Typography variant="subtitle2" color="text.secondary">
             Fecha: {new Date(order.createdAt).toLocaleString()}
           </Typography>
@@ -227,7 +264,16 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2}>
+        {/* Internal Notes */}
+        <OrderNotes
+          order={order}
+          onNotesChange={handleNotesChange}
+          updating={updatingNotes}
+        />
+
+        <Divider sx={{ my: 2 }} />
+
+        <Stack direction={isMobile ? 'column' : 'row'} spacing={2} sx={{ flexWrap: 'wrap' }}>
           {order.status !== OrderStatus.COMPLETED && (
             <>
               {getPreviousStatus(order.status) && (
@@ -236,6 +282,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
                   color="primary"
                   onClick={() => onStatusChange(order._id!.toString(), getPreviousStatus(order.status)!)}
                   disabled={updatingStatus[order._id!.toString()]}
+                  fullWidth={isMobile}
+                  sx={{ minHeight: isMobile ? 44 : 36 }}
                 >
                   Estado Anterior
                 </Button>
@@ -247,6 +295,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
                   color="primary"
                   onClick={() => setPaymentModalOpen(true)}
                   disabled={updatingStatus[order._id!.toString()]}
+                  fullWidth={isMobile}
+                  sx={{ minHeight: isMobile ? 44 : 36 }}
                 >
                   Registrar Pago
                 </Button>
@@ -256,6 +306,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
                   color="primary"
                   onClick={() => setNextStatusModalOpen(true)}
                   disabled={updatingStatus[order._id!.toString()]}
+                  fullWidth={isMobile}
+                  sx={{ minHeight: isMobile ? 44 : 36 }}
                 >
                   Siguiente Estado
                 </Button>
@@ -267,6 +319,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
                   color="error"
                   onClick={() => setIssueModalOpen(true)}
                   disabled={updatingStatus[order._id!.toString()]}
+                  fullWidth={isMobile}
+                  sx={{ minHeight: isMobile ? 44 : 36 }}
                 >
                   Marcar Problema
                 </Button>
@@ -280,6 +334,8 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
                   color="success"
                   onClick={() => setCompleteModalOpen(true)}
                   disabled={updatingStatus[order._id!.toString()]}
+                  fullWidth={isMobile}
+                  sx={{ minHeight: isMobile ? 44 : 36 }}
                 >
                   Completado
                 </Button>
@@ -317,6 +373,14 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
         currentStatus={order.status}
         nextStatus={getNextStatus(order.status)!}
         onConfirm={() => onStatusChange(order._id!.toString(), getNextStatus(order.status)!)}
+      />
+
+      <CustomerHistoryModal
+        open={historyModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+        phoneNumber={order.customerPhone}
+        customerName={order.customerName}
+        getBurgerName={getBurgerName}
       />
     </Card>
   );

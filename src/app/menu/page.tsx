@@ -4,6 +4,9 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MenuList } from '@/features/menu/components/MenuList';
 import { MenuThemeProvider } from '@/features/menu/contexts/MenuThemeContext';
+import { CartProvider } from '@/features/menu/contexts/CartContext';
+import { CartButton } from '@/features/menu/components/CartButton';
+import { CartDrawer } from '@/features/menu/components/CartDrawer';
 import { SafeArea } from '@/features/menu/components/SafeArea';
 
 function MenuPageContent() {
@@ -36,9 +39,12 @@ function MenuPageContent() {
         }
       `}</style>
       <MenuThemeProvider previewThemeName={previewThemeName || undefined}>
-        <SafeArea style={{ paddingTop: '5px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '5px' }}>
-          <MenuList />
-        </SafeArea>
+        <CartProvider>
+          <SafeArea style={{ paddingTop: '5px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '5px' }}>
+            <MenuList />
+          </SafeArea>
+          <CartDrawer />
+        </CartProvider>
       </MenuThemeProvider>
     </div>
   );
