@@ -260,7 +260,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
                 display: 'block',
                 objectFit: 'contain',
                 opacity: 0,
-                animation: isVisible ? 'fadeIn 1s ease-out 0.5s forwards' : 'none',
+                animation: isVisible ? 'fadeIn 1s ease-out 1s forwards' : 'none',
               }}
             />
           </div>
@@ -281,7 +281,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
             backgroundColor: theme.backgroundColor,
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateX(0)' : 'translateX(-100px)',
-            animation: isVisible ? 'slideInFromLeft 0.8s ease-out forwards' : 'none',
+            animation: isVisible ? 'slideInFromLeft 1s ease-out forwards' : 'none',
           }}
         >
           <BurgerNameDisplay burgerPart={burgerPart} />
@@ -317,9 +317,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
               lineHeight: 1.6,
               letterSpacing: '0.05em',
               textAlign: 'left',
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateY(0)' : 'translateY(50px)',
-              animation: isVisible ? 'slideInFromTop 0.8s ease-out 0.7s forwards' : 'none',
+              opacity: 0,
+              transform: 'translateY(50px)',
+              animation: isVisible ? 'slideInFromTop 1s ease-out 2.5s forwards' : 'none',
             }}
           >
             {ingredientsText}
@@ -337,9 +337,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({ burger, index }) => {
               letterSpacing: '0.05em',
               fontStyle: 'italic',
               flexShrink: 0,
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateX(0)' : 'translateX(100px)',
-              animation: isVisible ? 'slideInFromRight 0.8s ease-out 0.6s forwards' : 'none',
+              opacity: 0,
+              transform: 'translateX(100px)',
+              animation: isVisible ? 'slideInFromRight 1s ease-out 1.5s forwards' : 'none',
             }}
           >
             {burger.price.toFixed(0)}$
