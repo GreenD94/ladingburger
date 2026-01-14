@@ -10,6 +10,7 @@ import { ANIMATION_DURATION_MEDIUM } from '../constants/animations.constants';
 import { Z_INDEX_LOADING_SCREEN } from '../constants/zIndex.constants';
 import { CART_DRAWER_SHADOW } from '../constants/colors.constants';
 import { PRIMARY_GREEN } from '../constants/cartColors.constants';
+import { getBusinessContact } from '@/features/database/actions/businessContacts/getBusinessContact.action';
 
 interface DrawerContentProps {
   isOpen: boolean;
@@ -22,77 +23,104 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
   const hasItems = items.length > 0;
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [whatsappLink, setWhatsappLink] = useState('');
   const drawerRef = useRef<HTMLDivElement>(null);
   const startXRef = useRef<number>(0);
   const currentXRef = useRef<number>(0);
+  const isDraggingRef = useRef<boolean>(false);
   const EDGE_THRESHOLD = 50; // pixels from right edge to start drag
+
+  useEffect(() => {
+    const fetchWhatsAppLink = async () => {
+      try {
+        const contact = await getBusinessContact();
+        if (contact && contact.whatsappLink && contact.whatsappLink !== '') {
+          setWhatsappLink(contact.whatsappLink);
+        }
+      } catch (error) {
+        console.error('Error fetching WhatsApp link:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchWhatsAppLink();
+    }
+  }, [isOpen]);
 
   const handleBuyNow = () => {
     // TODO: Implement buy now action
   };
 
   const handleWhatsApp = () => {
-    // TODO: Implement WhatsApp action
+    if (whatsappLink && whatsappLink !== '') {
+      window.open(whatsappLink, '_blank');
+    }
   };
 
   const handleAddNote = (burgerId: string) => {
     // TODO: Implement add note action
   };
 
-  const handleStart = (clientX: number) => {
-    const windowWidth = window.innerWidth;
-    const startFromRightEdge = windowWidth - clientX <= EDGE_THRESHOLD;
+  const handleStart = (clientX: number, target: EventTarget | null) => {
+    if (!isOpen) return; // Only handle drag when drawer is open
     
-    // Allow drag if drawer is open OR if starting from right edge when closed
-    if (isOpen || (!isOpen && startFromRightEdge)) {
-      setIsDragging(true);
-      startXRef.current = clientX;
-      currentXRef.current = clientX;
-      setDragOffset(0);
+    const isButton = target instanceof HTMLButtonElement || 
+                     (target instanceof HTMLElement && target.closest('button') !== null);
+    
+    if (isButton) {
+      return; // Don't start drag if clicking on a button
     }
+    
+    // DON'T set isDragging here - only set it when there's actual movement
+    // This prevents accidental drag state from simple clicks
+    startXRef.current = clientX;
+    currentXRef.current = clientX;
+    setDragOffset(0);
   };
 
   const handleMove = (clientX: number) => {
-    if (!isDragging) return;
+    if (!isOpen) return;
     const deltaX = clientX - startXRef.current;
+    const MIN_DRAG_DISTANCE = 5; // Minimum pixels to consider it a drag vs click
     
-    if (isOpen) {
-      // When open, only allow dragging to the right (positive deltaX) to close
-      if (deltaX > 0) {
-        currentXRef.current = clientX;
-        setDragOffset(deltaX);
-      }
-    } else {
-      // When closed, only allow dragging to the left (negative deltaX) to open
-      if (deltaX < 0) {
-        currentXRef.current = clientX;
-        // Calculate how much of the drawer should be visible
-        const drawerWidth = drawerRef.current?.offsetWidth || window.innerWidth * 0.9;
-        const maxOffset = drawerWidth;
-        const offset = Math.min(Math.abs(deltaX), maxOffset);
-        setDragOffset(-offset);
-      }
+    // Only set isDragging when there's actual movement
+    if (Math.abs(deltaX) >= MIN_DRAG_DISTANCE && !isDraggingRef.current) {
+      isDraggingRef.current = true;
+      setIsDragging(true);
+    }
+    
+    if (!isDraggingRef.current) return;
+    
+    // When open, only allow dragging to the right (positive deltaX) to close
+    if (deltaX > 0) {
+      currentXRef.current = clientX;
+      setDragOffset(deltaX);
     }
   };
 
   const handleEnd = () => {
-    if (!isDragging) return;
+    if (!isDraggingRef.current || !isOpen) return;
     const deltaX = currentXRef.current - startXRef.current;
+    const MIN_DRAG_DISTANCE = 5; // Minimum pixels to consider it a drag vs click
     const drawerWidth = drawerRef.current?.offsetWidth || window.innerWidth * 0.9;
     const threshold = drawerWidth * 0.3;
     
-    if (isOpen) {
-      // If open and dragged right enough, close it
-      if (deltaX > threshold) {
-        closeCart();
-      }
-    } else {
-      // If closed and dragged left enough, open it
-      if (Math.abs(deltaX) > threshold) {
-        openCart();
-      }
+    // If it was just a click (no significant movement), don't close
+    if (Math.abs(deltaX) < MIN_DRAG_DISTANCE) {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      setDragOffset(0);
+      startXRef.current = 0;
+      currentXRef.current = 0;
+      return;
     }
     
+    // If open and dragged right enough, close it
+    if (deltaX > threshold) {
+      closeCart();
+    }
+    
+    isDraggingRef.current = false;
     setIsDragging(false);
     setDragOffset(0);
     startXRef.current = 0;
@@ -101,8 +129,11 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
 
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    handleStart(e.clientX);
+    if (!isOpen) return;
+    // Stop all event propagation to prevent overlay from receiving the event
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    handleStart(e.clientX, e.target);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -110,12 +141,23 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
   };
 
   const handleMouseUp = () => {
-    handleEnd();
+    // Only call handleEnd if we were actually dragging
+    if (isDraggingRef.current) {
+      handleEnd();
+    } else {
+      // Clean up if it was just a click (no drag occurred)
+      startXRef.current = 0;
+      currentXRef.current = 0;
+    }
   };
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
-    handleStart(e.touches[0].clientX);
+    if (!isOpen || e.touches.length === 0) return;
+    // Stop all event propagation to prevent overlay from receiving the event
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    handleStart(e.touches[0].clientX, e.target);
   };
 
   const handleTouchMove = (e: TouchEvent) => {
@@ -125,11 +167,20 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
   };
 
   const handleTouchEnd = () => {
-    handleEnd();
+    // Only call handleEnd if we were actually dragging
+    if (isDraggingRef.current) {
+      handleEnd();
+    } else {
+      // Clean up if it was just a tap (no drag occurred)
+      startXRef.current = 0;
+      currentXRef.current = 0;
+    }
   };
 
   useEffect(() => {
-    if (isDragging) {
+    // Always add move/end listeners when drawer is open to detect movement
+    // But only process in handleEnd if isDraggingRef.current is true
+    if (isOpen) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       document.addEventListener('touchmove', handleTouchMove);
@@ -142,7 +193,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
         document.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [isDragging]);
+  }, [isOpen]);
 
   // Calculate transform based on state
   let transformValue: string;
@@ -165,9 +216,23 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
   
   const transition = (isDragging || externalDragOffset !== 0) ? 'none' : `transform ${ANIMATION_DURATION_MEDIUM} ease-out`;
 
+  const handleDrawerClick = (e: React.MouseEvent) => {
+    // Stop all event propagation to prevent overlay from receiving the event
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+  };
+
+  const handleDrawerTouch = (e: React.TouchEvent) => {
+    // Stop all event propagation to prevent overlay from receiving the event
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+  };
+
   return (
     <div
       ref={drawerRef}
+      onClick={handleDrawerClick}
+      onTouchEnd={handleDrawerTouch}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       style={{
@@ -191,9 +256,10 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
         cursor: isDragging ? 'grabbing' : 'grab',
         borderTopLeftRadius: 'clamp(1rem, 4vw, 2rem)',
         borderBottomLeftRadius: 'clamp(1rem, 4vw, 2rem)',
+        pointerEvents: 'auto',
       }}
     >
-      <CartHeader total={totalPrice} />
+      <CartHeader total={totalPrice} onWhatsApp={whatsappLink !== '' ? handleWhatsApp : undefined} />
       <CheckeredDivider />
       <main
         style={{
@@ -238,7 +304,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ isOpen, externalDr
               fontStyle: 'italic',
             }}
           >
-            Your cart is empty
+            Tu carrito está vacío
           </div>
         )}
       </main>

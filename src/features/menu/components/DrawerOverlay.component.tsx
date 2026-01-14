@@ -15,9 +15,25 @@ export const DrawerOverlay: React.FC<DrawerOverlayProps> = ({ isOpen, onClose })
     return null;
   }
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the overlay itself, not on any child elements
+    // This prevents closing when clicking on the drawer content (which is a sibling, not a child)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleOverlayTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Only close if touching directly on the overlay itself
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <div
-      onClick={onClose}
+      onClick={handleOverlayClick}
+      onTouchEnd={handleOverlayTouch}
       style={{
         position: 'fixed',
         top: 0,
@@ -27,6 +43,7 @@ export const DrawerOverlay: React.FC<DrawerOverlayProps> = ({ isOpen, onClose })
         backgroundColor: OVERLAY_BACKGROUND_COLOR,
         zIndex: Z_INDEX_CART_OVERLAY,
         animation: `fadeIn ${ANIMATION_DURATION_MEDIUM} ease-out`,
+        pointerEvents: 'auto',
       }}
     />
   );

@@ -39,7 +39,7 @@ export const VisibleMenuItemProvider: React.FC<{ children: ReactNode }> = ({ chi
         });
 
         if (mostVisibleEntry) {
-          const itemIndexAttr = mostVisibleEntry.target.getAttribute('data-menu-item');
+          const itemIndexAttr = (mostVisibleEntry as IntersectionObserverEntry).target.getAttribute('data-menu-item');
           const itemIndex = itemIndexAttr ? parseInt(itemIndexAttr, 10) : null;
           if (itemIndex !== null) {
             setVisibleItemIndex(itemIndex);

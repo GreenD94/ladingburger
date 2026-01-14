@@ -66,7 +66,7 @@ export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp }) 
             e.currentTarget.style.transform = 'scale(1)';
           }}
         >
-          BUY NOW
+          COMPRAR
           <svg
             width="24"
             height="24"
@@ -84,15 +84,7 @@ export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp }) 
           </svg>
         </button>
       </div>
-      <div
-        style={{
-          height: '16px',
-          width: '128px',
-          backgroundColor: `${OFF_WHITE}1A`,
-          margin: '24px auto 0',
-          borderRadius: '9999px',
-        }}
-      />
+
     </footer>
   );
 };
