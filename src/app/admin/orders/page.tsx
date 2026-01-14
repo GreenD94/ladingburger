@@ -1,6 +1,6 @@
 'use client';
 
-import OrdersContainer from '@/features/admin/containers/OrdersContainer';
+import OrdersContainer from '@/features/admin/containers/OrdersContainer.container';
 
 export default function OrdersPage() {
   return <OrdersContainer />;

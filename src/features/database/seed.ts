@@ -1,5 +1,5 @@
 import clientPromise from './config/mongodb';
-import { Burger } from './types';
+import { Burger, BURGER_IMAGES } from './types/index.type';
 
 const initialBurgers: Omit<Burger, '_id'>[] = [
   {
@@ -7,7 +7,7 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     description: "Hamburguesa estilo venezolano con queso guayanés, plátano maduro y aguacate",
     price: 12.99,
     ingredients: ["Carne de res", "Queso guayanés", "Plátano maduro", "Aguacate", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
-    image: "/burgers/caraquena.jpg",
+    image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
     isAvailable: true
   },
@@ -16,7 +16,7 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     description: "Hamburguesa con carne de res, queso amarillo, tocineta y huevo frito",
     price: 11.99,
     ingredients: ["Carne de res", "Queso amarillo", "Tocineta", "Huevo frito", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
-    image: "/burgers/maracucha.jpg",
+    image: BURGER_IMAGES.CLASSIC,
     category: "Clásicas",
     isAvailable: true
   },
@@ -25,7 +25,7 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     description: "Hamburguesa con carne de res, queso de mano, aguacate y papas fritas",
     price: 13.99,
     ingredients: ["Carne de res", "Queso de mano", "Aguacate", "Papas fritas", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
-    image: "/burgers/andina.jpg",
+    image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
     isAvailable: true
   },
@@ -34,7 +34,7 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     description: "Hamburguesa con carne de res, queso guayanés, plátano maduro y tocineta",
     price: 12.99,
     ingredients: ["Carne de res", "Queso guayanés", "Plátano maduro", "Tocineta", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
-    image: "/burgers/oriental.jpg",
+    image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
     isAvailable: true
   }
@@ -45,10 +45,8 @@ export async function seedDatabase() {
     const client = await clientPromise;
     const db = client.db('saborea');
 
-    // Clear existing burgers
     await db.collection('burgers').deleteMany({});
 
-    // Insert new burgers
     const result = await db.collection('burgers').insertMany(initialBurgers);
 
     console.log(`Successfully seeded ${result.insertedCount} burgers`);

@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, CircularProgress, useTheme, useMediaQuery, ThemeProvider } from '@mui/material';
-import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin';
-import { TopBar } from '@/features/admin/components/TopBar';
-import { Sidebar } from '@/features/admin/components/Sidebar';
+import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin.action';
+import { TopBar } from '@/features/admin/components/TopBar.component';
+import { Sidebar } from '@/features/admin/components/Sidebar.component';
 import { useSwipeable } from 'react-swipeable';
-import { useAdminTheme } from '@/features/admin/hooks/useAdminTheme';
+import { useAdminTheme } from '@/features/admin/hooks/useAdminTheme.hook';
 import { createAdminTheme } from '@/theme';
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {

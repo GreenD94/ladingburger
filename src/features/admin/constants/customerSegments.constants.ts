@@ -1,0 +1,5 @@
+export const FIRST_ORDER_COUNT = 1;
+export const VIP_LIFETIME_VALUE_THRESHOLD = 100;
+export const VIP_ORDER_COUNT_THRESHOLD = 5;
+export const FREQUENT_ORDER_COUNT_THRESHOLD = 2;
+

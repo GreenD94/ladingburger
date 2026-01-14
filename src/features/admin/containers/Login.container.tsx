@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LoginForm } from '../components/LoginForm';
-import { login } from '@/features/database/actions/auth/login';
+import { LoginForm } from '../components/LoginForm.component';
+import { login } from '@/features/database/actions/auth/login.action';
 
 export const LoginContainer: React.FC = () => {
   const router = useRouter();

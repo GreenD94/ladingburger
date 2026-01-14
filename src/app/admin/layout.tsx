@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AdminThemeProvider } from '@/features/admin/contexts/AdminThemeContext';
-import { LanguageProvider } from '@/features/i18n/contexts/LanguageContext';
+import { AdminThemeProvider } from '@/features/admin/contexts/AdminThemeContext.context';
+import { LanguageProvider } from '@/features/i18n/contexts/LanguageContext.context';
 import AdminLayoutInner from './layout-inner';
 
 export default function AdminLayout({

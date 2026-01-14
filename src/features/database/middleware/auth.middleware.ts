@@ -30,7 +30,6 @@ export async function authMiddleware(req: NextRequest) {
       );
     }
 
-    // Add admin to request headers for downstream use
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set('x-admin-id', admin._id.toString());
     requestHeaders.set('x-admin-email', admin.email);

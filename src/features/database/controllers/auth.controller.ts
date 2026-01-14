@@ -8,7 +8,6 @@ export async function login(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    // Find admin by email
     const client = await clientPromise;
     const db = client.db();
     const admin = await db.collection('admins').findOne({ email });
@@ -20,7 +19,6 @@ export async function login(req: NextRequest) {
       );
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -29,7 +27,6 @@ export async function login(req: NextRequest) {
       );
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: admin._id.toString() },
       process.env.JWT_SECRET || 'your-secret-key',
@@ -44,12 +41,11 @@ export async function login(req: NextRequest) {
       }
     });
 
-    // Set cookie
     response.cookies.set('adminToken', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 // 1 day in seconds
+      maxAge: 24 * 60 * 60
     });
 
     return response;

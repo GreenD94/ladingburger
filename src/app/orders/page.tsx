@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { OrdersContainer } from '@/features/orders/container/Orders.container';
+import { OrdersContainer } from '@/features/orders/containers/Orders.container';
 
 export default function OrdersPage() {
   return (

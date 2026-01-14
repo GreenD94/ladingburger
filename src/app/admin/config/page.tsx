@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
-import { ThemeModeToggle } from '@/features/admin/components/config/ThemeModeToggle';
-import { LanguageSelector } from '@/features/admin/components/config/LanguageSelector';
-import { useLanguage } from '@/features/i18n/hooks/useLanguage';
+import { ThemeModeToggle } from '@/features/admin/components/config/ThemeModeToggle.component';
+import { LanguageSelector } from '@/features/admin/components/config/LanguageSelector.component';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
 export default function ConfigPage() {
   const { t } = useLanguage();

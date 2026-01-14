@@ -1,7 +1,8 @@
-import { MenuItemWithId } from '@/features/database/types/menu';
+import { MenuItemWithId } from '@/features/database/types/menu.type';
 import clientPromise from '../config/mongodb';
 import { Db, WithId, ObjectId } from 'mongodb';
-import { aggregateSalesData, aggregateCustomerData, determineTimeRange } from '@/features/analytics/utils/dataAggregation';
+import { aggregateSalesData, aggregateCustomerData, determineTimeRange } from '@/features/analytics/utils/dataAggregation.util';
+import { TOP_SELLING_ITEMS_LIMIT, HOURS_IN_DAY } from '../constants/emptyValues.constants';
 
 export interface Order {
   _id: string;
@@ -94,7 +95,6 @@ export async function updateDailySales(date: Date) {
   const client = await clientPromise;
   const db = client.db('saborea');
 
-  // Get all orders for the day
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date(date);
@@ -104,12 +104,10 @@ export async function updateDailySales(date: Date) {
     createdAt: { $gte: startOfDay, $lte: endOfDay }
   }).toArray() as unknown as Order[];
 
-  // Calculate daily metrics
   const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
   const totalOrders = orders.length;
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-  // Calculate customer metrics
   const customerOrders = orders.reduce((acc, order) => {
     if (!acc[order.customerPhone]) {
       acc[order.customerPhone] = 1;
@@ -123,7 +121,6 @@ export async function updateDailySales(date: Date) {
   const returningCustomers = Object.values(customerOrders).filter(count => count > 1).length;
   const totalCustomers = newCustomers + returningCustomers;
 
-  // Calculate items sold
   const itemsSold = orders.reduce((acc, order) => {
     order.items.forEach((item: OrderItem) => {
       const existing = acc.find(i => i.burgerId === item.burgerId);
@@ -141,8 +138,7 @@ export async function updateDailySales(date: Date) {
     return acc;
   }, [] as { burgerId: string; quantity: number; revenue: number }[]);
 
-  // Calculate peak hours
-  const peakHours = Array(24).fill(0).map((_, hour) => {
+  const peakHours = Array(HOURS_IN_DAY).fill(0).map((_, hour) => {
     const hourStart = new Date(date);
     hourStart.setHours(hour, 0, 0, 0);
     const hourEnd = new Date(date);
@@ -167,7 +163,6 @@ export async function updateDailySales(date: Date) {
     peakHours
   };
 
-  // Update or insert daily sales
   await db.collection('daily_sales').updateOne(
     { date: { $eq: date.toISOString().split('T')[0] } },
     { $set: dailySales },
@@ -186,12 +181,10 @@ export async function getAnalyticsSummary(db: Db, days: number): Promise<Analyti
     createdAt: { $gte: startDate, $lte: endDate }
   }).toArray() as unknown as Order[];
 
-  // Calculate revenue metrics
   const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
   const totalOrders = orders.length;
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-  // Calculate customer metrics
   const customerOrders = orders.reduce((acc, order) => {
     if (!acc[order.customerPhone]) {
       acc[order.customerPhone] = 1;
@@ -205,7 +198,6 @@ export async function getAnalyticsSummary(db: Db, days: number): Promise<Analyti
   const returningCustomers = Object.values(customerOrders).filter(count => count > 1).length;
   const totalCustomers = newCustomers + returningCustomers;
 
-  // Get top selling items
   const topSellingItems = await getTopSellingItems(db, days);
 
   return {
@@ -237,7 +229,6 @@ export async function getPeakHours(db: Db, date: Date) {
       return dailySales.peakHours;
     }
 
-    // If not, calculate from orders
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
@@ -252,20 +243,17 @@ export async function getPeakHours(db: Db, date: Date) {
       })
       .toArray();
 
-    // Calculate orders per hour
-    const hourlyOrders = new Array(24).fill(0);
+    const hourlyOrders = new Array(HOURS_IN_DAY).fill(0);
     orders.forEach(order => {
       const hour = new Date(order.createdAt).getHours();
       hourlyOrders[hour]++;
     });
 
-    // Transform to required format
     const peakHours = hourlyOrders.map((orders, hour) => ({
       hour,
       orders
     }));
 
-    // Cache the results
     await db.collection<DailySales>('daily_sales')
       .updateOne(
         { date: { $eq: dateString } },
@@ -289,7 +277,6 @@ export async function getSalesData(db: Db, days: number) {
     createdAt: { $gte: startDate, $lte: endDate }
   }).toArray() as unknown as Order[];
 
-  // Group orders by date
   const salesByDate = orders.reduce((acc, order) => {
     const date = order.createdAt.toISOString().split('T')[0];
     if (!acc[date]) {
@@ -303,7 +290,6 @@ export async function getSalesData(db: Db, days: number) {
     return acc;
   }, {} as Record<string, { revenue: number; orders: number }>);
 
-  // Convert to array and sort by date
   const salesData = Object.entries(salesByDate).map(([date, data]) => ({
     date,
     revenue: data.revenue,
@@ -322,11 +308,9 @@ export async function getTopSellingItems(db: Db, days: number) {
     createdAt: { $gte: startDate, $lte: endDate }
   }).toArray() as unknown as Order[];
 
-  // Get all menu items to map IDs to names
   const menuItems = await db.collection('menu_items').find({}).toArray() as unknown as MenuItemWithId[];
   const menuItemMap = new Map(menuItems.map(item => [item._id.toString(), item]));
 
-  // Aggregate item sales
   const itemSales = new Map<string, { quantity: number; revenue: number }>();
 
   orders.forEach(order => {
@@ -336,8 +320,7 @@ export async function getTopSellingItems(db: Db, days: number) {
       const menuItem = menuItemMap.get(itemId);
       
       if (!menuItem) {
-        console.warn(`Menu item not found for ID: ${itemId}`);
-        return; // Skip items that don't exist in the menu
+        return;
       }
       
       itemSales.set(itemId, {
@@ -347,12 +330,10 @@ export async function getTopSellingItems(db: Db, days: number) {
     });
   });
 
-  // Convert to array and sort by quantity
   const topSellingItems: TopSellingItem[] = Array.from(itemSales.entries())
     .map(([itemId, data]) => {
       const menuItem = menuItemMap.get(itemId);
       if (!menuItem) {
-        console.warn(`Menu item not found for ID: ${itemId} during final mapping`);
         return null;
       }
       return {
@@ -364,7 +345,7 @@ export async function getTopSellingItems(db: Db, days: number) {
     })
     .filter((item): item is TopSellingItem => item !== null)
     .sort((a, b) => b.quantity - a.quantity)
-    .slice(0, 10); // Get top 10 items
+    .slice(0, TOP_SELLING_ITEMS_LIMIT);
 
   return topSellingItems;
 }
@@ -378,7 +359,6 @@ export async function getCustomerAnalytics(db: Db, days: number): Promise<Custom
     createdAt: { $gte: startDate, $lte: endDate }
   }).toArray() as unknown as Order[];
 
-  // Calculate customer metrics
   const customerOrders = orders.reduce((acc, order) => {
     if (!acc[order.customerPhone]) {
       acc[order.customerPhone] = 1;

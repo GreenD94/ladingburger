@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, Paper } from '@mui/material';
-import { ThemeSelector } from '@/features/admin/components/theme/ThemeSelector';
-import { MenuPreview } from '@/features/admin/components/theme/MenuPreview';
-import { getSettings } from '@/features/database/actions/settings/getSettings';
-import { useLanguage } from '@/features/i18n/hooks/useLanguage';
+import { ThemeSelector } from '@/features/admin/components/theme/ThemeSelector.component';
+import { MenuPreview } from '@/features/admin/components/theme/MenuPreview.component';
+import { getSettings } from '@/features/database/actions/settings/getSettings.action';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
 export default function ThemePage() {
   const [selectedThemeName, setSelectedThemeName] = useState<string>('green');
