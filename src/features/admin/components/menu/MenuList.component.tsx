@@ -4,8 +4,8 @@ import React from 'react';
 import { Box, Typography, Stack } from '@mui/material';
 import { Burger } from '@/features/database/types/index.type';
 import { BurgerRow } from './BurgerRow.component';
-import LoadingState from '@/features/analytics/components/LoadingState.component';
-import ErrorState from '@/features/analytics/components/ErrorState.component';
+import LoadingState from '@/features/analytics/components/shared/LoadingState.component';
+import ErrorState from '@/features/analytics/components/shared/ErrorState.component';
 
 interface MenuListProps {
   burgers: Burger[];

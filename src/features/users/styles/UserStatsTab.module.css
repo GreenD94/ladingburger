@@ -1,0 +1,152 @@
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  gap: 16px;
+}
+
+.loadingIcon {
+  font-size: 48px;
+  color: #616f89;
+  opacity: 0.5;
+}
+
+.loadingText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #616f89;
+  margin: 0;
+  text-align: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  padding-bottom: 12px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.statCard {
+  background: #f6f6f8;
+  border: 1px solid rgba(19, 91, 236, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.statHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.statIcon {
+  font-size: 20px;
+  color: #135bec;
+}
+
+.statLabel {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 600;
+  color: #616f89;
+  margin: 0;
+}
+
+.statValue {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.statDescription {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  color: #616f89;
+  margin: 0;
+}
+
+.chartCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.datesCard {
+  background: #f6f6f8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dateItem:last-child {
+  border-bottom: none;
+}
+
+.dateIcon {
+  font-size: 24px;
+  color: #135bec;
+}
+
+.dateContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.dateLabel {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 400;
+  color: #616f89;
+  margin: 0;
+}
+
+.dateValue {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 500;
+  color: #111318;
+  margin: 0;
+}
+

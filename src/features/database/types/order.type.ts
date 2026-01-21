@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { PaymentStatusType, OrderStatusType } from './status.type';
+import { OrderStatusType } from './status.type';
 
 export interface OrderItem {
   burgerId: string;
@@ -17,18 +17,9 @@ export interface OrderLog {
   comment?: string;
 }
 
-export interface PaymentLog {
-  status: PaymentStatusType;
-  statusName: string;
-  createdAt: Date;
-  comment?: string;
-}
-
 export interface PaymentInfo {
   bankAccount: string;
   transferReference: string;
-  paymentStatus: PaymentStatusType;
-  paymentLogs?: PaymentLog[];
 }
 
 export interface CreateOrderDTO {
@@ -38,6 +29,7 @@ export interface CreateOrderDTO {
 
 export interface Order {
   _id?: ObjectId | string;
+  orderNumber?: number;
   userId?: string;
   customerPhone: string;
   customerName?: string;
@@ -53,6 +45,10 @@ export interface Order {
   internalNotes?: string;
   estimatedPrepTime?: number;
   actualPrepTime?: number;
+  cookingStartedAt?: Date;
   problemCategory?: string;
+  cancelledAt?: Date;
+  cancellationReason?: string;
+  cancelledBy?: string;
 }
 

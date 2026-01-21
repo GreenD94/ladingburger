@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Order, OrderStatus, PaymentStatus } from '@/features/database/types/index.type';
+import { Order, OrderStatus } from '@/features/database/types/index.type';
 import { DEFAULT_ORDER_THRESHOLDS } from '../constants/orderThresholds.constants';
 
 export interface OrderAlert {
@@ -32,8 +32,7 @@ export function useOrderAlerts(
       const orderAge = (now.getTime() - new Date(order.createdAt).getTime()) / (1000 * 60);
 
       if (
-        order.status === OrderStatus.WAITING_PAYMENT &&
-        order.paymentInfo.paymentStatus === PaymentStatus.PENDING &&
+        (order.status === OrderStatus.WAITING_PAYMENT || order.status === OrderStatus.PAYMENT_FAILED) &&
         orderAge > finalThresholds.paymentWaitingMinutes
       ) {
         alerts.push({

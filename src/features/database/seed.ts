@@ -9,7 +9,8 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ["Carne de res", "Queso guayanés", "Plátano maduro", "Aguacate", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
     image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
-    isAvailable: true
+    isAvailable: true,
+    estimatedPrepTime: 18,
   },
   {
     name: "La Maracucha",
@@ -18,7 +19,8 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ["Carne de res", "Queso amarillo", "Tocineta", "Huevo frito", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
     image: BURGER_IMAGES.CLASSIC,
     category: "Clásicas",
-    isAvailable: true
+    isAvailable: true,
+    estimatedPrepTime: 15,
   },
   {
     name: "La Andina",
@@ -27,7 +29,8 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ["Carne de res", "Queso de mano", "Aguacate", "Papas fritas", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
     image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
-    isAvailable: true
+    isAvailable: true,
+    estimatedPrepTime: 20,
   },
   {
     name: "La Oriental",
@@ -36,7 +39,8 @@ const initialBurgers: Omit<Burger, '_id'>[] = [
     ingredients: ["Carne de res", "Queso guayanés", "Plátano maduro", "Tocineta", "Lechuga", "Tomate", "Cebolla", "Salsa especial"],
     image: BURGER_IMAGES.CLASSIC,
     category: "Especialidades",
-    isAvailable: true
+    isAvailable: true,
+    estimatedPrepTime: 18,
   }
 ];
 

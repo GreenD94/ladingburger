@@ -74,11 +74,8 @@ export async function getOrdersByCustomerPhone(phoneNumber: string): Promise<Cus
         createdAt: new Date(orderDoc.createdAt),
         updatedAt: new Date(orderDoc.updatedAt),
         paymentInfo: {
-          ...orderDoc.paymentInfo,
-          paymentLogs: (orderDoc.paymentInfo?.paymentLogs || []).map((log: PaymentLogDocument) => ({
-            ...log,
-            createdAt: new Date(log.createdAt),
-          })),
+          bankAccount: (orderDoc.paymentInfo?.bankAccount as string) || '',
+          transferReference: (orderDoc.paymentInfo?.transferReference as string) || '',
         },
         logs: (orderDoc.logs || []).map((log: OrderLogDocument) => ({
           ...log,

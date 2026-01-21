@@ -1,0 +1,127 @@
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #f0f2f4;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 12px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #135bec;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.backButton:active {
+  background-color: rgba(19, 91, 236, 0.1);
+}
+
+.backIcon {
+  font-size: 24px;
+}
+
+.title {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.moreButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f4;
+  border: none;
+  color: #111318;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.moreButton:active {
+  background-color: #e0e0e0;
+}
+
+.moreIcon {
+  font-size: 20px;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  gap: 16px;
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.avatar {
+  width: clamp(80px, 20vw, 112px);
+  height: clamp(80px, 20vw, 112px);
+  border-radius: 50%;
+  border: 4px solid rgba(19, 91, 236, 0.1);
+  object-fit: cover;
+  background: #f0f0f0;
+}
+
+.badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #135bec;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 2px solid #ffffff;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.userName {
+  font-size: clamp(1.25rem, 3vw, 1.375rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  text-align: center;
+}
+
+.segment {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 600;
+  color: #135bec;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-align: center;
+}
+

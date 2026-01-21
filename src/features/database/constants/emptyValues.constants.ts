@@ -20,7 +20,6 @@ export const EMPTY_FILTERS: OrdersFiltersState = {
     end: EMPTY_DATE,
   },
   statuses: [],
-  paymentStatuses: [],
   amountRange: {
     min: 0,
     max: 0,
@@ -32,4 +31,7 @@ export const EMPTY_ORDERS_FILTERS_STATE = EMPTY_FILTERS;
 export const TOP_SELLING_ITEMS_LIMIT = 10;
 export const HOURS_IN_DAY = 24;
 export const COOKIE_MAX_AGE_ONE_DAY = 24 * 60 * 60;
+
+// Constant to represent "not loaded" state (instead of null)
+export const NOT_LOADED = -1;
 

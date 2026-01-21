@@ -1,0 +1,379 @@
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.searchSection {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.searchBar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: border-color 0.2s;
+}
+
+.searchBar:focus-within {
+  border-color: #135bec;
+  box-shadow: 0 0 0 3px rgba(19, 91, 236, 0.1);
+}
+
+.searchIcon {
+  font-size: 20px;
+  color: #616f89;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #111318;
+  background: transparent;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: #999;
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover {
+  background: #e0e0e0;
+}
+
+.clearIcon {
+  font-size: 16px;
+  color: #616f89;
+}
+
+.filterToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.filterToggle:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.filterIcon {
+  font-size: 24px;
+  color: #111318;
+}
+
+.filterBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+}
+
+.filtersPanel {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filterLabel {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 600;
+  color: #111318;
+}
+
+.filterRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dateInput,
+.amountInput {
+  width: 100%;
+  padding: 12px 16px;
+  min-height: 44px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #111318;
+  background: #ffffff;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.dateInput:focus,
+.amountInput:focus {
+  outline: none;
+  border-color: #135bec;
+  box-shadow: 0 0 0 3px rgba(19, 91, 236, 0.1);
+}
+
+.statusSelect {
+  width: 100%;
+}
+
+.clearFiltersButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  min-height: 44px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111318;
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-top: 8px;
+}
+
+.clearFiltersButton:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.clearFiltersIcon {
+  font-size: 20px;
+}
+
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  gap: 16px;
+}
+
+.loadingIcon,
+.emptyIcon {
+  font-size: 48px;
+  color: #616f89;
+  opacity: 0.5;
+}
+
+.loadingText,
+.emptyText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #616f89;
+  margin: 0;
+  text-align: center;
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.orderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.orderId {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 600;
+  color: #111318;
+  margin: 0;
+}
+
+.orderDate {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  color: #616f89;
+  margin: 0;
+}
+
+.orderStatus {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.status1 {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.status2 {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.status3 {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.status4 {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status5 {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.status6 {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.status7 {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+.status8 {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.status9 {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.orderDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  gap: 12px;
+}
+
+.orderTotal {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+}
+
+.orderItems {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  color: #616f89;
+  margin: 0;
+}
+
+.detailButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  min-height: 40px;
+  background: #135bec;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.detailButton:hover {
+  background: #0F4BC5;
+}
+
+.detailButton:active {
+  transform: scale(0.98);
+  background: #0D3FA3;
+}
+
+.detailIcon {
+  font-size: 18px;
+}
+
+.detailText {
+  font-weight: 600;
+}
+
+.loadingMore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 12px;
+}
+
+.observerTarget {
+  height: 1px;
+  width: 100%;
+}
+

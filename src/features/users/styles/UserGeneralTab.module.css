@@ -1,0 +1,163 @@
+.content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  padding-bottom: 12px;
+}
+
+.editButton {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 700;
+  color: #135bec;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.editButton:active {
+  opacity: 0.7;
+}
+
+.infoCard {
+  background: #f6f6f8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  min-height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.infoItem:last-child {
+  border-bottom: none;
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(19, 91, 236, 0.1);
+  color: #135bec;
+  flex-shrink: 0;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.infoValue {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 500;
+  color: #111318;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.infoLabel {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 400;
+  color: #616f89;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(19, 91, 236, 0.1);
+  color: #135bec;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.notesCard {
+  background: #f6f6f8;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.notesText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #111318;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.metricCard {
+  background: #f6f6f8;
+  border: 1px solid rgba(19, 91, 236, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.metricLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #616f89;
+  margin: 0 0 8px 0;
+}
+
+.metricValue {
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  line-height: 1.2;
+}
+

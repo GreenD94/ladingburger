@@ -47,7 +47,7 @@ export function exportOrdersToCSV(options: ExportOptions): void {
       getBurgerName(item.burgerId),
       item.quantity.toString(),
       index === 0 ? `$${order.totalPrice.toLocaleString()}` : '',
-      index === 0 ? (order.paymentInfo.paymentStatus === 1 ? 'Pagado' : 'Pendiente') : '',
+      index === 0 ? (order.status === OrderStatus.COOKING || order.status === OrderStatus.IN_TRANSIT || order.status === OrderStatus.WAITING_PICKUP || order.status === OrderStatus.COMPLETED ? 'Pagado' : order.status === OrderStatus.PAYMENT_FAILED ? 'Pago Fallido' : 'Pendiente') : '',
     ]);
   });
 

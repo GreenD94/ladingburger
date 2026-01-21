@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { Box, Card, CardContent, Typography, Button, Stack, Chip, Divider, List, ListItem, ListItemText, useTheme, useMediaQuery } from '@mui/material';
-import { Order, OrderStatus, OrderStatusType, PaymentStatus, OrderStatusLabels } from '@/features/database/types/index.type';
+import { Order, OrderStatus, OrderStatusType, OrderStatusLabels } from '@/features/database/types/index.type';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import NoteIcon from '@mui/icons-material/Note';
-import PaymentIcon from '@mui/icons-material/Payment';
 import { OrderTimer } from './OrderTimer.component';
 import PaymentModal from './PaymentModal.component';
 import { IssueModal } from './IssueModal.component';
 import { ConfirmCompleteModal } from './ConfirmCompleteModal.component';
 import { ConfirmNextStatusModal } from './ConfirmNextStatusModal.component';
+import { CancelOrderModal } from './CancelOrderModal.component';
 import { CustomerInfo } from './CustomerInfo.component';
 import { CustomerHistoryModal } from './CustomerHistoryModal.component';
 import { OrderPriorityComponent } from './OrderPriority.component';
@@ -18,6 +18,7 @@ import { OrderNotes } from './OrderNotes.component';
 import { WhatsAppActions } from './WhatsAppActions.component';
 import { updateOrderPriority } from '@/features/orders/actions/updateOrderPriority.action';
 import { updateOrderNotes } from '@/features/orders/actions/updateOrderNotes.action';
+import { getValidNextStatuses } from '@/features/orders/utils/validateStatusTransition.util';
 
 interface OrderCardProps {
   order: Order;
@@ -32,6 +33,7 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
   const [issueModalOpen, setIssueModalOpen] = useState(false);
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [nextStatusModalOpen, setNextStatusModalOpen] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [updatingPriority, setUpdatingPriority] = useState(false);
   const [updatingNotes, setUpdatingNotes] = useState(false);
@@ -42,54 +44,33 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
   const getStatusColor = (status: OrderStatusType) => {
     switch (status) {
       case OrderStatus.WAITING_PAYMENT: return '#FFB74D';
+      case OrderStatus.PAYMENT_FAILED: return '#F44336';
       case OrderStatus.COOKING: return '#FF5722';
       case OrderStatus.IN_TRANSIT: return '#4CAF50';
       case OrderStatus.WAITING_PICKUP: return '#2196F3';
       case OrderStatus.COMPLETED: return '#4CAF50';
       case OrderStatus.ISSUE: return '#F44336';
+      case OrderStatus.CANCELLED: return '#757575';
+      case OrderStatus.REFUNDED: return '#9E9E9E';
       default: return '#9E9E9E';
     }
   };
 
-  const getPaymentStatusColor = (status: number) => {
-    switch (status) {
-      case PaymentStatus.PAID: return 'success.main';
-      case PaymentStatus.PENDING: return 'warning.main';
-      case PaymentStatus.FAILED: return 'error.main';
-      case PaymentStatus.REFUNDED: return 'info.main';
-      default: return 'text.secondary';
-    }
-  };
+  const validNextStatuses = getValidNextStatuses(order.status);
+  const nextStatus = validNextStatuses.find(s => {
+    if (order.status === OrderStatus.WAITING_PAYMENT || order.status === OrderStatus.PAYMENT_FAILED) return s === OrderStatus.COOKING;
+    if (order.status === OrderStatus.COOKING) return s === OrderStatus.IN_TRANSIT;
+    if (order.status === OrderStatus.IN_TRANSIT) return s === OrderStatus.WAITING_PICKUP;
+    if (order.status === OrderStatus.WAITING_PICKUP) return s === OrderStatus.COMPLETED;
+    return false;
+  });
 
-  const getPaymentStatusText = (status: number) => {
-    switch (status) {
-      case PaymentStatus.PAID: return 'Pagado';
-      case PaymentStatus.PENDING: return 'Pendiente';
-      case PaymentStatus.FAILED: return 'Fallido';
-      case PaymentStatus.REFUNDED: return 'Reembolsado';
-      default: return 'Desconocido';
-    }
-  };
-
-  const getNextStatus = (currentStatus: OrderStatusType): OrderStatusType | undefined => {
-    switch (currentStatus) {
-      case OrderStatus.WAITING_PAYMENT: return OrderStatus.COOKING;
-      case OrderStatus.COOKING: return OrderStatus.IN_TRANSIT;
-      case OrderStatus.IN_TRANSIT: return OrderStatus.WAITING_PICKUP;
-      case OrderStatus.WAITING_PICKUP: return OrderStatus.COMPLETED;
-      default: return undefined;
-    }
-  };
-
-  const getPreviousStatus = (currentStatus: OrderStatusType): OrderStatusType | undefined => {
-    switch (currentStatus) {
-      case OrderStatus.COOKING: return OrderStatus.WAITING_PAYMENT;
-      case OrderStatus.IN_TRANSIT: return OrderStatus.COOKING;
-      case OrderStatus.WAITING_PICKUP: return OrderStatus.IN_TRANSIT;
-      case OrderStatus.COMPLETED: return OrderStatus.WAITING_PICKUP;
-      default: return undefined;
-    }
-  };
+  const previousStatus = validNextStatuses.find(s => {
+    if (order.status === OrderStatus.COOKING) return s === OrderStatus.WAITING_PAYMENT;
+    if (order.status === OrderStatus.IN_TRANSIT) return s === OrderStatus.COOKING;
+    if (order.status === OrderStatus.WAITING_PICKUP) return s === OrderStatus.IN_TRANSIT;
+    return false;
+  });
 
   const handlePriorityChange = async (orderId: string, priority: 'normal' | 'high' | 'urgent') => {
     try {
@@ -119,13 +100,15 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
     }
   };
 
-  const nextStatus = getNextStatus(order.status);
-  const previousStatus = getPreviousStatus(order.status);
   const orderId = order._id?.toString() || '';
+  const displayOrderNumber = order.orderNumber || orderId.slice(-6);
+  const isCancelled = order.status === OrderStatus.CANCELLED;
+  const isCompleted = order.status === OrderStatus.COMPLETED;
+  const isRefunded = order.status === OrderStatus.REFUNDED;
 
   return (
-    <Card>
-      <CardContent>
+    <Card sx={{ mb: 2 }}>
+      <CardContent sx={{ p: isMobile ? 2 : 3 }}>
         <Box sx={{ mb: 2 }}>
           <CustomerInfo
             phoneNumber={order.customerPhone}
@@ -136,10 +119,10 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
 
         <Divider sx={{ my: 2 }} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 2 }}>
-          <Box>
-            <Typography variant="h6">
-              Orden #{orderId.slice(-6)}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ flex: 1, minWidth: isMobile ? '100%' : 'auto' }}>
+            <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ fontWeight: 'bold', mb: 0.5 }}>
+              Pedido #{displayOrderNumber}
             </Typography>
             <OrderTimer createdAt={order.createdAt} />
           </Box>
@@ -148,7 +131,7 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
               phoneNumber={order.customerPhone}
               orderId={orderId}
               customerName={order.customerName}
-              disabled={updatingStatus[orderId]}
+              disabled={updatingStatus[orderId] || isCancelled}
             />
           </Box>
         </Box>
@@ -161,27 +144,104 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
           />
         </Box>
 
-        {(order.status === OrderStatus.ISSUE || order.status === OrderStatus.COMPLETED) && (
+        {order.status === OrderStatus.PAYMENT_FAILED && (
           <Box sx={{ 
-            backgroundColor: (theme) => theme.palette.mode === 'dark' 
-              ? 'rgba(239, 83, 80, 0.12)' 
-              : 'rgba(244, 67, 54, 0.1)', 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
             p: 2, 
             borderRadius: 1,
-            mb: 2
+            mb: 2,
+            border: '1px solid rgba(244, 67, 54, 0.3)'
           }}>
             <Typography 
               variant="body1" 
               sx={{ 
-                color: (theme) => theme.palette.mode === 'dark' 
-                  ? theme.palette.error.light 
-                  : theme.palette.error.main, 
-                fontWeight: 'bold' 
+                color: '#f44336', 
+                fontWeight: 'bold',
+                mb: 1
+              }}
+            >
+              Pago Fallido
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              El pago no pudo ser procesado. Puedes reintentar el pago o cancelar el pedido.
+            </Typography>
+          </Box>
+        )}
+
+        {order.status === OrderStatus.REFUNDED && (
+          <Box sx={{ 
+            backgroundColor: 'rgba(158, 158, 158, 0.1)', 
+            p: 2, 
+            borderRadius: 1,
+            mb: 2,
+            border: '1px solid rgba(158, 158, 158, 0.3)'
+          }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: '#9E9E9E', 
+                fontWeight: 'bold',
+                mb: 1
+              }}
+            >
+              Pedido Reembolsado
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              El pago de este pedido ha sido reembolsado.
+            </Typography>
+          </Box>
+        )}
+
+        {isCancelled && (
+          <Box sx={{ 
+            backgroundColor: 'rgba(117, 117, 117, 0.1)', 
+            p: 2, 
+            borderRadius: 1,
+            mb: 2,
+            border: '1px solid rgba(117, 117, 117, 0.3)'
+          }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: '#757575', 
+                fontWeight: 'bold',
+                mb: 1
+              }}
+            >
+              Pedido Cancelado
+            </Typography>
+            {order.cancellationReason && (
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Razón: {order.cancellationReason}
+              </Typography>
+            )}
+            {order.cancelledAt && (
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
+                Cancelado el: {new Date(order.cancelledAt).toLocaleString()}
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {(order.status === OrderStatus.ISSUE) && (
+          <Box sx={{ 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            p: 2, 
+            borderRadius: 1,
+            mb: 2,
+            border: '1px solid rgba(244, 67, 54, 0.3)'
+          }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: '#f44336', 
+                fontWeight: 'bold',
+                mb: 1
               }}
             >
               Problema reportado:
             </Typography>
-            <Typography variant="body2" sx={{ color: '#f44336', mt: 1 }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               {order.logs
                 ?.filter(log => log.status === OrderStatus.ISSUE)
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]?.comment || 'No se proporcionó descripción del problema'}
@@ -193,21 +253,19 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
           <Typography variant="subtitle2" color="text.secondary">
             Fecha: {new Date(order.createdAt).toLocaleString()}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-            <PaymentIcon sx={{ fontSize: '1rem', mr: 0.5, color: getPaymentStatusColor(order.paymentInfo.paymentStatus) }} />
-            <Typography variant="subtitle2" sx={{ color: getPaymentStatusColor(order.paymentInfo.paymentStatus) }}>
-              Pago: {getPaymentStatusText(order.paymentInfo.paymentStatus)}
-            </Typography>
-          </Box>
-          {order.paymentInfo.bankAccount && (
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Cuenta: {order.paymentInfo.bankAccount}
-            </Typography>
-          )}
-          {order.paymentInfo.transferReference && (
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Referencia: {order.paymentInfo.transferReference}
-            </Typography>
+          {(order.paymentInfo.bankAccount || order.paymentInfo.transferReference) && (
+            <Box sx={{ mt: 1 }}>
+              {order.paymentInfo.bankAccount && (
+                <Typography variant="subtitle2" color="text.secondary">
+                  Cuenta: {order.paymentInfo.bankAccount}
+                </Typography>
+              )}
+              {order.paymentInfo.transferReference && (
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Referencia: {order.paymentInfo.transferReference}
+                </Typography>
+              )}
+            </Box>
           )}
         </Box>
 
@@ -271,76 +329,124 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
 
         <Divider sx={{ my: 2 }} />
 
-        <Stack direction={isMobile ? 'column' : 'row'} spacing={2} sx={{ flexWrap: 'wrap' }}>
-          {order.status !== OrderStatus.COMPLETED && (
-            <>
+        {!isCancelled && !isCompleted && !isRefunded && (
+          <Stack direction="column" spacing={1.5} sx={{ mt: 2 }}>
+            {(order.status === OrderStatus.WAITING_PAYMENT || order.status === OrderStatus.PAYMENT_FAILED) && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setPaymentModalOpen(true)}
+                disabled={updatingStatus[orderId]}
+                fullWidth
+                sx={{ 
+                  minHeight: 48,
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  py: 1.5
+                }}
+              >
+                {order.status === OrderStatus.PAYMENT_FAILED ? 'Reintentar Pago' : 'Registrar Pago'}
+              </Button>
+            )}
+
+            {nextStatus && order.status !== OrderStatus.WAITING_PAYMENT && order.status !== OrderStatus.PAYMENT_FAILED && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setNextStatusModalOpen(true)}
+                disabled={updatingStatus[orderId]}
+                fullWidth
+                sx={{ 
+                  minHeight: 48,
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  py: 1.5
+                }}
+              >
+                Siguiente Estado
+              </Button>
+            )}
+
+            {(order.status === OrderStatus.COOKING || 
+              order.status === OrderStatus.WAITING_PICKUP || 
+              order.status === OrderStatus.ISSUE) && (
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => setCompleteModalOpen(true)}
+                disabled={updatingStatus[orderId]}
+                fullWidth
+                sx={{ 
+                  minHeight: 48,
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  py: 1.5
+                }}
+              >
+                Completar Pedido
+              </Button>
+            )}
+
+            <Stack direction="row" spacing={1}>
               {previousStatus && (
                 <Button
                   variant="outlined"
                   color="primary"
                   onClick={() => onStatusChange(orderId, previousStatus)}
                   disabled={updatingStatus[orderId]}
-                  fullWidth={isMobile}
-                  sx={{ minHeight: isMobile ? 44 : 36 }}
+                  fullWidth
+                  sx={{ 
+                    minHeight: 48,
+                    fontSize: '0.9rem',
+                    py: 1.5
+                  }}
                 >
                   Estado Anterior
-                </Button>
-              )}
-              
-              {order.status === OrderStatus.WAITING_PAYMENT && order.paymentInfo.paymentStatus === PaymentStatus.PENDING ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setPaymentModalOpen(true)}
-                  disabled={updatingStatus[orderId]}
-                  fullWidth={isMobile}
-                  sx={{ minHeight: isMobile ? 44 : 36 }}
-                >
-                  Registrar Pago
-                </Button>
-              ) : nextStatus && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setNextStatusModalOpen(true)}
-                  disabled={updatingStatus[orderId]}
-                  fullWidth={isMobile}
-                  sx={{ minHeight: isMobile ? 44 : 36 }}
-                >
-                  Siguiente Estado
                 </Button>
               )}
 
               {order.status !== OrderStatus.ISSUE && (
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   color="error"
                   onClick={() => setIssueModalOpen(true)}
                   disabled={updatingStatus[orderId]}
-                  fullWidth={isMobile}
-                  sx={{ minHeight: isMobile ? 44 : 36 }}
+                  fullWidth
+                  sx={{ 
+                    minHeight: 48,
+                    fontSize: '0.9rem',
+                    py: 1.5
+                  }}
                 >
-                  Marcar Problema
+                  Problema
                 </Button>
               )}
 
-              {(order.status === OrderStatus.COOKING || 
-                order.status === OrderStatus.WAITING_PICKUP || 
-                order.status === OrderStatus.ISSUE) && (
+              {validNextStatuses.includes(OrderStatus.CANCELLED) && (
                 <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => setCompleteModalOpen(true)}
+                  variant="outlined"
+                  color="inherit"
+                  onClick={() => setCancelModalOpen(true)}
                   disabled={updatingStatus[orderId]}
-                  fullWidth={isMobile}
-                  sx={{ minHeight: isMobile ? 44 : 36 }}
+                  fullWidth
+                  sx={{ 
+                    minHeight: 48,
+                    fontSize: '0.9rem',
+                    py: 1.5,
+                    borderColor: '#757575',
+                    color: '#757575',
+                    '&:hover': {
+                      borderColor: '#424242',
+                      backgroundColor: 'rgba(117, 117, 117, 0.04)'
+                    }
+                  }}
                 >
-                  Completado
+                  Cancelar
                 </Button>
               )}
-            </>
-          )}
-        </Stack>
+            </Stack>
+          </Stack>
+        )}
       </CardContent>
 
       <PaymentModal
@@ -381,6 +487,14 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
         phoneNumber={order.customerPhone}
         customerName={order.customerName}
         getBurgerName={getBurgerName}
+      />
+
+      <CancelOrderModal
+        open={cancelModalOpen}
+        onClose={() => setCancelModalOpen(false)}
+        orderId={orderId}
+        orderNumber={order.orderNumber}
+        onSuccess={onPaymentUpdate}
       />
     </Card>
   );

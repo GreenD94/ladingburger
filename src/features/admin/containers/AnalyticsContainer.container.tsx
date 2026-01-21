@@ -2,20 +2,24 @@
 
 import { useState, useCallback } from 'react';
 import { TimeRange } from '@/features/analytics/utils/dataAggregation.util';
-import { Box, Typography, Alert, useTheme, useMediaQuery } from '@mui/material';
+import { SafeArea } from '@/features/shared/components/SafeArea.component';
+import { AnalyticsCategoryNav } from '@/features/analytics/components/AnalyticsCategoryNav.component';
 import AnalyticsControls from '../components/AnalyticsControls.component';
 import AnalyticsDashboard from '../components/AnalyticsDashboard.component';
+import { useAnalyticsCategories } from '@/features/analytics/hooks/useAnalyticsCategories.hook';
+import { EMPTY_STRING } from '@/features/database/constants/emptyValues.constants';
+import styles from '@/features/admin/styles/AnalyticsContainer.module.css';
 
 export default function AnalyticsContainer() {
   const [timeRange, setTimeRange] = useState<number>(7);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [aggregationRange, setAggregationRange] = useState<TimeRange>('daily');
-  const [error, setError] = useState<string>('');
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [error, setError] = useState<string>(EMPTY_STRING);
+  
+  const { selectedCategory, changeCategory } = useAnalyticsCategories();
 
   const handleTimeRangeChange = useCallback((days: number) => {
-    setError('');
+    setError(EMPTY_STRING);
     setTimeRange(days);
   }, []);
 
@@ -24,11 +28,13 @@ export default function AnalyticsContainer() {
       setError('Por favor seleccione una fecha válida');
       return;
     }
-    if (date > new Date()) {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (date > today) {
       setError('La fecha seleccionada no puede ser en el futuro');
       return;
     }
-    setError('');
+    setError(EMPTY_STRING);
     setSelectedDate(date);
   }, []);
 
@@ -36,43 +42,18 @@ export default function AnalyticsContainer() {
     setAggregationRange(range);
   }, []);
 
-  const hasError = error !== '';
+  const hasError = error !== EMPTY_STRING;
 
   return (
-    <Box 
-      sx={{ 
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
-      <Box
-        sx={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          bgcolor: 'background.paper',
-          p: { xs: 2, sm: 3 },
-          pb: { xs: 1, sm: 2 }
-        }}
-      >
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          sx={{ 
-            fontSize: { xs: '1.5rem', sm: '2rem' },
-            mb: { xs: 1, sm: 2 }
-          }}
-        >
-          Panel de Análisis
-        </Typography>
+    <SafeArea className={styles.container} sides="all">
+      <header className={styles.header}>
+        <h1 className={styles.title}>Panel de Análisis</h1>
 
         {hasError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
+          <div className={styles.errorAlert}>
+            <span className={`material-symbols-outlined ${styles.errorIcon}`}>error</span>
+            <span className={styles.errorText}>{error}</span>
+          </div>
         )}
 
         <AnalyticsControls
@@ -82,26 +63,22 @@ export default function AnalyticsContainer() {
           onDateChange={handleDateChange}
           onAggregationChange={handleAggregationChange}
         />
-      </Box>
+      </header>
 
-      <Box
-        sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: { xs: 2, sm: 3 },
-          pt: { xs: 1, sm: 2 },
-          pb: { xs: 4, sm: 3 }
-        }}
-      >
+      <AnalyticsCategoryNav
+        selectedCategory={selectedCategory}
+        onCategoryChange={changeCategory}
+      />
+
+      <main className={styles.main}>
         <AnalyticsDashboard
           timeRange={timeRange}
           selectedDate={selectedDate}
           aggregationRange={aggregationRange}
+          selectedCategory={selectedCategory}
         />
-      </Box>
-      <Box
-        height={300}></Box>      
-    </Box>
+        <div className={styles.spacer}></div>
+      </main>
+    </SafeArea>
   );
 }
-

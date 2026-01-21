@@ -42,11 +42,23 @@ export async function createAdmin(adminData: Omit<CreateAdmin, 'createdAt' | 'up
   const client = await clientPromise;
   const db = client.db('saborea');
   
+  const normalizedEmail = adminData.email.trim().toLowerCase();
+  
+  const existingAdmin = await db.collection('admins').findOne({
+    email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') },
+  });
+  
+  if (existingAdmin) {
+    throw new Error('Admin with this email already exists');
+  }
+  
   const hashedPassword = await bcrypt.hash(adminData.password, 10);
   const now = new Date();
   const admin: CreateAdmin = {
     ...adminData,
+    email: normalizedEmail,
     password: hashedPassword,
+    isEnabled: adminData.isEnabled !== undefined ? adminData.isEnabled : true,
     createdAt: now,
     updatedAt: now
   };

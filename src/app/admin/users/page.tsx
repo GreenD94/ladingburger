@@ -1,11 +1,5 @@
-'use client';
-
-import { Typography } from '@mui/material';
+import UsersContainer from '@/features/users/containers/UsersContainer.container';
 
 export default function UsersPage() {
-  return (
-    <Typography variant="h4" component="h1">
-      Users Management
-    </Typography>
-  );
-} 
+  return <UsersContainer />;
+}

@@ -28,11 +28,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, orderNumber, burgers }) =>
   const getStatusColor = (status: number) => {
     switch (status) {
       case OrderStatus.WAITING_PAYMENT: return '#FFB74D';
+      case OrderStatus.PAYMENT_FAILED: return '#F44336';
       case OrderStatus.COOKING: return '#FF5722';
       case OrderStatus.IN_TRANSIT: return '#4CAF50';
       case OrderStatus.WAITING_PICKUP: return '#2196F3';
       case OrderStatus.COMPLETED: return '#4CAF50';
       case OrderStatus.ISSUE: return '#F44336';
+      case OrderStatus.CANCELLED: return '#757575';
+      case OrderStatus.REFUNDED: return '#9E9E9E';
       default: return '#9E9E9E';
     }
   };
@@ -40,11 +43,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, orderNumber, burgers }) =>
   const getStatusName = (status: number) => {
     switch (status) {
       case OrderStatus.WAITING_PAYMENT: return 'Esperando Pago';
+      case OrderStatus.PAYMENT_FAILED: return 'Pago Fallido';
       case OrderStatus.COOKING: return 'En Cocina';
       case OrderStatus.IN_TRANSIT: return 'En Camino';
       case OrderStatus.WAITING_PICKUP: return 'Esperando Recoger';
       case OrderStatus.COMPLETED: return 'Completado';
       case OrderStatus.ISSUE: return 'Con Problema';
+      case OrderStatus.CANCELLED: return 'Cancelado';
+      case OrderStatus.REFUNDED: return 'Reembolsado';
       default: return 'Desconocido';
     }
   };

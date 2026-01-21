@@ -14,6 +14,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Burger } from '@/features/database/types/index.type';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
 interface BurgerRowProps {
   burger: Burger;
@@ -26,6 +27,7 @@ export const BurgerRow: React.FC<BurgerRowProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { t } = useLanguage();
   return (
     <Card>
       <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
@@ -97,6 +99,9 @@ export const BurgerRow: React.FC<BurgerRowProps> = ({
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                 <strong>Ingredientes:</strong> {burger.ingredients.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                <strong>{t('estimatedTime')}:</strong> {burger.estimatedPrepTime ? `${burger.estimatedPrepTime} ${t('minutes')}` : 'N/A'}
               </Typography>
             </Stack>
 

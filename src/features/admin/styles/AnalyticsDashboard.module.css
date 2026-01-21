@@ -1,0 +1,27 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 4vw, 24px);
+  width: 100%;
+}
+
+.comingSoon {
+  padding: 60px 20px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comingSoonText {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #666;
+  margin: 0;
+}
+
+@media (min-width: 600px) {
+  .dashboard {
+    gap: 24px;
+  }
+}
+

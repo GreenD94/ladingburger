@@ -1,0 +1,56 @@
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 4vw, 20px);
+  margin-bottom: 20px;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 500;
+  color: #111318;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 12px 16px;
+  min-height: 44px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #111318;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  touch-action: manipulation;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: #135bec;
+  box-shadow: 0 0 0 3px rgba(19, 91, 236, 0.1);
+}
+
+.dateInput:active {
+  border-color: #135bec;
+}
+
+@media (min-width: 600px) {
+  .controls {
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-end;
+  }
+
+  .controlGroup {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+

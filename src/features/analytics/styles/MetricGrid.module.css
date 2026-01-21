@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 1), 1fr);
+  gap: clamp(12px, 3vw, 16px);
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(var(--columns, 2), 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(var(--columns, 4), 1fr);
+    gap: 20px;
+  }
+}
+

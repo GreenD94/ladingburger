@@ -24,6 +24,7 @@ import {
   Analytics as AnalyticsIcon,
   Palette as ThemeIcon,
   Settings as ConfigIcon,
+  Kitchen as KitchenIcon,
 } from '@mui/icons-material';
 import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
@@ -44,11 +45,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'pers
   const menuItems = [
     { text: t('analytics'), icon: <AnalyticsIcon />, path: '/admin/analytics' },
     { text: t('orders'), icon: <OrdersIcon />, path: '/admin/orders' },
+    { text: t('kitchen'), icon: <KitchenIcon />, path: '/admin/kitchen' },
     { text: t('menu'), icon: <MenuIcon />, path: '/admin/menu' },
     { text: t('business'), icon: <BusinessIcon />, path: '/admin/business' },
     { text: t('theme'), icon: <ThemeIcon />, path: '/admin/theme' },
     { text: t('config'), icon: <ConfigIcon />, path: '/admin/config' },
-    { text: t('admin'), icon: <AdminIcon />, path: '/admin/settings' },
+    { text: t('admin'), icon: <AdminIcon />, path: '/admin/admins' },
     { text: t('users'), icon: <UsersIcon />, path: '/admin/users' },
   ];
 

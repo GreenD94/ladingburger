@@ -12,7 +12,7 @@ import { getBusinessContact } from '@/features/database/actions/businessContacts
 import { createBusinessContact } from '@/features/database/actions/businessContacts/createBusinessContact.action';
 import { updateBusinessContact } from '@/features/database/actions/businessContacts/updateBusinessContact.action';
 import { deleteBusinessContact } from '@/features/database/actions/businessContacts/deleteBusinessContact.action';
-import { OrderStatus, PaymentStatus, Order, CreateOrderDTO, Burger, BusinessContact, PaymentStatusLabels } from '@/features/database/types/index.type';
+import { OrderStatus, Order, CreateOrderDTO, Burger, BusinessContact } from '@/features/database/types/index.type';
 import { login } from '@/features/database/actions/auth/login.action';
 import { logout } from '@/features/database/actions/auth/logout.action';
 import { getCurrentAdmin } from '@/features/database/actions/auth/getCurrentAdmin.action';

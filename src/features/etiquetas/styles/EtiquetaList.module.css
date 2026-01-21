@@ -1,0 +1,12 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 3vw, 16px);
+}
+
+@media (min-width: 600px) {
+  .list {
+    gap: 16px;
+  }
+}
+

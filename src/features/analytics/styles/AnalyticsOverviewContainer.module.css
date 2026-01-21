@@ -1,0 +1,7 @@
+.container {
+  min-height: 100vh;
+  background: #f6f6f8;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+

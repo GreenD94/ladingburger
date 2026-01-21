@@ -1,0 +1,146 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 1.25rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.loadingIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 1.25rem;
+  pointer-events: none;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  padding-left: 48px;
+  padding-right: 48px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #ffffff;
+}
+
+.searchInput:focus {
+  border-color: #135bec;
+}
+
+.pillsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.pill {
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pillUnselected {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.pillUnselected:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.pillSelected {
+  background-color: #135bec;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pillSelected:hover {
+  background-color: #0f4bc2;
+}
+
+.emptyState {
+  padding: 24px 16px;
+  text-align: center;
+  color: #999;
+  font-size: 0.9375rem;
+}
+
+.showMoreButton,
+.showLessButton {
+  align-self: flex-start;
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #135bec;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.showMoreButton:hover,
+.showLessButton:hover {
+  background-color: rgba(19, 91, 236, 0.08);
+  border-color: #135bec;
+}
+
+.showMoreButton:active,
+.showLessButton:active {
+  background-color: rgba(19, 91, 236, 0.12);
+}
+
+@media (max-width: 600px) {
+  .pill {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+
+  .searchInput {
+    min-height: 48px;
+  }
+}
+

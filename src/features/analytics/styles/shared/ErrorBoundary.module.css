@@ -1,0 +1,48 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 64px;
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0 0 12px 0;
+}
+
+.message {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #666;
+  margin: 0 0 24px 0;
+  max-width: 500px;
+}
+
+.retryButton {
+  padding: 12px 24px;
+  min-height: 44px;
+  background: #135bec;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.retryButton:active {
+  background: #0f4bc4;
+}
+

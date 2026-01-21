@@ -1,0 +1,98 @@
+.container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f6f6f8;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #e0e0e0;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.resetPasswordButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  background: #f59e0b;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  padding: 12px 24px;
+  touch-action: manipulation;
+}
+
+.resetPasswordButton:active {
+  transform: scale(0.98);
+  background: #d97706;
+}
+
+.resetPasswordIcon {
+  font-size: 24px;
+}
+
+.resetPasswordText {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.editButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  background: #ffffff;
+  color: #111318;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
+  padding: 12px 24px;
+  touch-action: manipulation;
+}
+
+.editButton:active {
+  transform: scale(0.98);
+  background: #e0e0e0;
+}
+
+.editIcon {
+  font-size: 24px;
+}
+
+.editText {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+

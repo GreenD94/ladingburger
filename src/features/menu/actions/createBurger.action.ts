@@ -10,8 +10,8 @@ export interface CreateBurgerInput {
   price: number;
   ingredients: string[];
   image: BurgerImage;
-  category: string;
   isAvailable: boolean;
+  estimatedPrepTime?: number;
 }
 
 export async function createBurger(burgerData: CreateBurgerInput): Promise<{ success: boolean; data?: Burger; error?: string }> {

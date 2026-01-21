@@ -108,6 +108,10 @@ export const MenuAnimations = () => (
         transform: translateX(100px) translateY(-50%);
       }
     }
+
+    .menu-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
   `}</style>
 );
 

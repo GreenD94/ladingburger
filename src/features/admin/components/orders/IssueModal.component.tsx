@@ -1,17 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Box
-} from '@mui/material';
 import { updateOrderStatus } from '@/features/orders/actions/updateOrderStatus.action';
 import { OrderStatus } from '@/features/database/types/index.type';
+import { EMPTY_STRING } from '@/features/database/constants/emptyValues.constants';
+import styles from '@/features/admin/styles/Modal.module.css';
 
 interface IssueModalProps {
   open: boolean;
@@ -21,8 +14,12 @@ interface IssueModalProps {
 }
 
 export function IssueModal({ open, onClose, orderId, onSuccess }: IssueModalProps) {
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(EMPTY_STRING);
   const [loading, setLoading] = useState(false);
+
+  if (!open) {
+    return null;
+  }
 
   const handleSubmit = async () => {
     try {
@@ -30,7 +27,7 @@ export function IssueModal({ open, onClose, orderId, onSuccess }: IssueModalProp
       await updateOrderStatus(orderId, OrderStatus.ISSUE, comment);
       onSuccess();
       onClose();
-      setComment('');
+      setComment(EMPTY_STRING);
     } catch (error) {
       console.error('Error marking order as issue:', error);
     } finally {
@@ -38,36 +35,52 @@ export function IssueModal({ open, onClose, orderId, onSuccess }: IssueModalProp
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Reportar Problema</DialogTitle>
-      <DialogContent>
-        <Box sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Descripción del problema"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Describe el problema que ha ocurrido con esta orden..."
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
-          Cancelar
-        </Button>
-        <Button 
-          onClick={handleSubmit} 
-          variant="contained" 
-          color="error"
-          disabled={loading || !comment.trim()}
-        >
-          {loading ? 'Guardando...' : 'Reportar Problema'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Reportar Problema</h2>
+          <button className={styles.closeButton} onClick={onClose}>
+            <span className={`material-symbols-outlined ${styles.closeIcon}`}>close</span>
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Descripción del problema
+            </label>
+            <textarea
+              className={styles.textarea}
+              rows={4}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Describe el problema que ha ocurrido con esta orden..."
+            />
+          </div>
+        </div>
+        <div className={styles.modalActions}>
+          <button
+            className={`${styles.button} ${styles.buttonSecondary}`}
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancelar
+          </button>
+          <button
+            className={`${styles.button} ${styles.buttonDanger}`}
+            onClick={handleSubmit}
+            disabled={loading || comment.trim() === EMPTY_STRING}
+          >
+            {loading ? 'Guardando...' : 'Reportar Problema'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
-

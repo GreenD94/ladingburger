@@ -1,40 +1,35 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Stack,
-  IconButton,
-  Card,
-  CardContent,
-  useTheme,
-  useMediaQuery,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
-import NoteIcon from '@mui/icons-material/Note';
 import { Order } from '@/features/database/types/index.type';
+import { MOBILE_BREAKPOINT } from '@/features/admin/constants/responsive.constants';
+import { EMPTY_STRING } from '@/features/database/constants/emptyValues.constants';
+import styles from '@/features/admin/styles/Modal.module.css';
 
 interface OrderNotesProps {
   order: Order;
   onNotesChange: (orderId: string, notes: string) => void;
-  updating?: boolean;
+  updating: boolean;
 }
 
 export const OrderNotes: React.FC<OrderNotesProps> = ({
   order,
   onNotesChange,
-  updating = false,
+  updating,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [notes, setNotes] = useState(order.internalNotes || '');
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const orderId = order._id?.toString() || '';
+  const [notes, setNotes] = useState(order.internalNotes || EMPTY_STRING);
+  const [isMobile, setIsMobile] = useState(false);
+  const orderId = order._id?.toString() || EMPTY_STRING;
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleSave = () => {
     onNotesChange(orderId, notes);
@@ -42,81 +37,75 @@ export const OrderNotes: React.FC<OrderNotesProps> = ({
   };
 
   const handleCancel = () => {
-    setNotes(order.internalNotes || '');
+    setNotes(order.internalNotes || EMPTY_STRING);
     setIsEditing(false);
   };
 
   if (isEditing) {
     return (
-      <Card variant="outlined" sx={{ mt: 2 }}>
-        <CardContent>
-          <Stack spacing={2}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Notas Internas (Solo visible para staff)
-            </Typography>
-            <TextField
-              multiline
-              rows={3}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Agregar notas sobre este pedido..."
-              fullWidth
-              sx={{ minHeight: isMobile ? 100 : 80 }}
-            />
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <Button
-                onClick={handleCancel}
-                variant="outlined"
-                startIcon={<CancelIcon />}
-                sx={{ minHeight: isMobile ? 44 : 36 }}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSave}
-                variant="contained"
-                startIcon={<SaveIcon />}
-                disabled={updating}
-                sx={{ minHeight: isMobile ? 44 : 36 }}
-              >
-                Guardar
-              </Button>
-            </Stack>
-          </Stack>
-        </CardContent>
-      </Card>
+      <div style={{ marginTop: '16px', padding: '16px', border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#ffffff' }}>
+        <div className={styles.formGroup}>
+          <label className={styles.label} style={{ fontSize: '0.75rem', color: '#666' }}>
+            Notas Internas (Solo visible para staff)
+          </label>
+          <textarea
+            className={styles.textarea}
+            rows={3}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Agregar notas sobre este pedido..."
+            style={{ minHeight: isMobile ? 100 : 80 }}
+          />
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <button
+              className={`${styles.button} ${styles.buttonSecondary}`}
+              onClick={handleCancel}
+              style={{ minHeight: isMobile ? 44 : 36 }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '1rem', marginRight: '4px' }}>cancel</span>
+              Cancelar
+            </button>
+            <button
+              className={`${styles.button} ${styles.buttonPrimary}`}
+              onClick={handleSave}
+              disabled={updating}
+              style={{ minHeight: isMobile ? 44 : 36 }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '1rem', marginRight: '4px' }}>save</span>
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card variant="outlined" sx={{ mt: 2 }}>
-      <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <NoteIcon fontSize="small" color="primary" />
-            <Typography variant="subtitle2" color="text.secondary">
-              Notas Internas
-            </Typography>
-          </Stack>
-          <IconButton
-            onClick={() => setIsEditing(true)}
-            size="small"
-            sx={{ minWidth: isMobile ? 44 : 40, minHeight: isMobile ? 44 : 40 }}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </Stack>
-        {order.internalNotes ? (
-          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mt: 1 }}>
-            {order.internalNotes}
-          </Typography>
-        ) : (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
-            No hay notas para este pedido
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
+    <div style={{ marginTop: '16px', padding: '16px', border: '1px solid #e0e0e0', borderRadius: '8px', backgroundColor: '#ffffff' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '1rem', color: '#135bec' }}>note</span>
+          <label className={styles.label} style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
+            Notas Internas
+          </label>
+        </div>
+        <button
+          className={styles.closeButton}
+          onClick={() => setIsEditing(true)}
+          style={{ minWidth: isMobile ? 44 : 40, minHeight: isMobile ? 44 : 40 }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>edit</span>
+        </button>
+      </div>
+      {order.internalNotes ? (
+        <p style={{ fontSize: '0.875rem', whiteSpace: 'pre-wrap', marginTop: '8px', color: '#111318' }}>
+          {order.internalNotes}
+        </p>
+      ) : (
+        <p style={{ fontSize: '0.875rem', fontStyle: 'italic', marginTop: '8px', color: '#666' }}>
+          No hay notas para este pedido
+        </p>
+      )}
+    </div>
   );
 };
-

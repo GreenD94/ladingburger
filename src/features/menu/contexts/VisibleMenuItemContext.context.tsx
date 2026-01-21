@@ -5,11 +5,13 @@ import { INTERSECTION_THRESHOLD } from '../constants/dimensions.constants';
 import { useCart } from './CartContext.context';
 
 interface VisibleMenuItemContextType {
-  visibleItemIndex: number | null;
+  visibleItemIndex: number;
 }
 
+const EMPTY_VISIBLE_ITEM_INDEX = -1;
+
 const EMPTY_VISIBLE_MENU_ITEM_CONTEXT_VALUE: VisibleMenuItemContextType = {
-  visibleItemIndex: null,
+  visibleItemIndex: EMPTY_VISIBLE_ITEM_INDEX,
 };
 
 const VisibleMenuItemContext = createContext<VisibleMenuItemContextType>(
@@ -17,8 +19,8 @@ const VisibleMenuItemContext = createContext<VisibleMenuItemContextType>(
 );
 
 export const VisibleMenuItemProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [visibleItemIndex, setVisibleItemIndex] = useState<number | null>(null);
-  const lastVisibleItemRef = useRef<number | null>(null);
+  const [visibleItemIndex, setVisibleItemIndex] = useState<number>(EMPTY_VISIBLE_ITEM_INDEX);
+  const lastVisibleItemRef = useRef<number>(EMPTY_VISIBLE_ITEM_INDEX);
   const { isOpen } = useCart();
 
   useEffect(() => {
@@ -40,15 +42,16 @@ export const VisibleMenuItemProvider: React.FC<{ children: ReactNode }> = ({ chi
 
         if (mostVisibleEntry) {
           const itemIndexAttr = (mostVisibleEntry as IntersectionObserverEntry).target.getAttribute('data-menu-item');
-          const itemIndex = itemIndexAttr ? parseInt(itemIndexAttr, 10) : null;
-          if (itemIndex !== null) {
+          const itemIndex = itemIndexAttr ? parseInt(itemIndexAttr, 10) : EMPTY_VISIBLE_ITEM_INDEX;
+          const hasValidIndex = itemIndex !== EMPTY_VISIBLE_ITEM_INDEX;
+          if (hasValidIndex) {
             setVisibleItemIndex(itemIndex);
             lastVisibleItemRef.current = itemIndex;
           }
         } else {
           const hasIntersectingItems = entries.some((entry) => entry.isIntersecting);
           if (!hasIntersectingItems && !isOpen) {
-            setVisibleItemIndex(null);
+            setVisibleItemIndex(EMPTY_VISIBLE_ITEM_INDEX);
           }
         }
       },
@@ -73,7 +76,8 @@ export const VisibleMenuItemProvider: React.FC<{ children: ReactNode }> = ({ chi
     };
   }, [isOpen]);
 
-  const currentVisibleIndex = isOpen && lastVisibleItemRef.current !== null 
+  const hasLastVisibleItem = lastVisibleItemRef.current !== EMPTY_VISIBLE_ITEM_INDEX;
+  const currentVisibleIndex = isOpen && hasLastVisibleItem 
     ? lastVisibleItemRef.current 
     : visibleItemIndex;
 

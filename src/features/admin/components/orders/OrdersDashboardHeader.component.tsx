@@ -21,11 +21,14 @@ interface OrdersDashboardHeaderProps {
 const getStatusColor = (status: OrderStatusType) => {
   switch (status) {
     case OrderStatus.WAITING_PAYMENT: return '#FFB74D';
+    case OrderStatus.PAYMENT_FAILED: return '#F44336';
     case OrderStatus.COOKING: return '#FF5722';
     case OrderStatus.IN_TRANSIT: return '#4CAF50';
     case OrderStatus.WAITING_PICKUP: return '#2196F3';
     case OrderStatus.COMPLETED: return '#4CAF50';
     case OrderStatus.ISSUE: return '#F44336';
+    case OrderStatus.CANCELLED: return '#757575';
+    case OrderStatus.REFUNDED: return '#9E9E9E';
     default: return '#9E9E9E';
   }
 };
@@ -49,7 +52,7 @@ export const OrdersDashboardHeader: React.FC<OrdersDashboardHeaderProps> = ({
                       orderCounts[OrderStatus.IN_TRANSIT] + 
                       orderCounts[OrderStatus.WAITING_PICKUP];
 
-  const totalUnpaid = orderCounts[OrderStatus.WAITING_PAYMENT];
+  const totalUnpaid = orderCounts[OrderStatus.WAITING_PAYMENT] + orderCounts[OrderStatus.PAYMENT_FAILED];
 
   const totalUrgent = orderCounts[OrderStatus.ISSUE];
 

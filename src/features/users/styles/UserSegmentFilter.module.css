@@ -1,0 +1,58 @@
+.filterContainer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 8px;
+}
+
+.filterContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.segmentButton {
+  padding: 6px 16px;
+  min-height: 28px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+.segmentButton:active {
+  transform: scale(0.95);
+}
+
+.segmentButton:hover {
+  border-color: #135bec;
+  color: #135bec;
+}
+
+.segmentButtonSelected {
+  background: #135bec;
+  color: #ffffff;
+  border-color: #135bec;
+}
+
+.segmentButtonSelected:hover {
+  background: #0f4bc4;
+  border-color: #0f4bc4;
+}
+
+@media (min-width: 600px) {
+  .filterContainer {
+    gap: 12px;
+  }
+}
+

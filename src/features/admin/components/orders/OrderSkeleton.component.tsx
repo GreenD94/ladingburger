@@ -1,44 +1,35 @@
 'use client';
 
-import { Box, Skeleton, Stack } from '@mui/material';
+import styles from '@/features/admin/styles/Skeleton.module.css';
 
 export function OrderSkeleton() {
   return (
-    <Box
-      sx={{
-        p: 2,
-        mb: 2,
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-        boxShadow: 1,
-      }}
-    >
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Skeleton variant="circular" width={40} height={40} />
-        <Box sx={{ flex: 1 }}>
-          <Skeleton variant="text" width="40%" height={24} />
-          <Skeleton variant="text" width="60%" height={20} />
-        </Box>
-        <Skeleton variant="rectangular" width={80} height={32} />
-      </Stack>
+    <div className={styles.skeletonCard}>
+      <div className={styles.skeletonCardHeader}>
+        <div className={`${styles.skeleton} ${styles.skeletonCircular}`} />
+        <div className={styles.skeletonCardContent}>
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ width: '40%' }} />
+          <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ width: '60%' }} />
+        </div>
+        <div className={`${styles.skeleton} ${styles.skeletonRect}`} style={{ width: '80px', height: '32px' }} />
+      </div>
 
-      <Stack spacing={1} sx={{ mb: 2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
         {[1, 2, 3].map((index) => (
-          <Box key={index} sx={{ display: 'flex', gap: 1 }}>
-            <Skeleton variant="rectangular" width={24} height={24} />
-            <Skeleton variant="text" width="70%" height={20} />
-          </Box>
+          <div key={index} style={{ display: 'flex', gap: '8px' }}>
+            <div className={`${styles.skeleton} ${styles.skeletonRect}`} style={{ width: '24px', height: '24px' }} />
+            <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ width: '70%' }} />
+          </div>
         ))}
-      </Stack>
+      </div>
 
-      <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-        <Skeleton variant="text" width="30%" height={24} />
-        <Stack direction="row" spacing={1}>
-          <Skeleton variant="rectangular" width={100} height={36} />
-          <Skeleton variant="rectangular" width={100} height={36} />
-        </Stack>
-      </Stack>
-    </Box>
+      <div className={styles.skeletonCardFooter}>
+        <div className={`${styles.skeleton} ${styles.skeletonText}`} style={{ width: '30%' }} />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <div className={`${styles.skeleton} ${styles.skeletonRect}`} style={{ width: '100px', height: '36px' }} />
+          <div className={`${styles.skeleton} ${styles.skeletonRect}`} style={{ width: '100px', height: '36px' }} />
+        </div>
+      </div>
+    </div>
   );
 }
-

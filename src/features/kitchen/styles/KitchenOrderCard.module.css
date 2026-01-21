@@ -1,0 +1,356 @@
+.card {
+  background-color: var(--surface-color, #ffffff);
+  border-radius: 12px;
+  padding: clamp(16px, 4vw, 20px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.cardReady {
+  border-color: var(--success-color, #4caf50);
+  background-color: var(--success-light, #e8f5e9);
+}
+
+.cardNormal {
+  border-color: var(--border-color, #e0e0e0);
+  background-color: var(--surface-color, #ffffff);
+}
+
+.cardHigh {
+  border-color: var(--warning-color, #ff9800);
+  background-color: var(--warning-light, #fff3e0);
+}
+
+.cardUrgent {
+  border-color: var(--error-color, #f44336);
+  background-color: var(--error-light, #ffebee);
+  animation: pulse 2s infinite;
+}
+
+.cardOverdue {
+  border-color: var(--error-color, #f44336);
+  background-color: var(--error-light, #ffebee);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.orderTitle {
+  font-size: clamp(18px, 4.5vw, 22px);
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary, #212121);
+  flex: 1;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
+  border-radius: 16px;
+  font-size: clamp(12px, 3vw, 14px);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badgeCooking {
+  background-color: var(--warning-color, #ff9800);
+  color: white;
+}
+
+.badgePending {
+  background-color: var(--info-color, #2196f3);
+  color: white;
+}
+
+.badgeReady {
+  background-color: var(--success-color, #4caf50);
+  color: white;
+}
+
+.burgersList {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.burgerItem {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(12px, 3vw, 16px);
+  background-color: var(--background-color, #f5f5f5);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color, #1976d2);
+}
+
+.burgerHeader {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.burgerQuantity {
+  font-size: clamp(18px, 4.5vw, 22px);
+  font-weight: 700;
+  color: var(--primary-color, #1976d2);
+  min-width: 32px;
+}
+
+.burgerName {
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  color: var(--text-primary, #212121);
+  flex: 1;
+}
+
+.ingredientsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 1.5vw, 8px);
+  margin-top: clamp(4px, 1vw, 6px);
+}
+
+.ingredientTag {
+  display: inline-block;
+  padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
+  background-color: var(--surface-color, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 16px;
+  font-size: clamp(12px, 3vw, 14px);
+  color: var(--text-primary, #212121);
+  font-weight: 500;
+}
+
+.itemNote {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1vw, 6px);
+  margin-top: clamp(4px, 1vw, 6px);
+  padding-top: clamp(8px, 2vw, 12px);
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+.itemNoteLabel {
+  font-size: clamp(11px, 2.75vw, 13px);
+  color: var(--text-secondary, #757575);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.itemNoteText {
+  font-size: clamp(13px, 3.25vw, 15px);
+  color: var(--text-primary, #212121);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.notesSection {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1vw, 6px);
+  padding: clamp(12px, 3vw, 16px);
+  background-color: var(--background-color, #f5f5f5);
+  border-radius: 8px;
+}
+
+.notesLabel {
+  font-size: clamp(12px, 3vw, 14px);
+  color: var(--text-secondary, #757575);
+  font-weight: 500;
+}
+
+.notesText {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: var(--text-primary, #212121);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.timeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.5vw, 8px);
+  padding: clamp(12px, 3vw, 16px);
+  background-color: var(--background-color, #f5f5f5);
+  border-radius: 8px;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.timeIcon {
+  font-size: clamp(18px, 4.5vw, 20px);
+  color: var(--text-secondary, #757575);
+}
+
+.timeText {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: var(--text-primary, #212121);
+  font-weight: 500;
+}
+
+.timeOverdue {
+  color: var(--error-color, #f44336);
+  font-weight: 700;
+}
+
+.timeAlmostDue {
+  color: var(--warning-color, #ff9800);
+  font-weight: 600;
+}
+
+.buttonsRow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(12px, 3vw, 16px);
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.buttonWhatsApp {
+  background-color: var(--whatsapp-color, #25d366);
+  color: white;
+}
+
+.buttonWhatsApp:hover {
+  background-color: var(--whatsapp-dark, #20ba5a);
+  transform: translateY(-1px);
+}
+
+.buttonDetails {
+  background-color: var(--primary-color, #1976d2);
+  color: white;
+}
+
+.buttonDetails:hover {
+  background-color: var(--primary-dark, #1565c0);
+  transform: translateY(-1px);
+}
+
+.buttonIcon {
+  font-size: clamp(18px, 4.5vw, 20px);
+}
+
+.buttonReady {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(14px, 3.5vw, 18px);
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--success-color, #4caf50);
+  color: white;
+  min-height: 48px;
+  margin-top: clamp(8px, 2vw, 12px);
+}
+
+.buttonReady:hover:not(:disabled) {
+  background-color: var(--success-dark, #388e3c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.buttonReady:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonTake {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(14px, 3.5vw, 18px);
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--primary-color, #1976d2);
+  color: white;
+  min-height: 48px;
+  margin-top: clamp(8px, 2vw, 12px);
+}
+
+.buttonTake:hover:not(:disabled) {
+  background-color: var(--primary-dark, #1565c0);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.buttonTake:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.readyMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 12px);
+  padding: clamp(12px, 3vw, 16px);
+  background-color: var(--success-color, #4caf50);
+  color: white;
+  border-radius: 8px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  margin-top: clamp(8px, 2vw, 12px);
+}
+
+.readyIcon {
+  font-size: clamp(20px, 5vw, 24px);
+}
+
+.readyText {
+  flex: 1;
+  text-align: center;
+}
+

@@ -16,5 +16,6 @@ export interface Burger {
   image: BurgerImage;
   category: string;
   isAvailable: boolean;
+  estimatedPrepTime?: number;
 }
 

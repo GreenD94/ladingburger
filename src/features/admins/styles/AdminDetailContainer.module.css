@@ -1,0 +1,8 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f6f6f8;
+  overflow: hidden;
+}
+

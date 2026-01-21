@@ -16,6 +16,7 @@ import { getAllMenuItems, createBurger, updateBurger, deleteBurger } from '@/fea
 import { MenuList } from '../components/menu/MenuList.component';
 import { BurgerForm } from '../components/menu/BurgerForm.component';
 import { DeleteConfirmDialog } from '../components/menu/DeleteConfirmDialog.component';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
 interface SnackbarState {
   open: boolean;
@@ -30,6 +31,7 @@ const EMPTY_SNACKBAR: SnackbarState = {
 };
 
 export const MenuContainer: React.FC = () => {
+  const { t } = useLanguage();
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -46,7 +48,7 @@ export const MenuContainer: React.FC = () => {
       setBurgers(allBurgers);
     } catch (err) {
       console.error('Error fetching burgers:', err);
-      setError('Error al cargar el menú');
+      setError(t('errorLoadingMenu'));
     } finally {
       setLoading(false);
     }
@@ -84,12 +86,12 @@ export const MenuContainer: React.FC = () => {
         if (result.success) {
           setSnackbar({
             open: true,
-            message: 'Hamburguesa actualizada exitosamente',
+            message: t('burgerUpdatedSuccess'),
             severity: 'success',
           });
           await fetchBurgers();
         } else {
-          throw new Error(result.error || 'Error al actualizar');
+          throw new Error(result.error || t('errorUpdatingBurger'));
         }
       } else {
         const result = await createBurger(burgerData);
@@ -97,19 +99,19 @@ export const MenuContainer: React.FC = () => {
         if (result.success) {
           setSnackbar({
             open: true,
-            message: 'Hamburguesa creada exitosamente',
+            message: t('burgerCreatedSuccess'),
             severity: 'success',
           });
           await fetchBurgers();
         } else {
-          throw new Error(result.error || 'Error al crear');
+          throw new Error(result.error || t('errorCreatingBurger'));
         }
       }
     } catch (err) {
       console.error('Error saving burger:', err);
       setSnackbar({
         open: true,
-        message: err instanceof Error ? err.message : 'Error al guardar la hamburguesa',
+        message: err instanceof Error ? err.message : t('errorSavingBurger'),
         severity: 'error',
       });
     }
@@ -125,20 +127,20 @@ export const MenuContainer: React.FC = () => {
       if (result.success) {
         setSnackbar({
           open: true,
-          message: 'Hamburguesa eliminada exitosamente',
+          message: t('burgerDeletedSuccess'),
           severity: 'success',
         });
         setDeleteDialogOpen(false);
         setSelectedBurger(EMPTY_BURGER);
         await fetchBurgers();
       } else {
-        throw new Error(result.error || 'Error al eliminar');
+        throw new Error(result.error || t('errorDeletingBurger'));
       }
     } catch (err) {
       console.error('Error deleting burger:', err);
       setSnackbar({
         open: true,
-        message: err instanceof Error ? err.message : 'Error al eliminar la hamburguesa',
+        message: err instanceof Error ? err.message : t('errorDeletingBurger'),
         severity: 'error',
       });
     }
@@ -167,7 +169,7 @@ export const MenuContainer: React.FC = () => {
           component="h1"
           sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' }, width: { xs: '100%', sm: 'auto' } }}
         >
-          Gestión de Menú
+          {t('menuManagement')}
         </Typography>
         <Button
           variant="contained"
@@ -178,7 +180,7 @@ export const MenuContainer: React.FC = () => {
             width: { xs: '100%', sm: 'auto' },
           }}
         >
-          Nueva Hamburguesa
+          {t('newBurger')}
         </Button>
       </Box>
 

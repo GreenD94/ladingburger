@@ -1,0 +1,113 @@
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: clamp(16px, 4vw, 24px);
+  padding-top: calc(clamp(16px, 4vw, 24px) + env(safe-area-inset-top, 0px));
+  padding-bottom: clamp(20px, 5vw, 28px);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #111318;
+  cursor: pointer;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.backButton:active {
+  background: #f3f4f6;
+}
+
+.backIcon {
+  font-size: 24px;
+}
+
+.title {
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatarContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #135bec 0%, #0f4bc4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(19, 91, 236, 0.3);
+}
+
+.avatarIcon {
+  font-size: 40px;
+  color: #ffffff;
+}
+
+.badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #22c55e;
+  color: #ffffff;
+  font-size: clamp(0.625rem, 1.5vw, 0.75rem);
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.adminInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.adminEmail {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0;
+  word-break: break-word;
+}
+
+.status {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (min-width: 600px) {
+  .header {
+    padding: 24px;
+    padding-bottom: 28px;
+  }
+}
+

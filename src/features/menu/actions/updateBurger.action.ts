@@ -11,8 +11,8 @@ export interface UpdateBurgerInput {
   price?: number;
   ingredients?: string[];
   image?: string;
-  category?: string;
   isAvailable?: boolean;
+  estimatedPrepTime?: number;
 }
 
 interface UpdateFields {
@@ -21,8 +21,8 @@ interface UpdateFields {
   price?: number;
   ingredients?: string[];
   image?: string;
-  category?: string;
   isAvailable?: boolean;
+  estimatedPrepTime?: number;
   updatedAt: Date;
 }
 

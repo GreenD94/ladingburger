@@ -1,0 +1,90 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  padding-bottom: 12px;
+  padding-left: calc(16px + env(safe-area-inset-left, 0px));
+  padding-right: calc(16px + env(safe-area-inset-right, 0px));
+}
+
+.scrollContainer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.categoryButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  min-height: 44px;
+  border: 1px solid #e0e0e0;
+  border-radius: 24px;
+  background: #ffffff;
+  color: #111318;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+.categoryButton:active {
+  transform: scale(0.95);
+}
+
+.categoryButton:hover {
+  background: #f5f5f5;
+  border-color: #135bec;
+}
+
+.categoryButtonSelected {
+  background: #135bec;
+  color: #ffffff;
+  border-color: #135bec;
+}
+
+.categoryButtonSelected:hover {
+  background: #0f4bc4;
+}
+
+.categoryIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.categoryLabel {
+  line-height: 1.2;
+}
+
+@media (min-width: 600px) {
+  .nav {
+    padding-left: calc(24px + env(safe-area-inset-left, 0px));
+    padding-right: calc(24px + env(safe-area-inset-right, 0px));
+  }
+
+  .scrollContainer {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .categoryButton {
+    padding: 14px 24px;
+  }
+}
+

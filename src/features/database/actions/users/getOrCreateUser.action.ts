@@ -2,6 +2,7 @@
 
 import clientPromise from '../../config/mongodb';
 import { User } from '../../types/index.type';
+import { assignNuevoOnUserCreation } from '@/features/etiquetas/utils/userTags.util';
 
 export async function getOrCreateUser(phoneNumber: string): Promise<{ userId: string }> {
   try {
@@ -21,7 +22,17 @@ export async function getOrCreateUser(phoneNumber: string): Promise<{ userId: st
     };
 
     const result = await users.insertOne(newUser);
-    return { userId: result.insertedId.toString() };
+    const userId = result.insertedId.toString();
+
+    // Assign "Nuevo" etiqueta to newly created user
+    try {
+      await assignNuevoOnUserCreation(userId);
+    } catch (etiquetaError) {
+      console.error('Error assigning Nuevo etiqueta to user:', etiquetaError);
+      // Don't fail user creation if etiqueta assignment fails
+    }
+
+    return { userId };
   } catch (error) {
     console.error('Error in getOrCreateUser:', error);
     throw new Error('Failed to get or create user');

@@ -1,7 +1,5 @@
-'use client';
-
-import AnalyticsContainer from '@/features/admin/containers/AnalyticsContainer.container';
+import AnalyticsOverviewContainer from '@/features/analytics/containers/AnalyticsOverviewContainer.container';
 
 export default function AnalyticsPage() {
-  return <AnalyticsContainer />;
+  return <AnalyticsOverviewContainer />;
 } 

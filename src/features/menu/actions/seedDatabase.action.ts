@@ -22,6 +22,7 @@ const burgers: Omit<Burger, '_id'>[] = [
       'Papas 120g'
     ],
     isAvailable: true,
+    estimatedPrepTime: 15,
   },
 ];
 
@@ -44,10 +45,17 @@ export async function seedDatabase() {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     
-    try {
-      await createAdmin({ email: adminEmail, password: adminPassword });
-    } catch (error) {
-      console.error('Error creating admin:', error);
+    const normalizedEmail = adminEmail.trim().toLowerCase();
+    const existingAdmin = await db.collection('admins').findOne({
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') },
+    });
+    
+    if (!existingAdmin) {
+      try {
+        await createAdmin({ email: normalizedEmail, password: adminPassword });
+      } catch (error) {
+        console.error('Error creating admin:', error);
+      }
     }
 
     return {

@@ -10,6 +10,7 @@ export const MenuContainer = () => {
   const previewThemeName = previewThemeNameParam || EMPTY_STRING;
   const hasPreviewTheme = previewThemeName !== EMPTY_STRING;
 
+
   return (
     <div
       style={{
@@ -30,11 +31,6 @@ export const MenuContainer = () => {
       }}
       className="menu-scroll-container"
     >
-      <style jsx>{`
-        .menu-scroll-container::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
       <MenuProviders previewThemeName={hasPreviewTheme ? previewThemeName : undefined} />
     </div>
   );

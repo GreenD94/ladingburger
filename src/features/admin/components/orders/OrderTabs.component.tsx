@@ -14,6 +14,8 @@ const getStatusColor = (status: OrderStatusType) => {
   switch (status) {
     case OrderStatus.WAITING_PAYMENT:
       return '#FFB74D';
+    case OrderStatus.PAYMENT_FAILED:
+      return '#F44336';
     case OrderStatus.COOKING:
       return '#FF5722';
     case OrderStatus.IN_TRANSIT:
@@ -24,6 +26,10 @@ const getStatusColor = (status: OrderStatusType) => {
       return '#4CAF50';
     case OrderStatus.ISSUE:
       return '#F44336';
+    case OrderStatus.CANCELLED:
+      return '#757575';
+    case OrderStatus.REFUNDED:
+      return '#9E9E9E';
     default:
       return '#9E9E9E';
   }

@@ -24,7 +24,7 @@ export const CartHeader: React.FC<CartHeaderProps> = ({ total, onWhatsApp }) => 
     <header
       style={{
         position: 'relative',
-        paddingTop: '56px',
+        paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))',
         paddingBottom: '24px',
         paddingLeft: '24px',
         paddingRight: '24px',
@@ -40,7 +40,7 @@ export const CartHeader: React.FC<CartHeaderProps> = ({ total, onWhatsApp }) => 
           onClick={handleWhatsAppClick}
           style={{
             position: 'absolute',
-            top: '16px',
+            top: 'calc(16px + env(safe-area-inset-top, 0px))',
             right: '16px',
             width: 'clamp(56px, 14vw, 72px)',
             height: 'clamp(56px, 14vw, 72px)',

@@ -1,0 +1,167 @@
+.card {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.cardContent {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.orderTitleSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+
+.orderTitle {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #111318;
+  margin: 0;
+}
+
+.customerName {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.customerPhone {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+}
+
+.orderPrice {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #135bec;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.timeInfo {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #666;
+}
+
+.timeIcon {
+  font-size: 1rem;
+}
+
+.timeText {
+  font-size: 0.875rem;
+}
+
+.buttonsRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.button {
+  flex: 1;
+  height: 48px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
+  border: none;
+}
+
+.buttonWhatsApp {
+  border: 1px solid #25D366;
+  color: #25D366;
+  background-color: transparent;
+}
+
+.buttonWhatsApp:hover {
+  border-color: #128C7E;
+  background-color: rgba(37, 211, 102, 0.04);
+}
+
+.buttonDetails {
+  background-color: #135bec;
+  color: #ffffff;
+}
+
+.buttonDetails:hover {
+  background-color: #0d47a1;
+}
+
+.buttonPayment {
+  width: 100%;
+  height: 48px;
+  background-color: #135bec;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 4px;
+  text-transform: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.buttonPayment:hover {
+  background-color: #0d47a1;
+}
+
+.buttonPayment:disabled {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.26);
+  cursor: not-allowed;
+}
+
+.buttonIcon {
+  font-size: 1.125rem;
+}
+
+.buttonPaymentIcon {
+  font-size: 1.25rem;
+}
+
+.cookingActionsRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.buttonCookingAction {
+  flex: 1;
+  background-color: #135bec;
+  color: #ffffff;
+  font-weight: 600;
+}
+

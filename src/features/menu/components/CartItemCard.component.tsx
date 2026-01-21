@@ -5,17 +5,14 @@ import { CartItem } from '../contexts/CartContext.context';
 import { PRIMARY_GREEN, OFF_WHITE } from '../constants/cartColors.constants';
 import { CARD_PADDING, CARD_GAP } from '../constants/cartItem.constants';
 import { parseBurgerName } from '../utils/parseBurgerName.util';
-// import { useSwipeToReduce } from '../hooks/useSwipeToReduce.hook';
 import { CartItemPlusButton } from './CartItemPlusButton.component';
 import { CartItemMinusButton } from './CartItemMinusButton.component';
-// import { SwipeTrashIcon } from './SwipeTrashIcon.component';
 import { CartItemBadge } from './CartItemBadge.component';
 
 interface CartItemCardProps {
   item: CartItem;
   onRemove: () => void;
   onUpdateQuantity: (quantity: number) => void;
-  onAddNote: () => void;
   index: number;
 }
 
@@ -27,20 +24,6 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
 }) => {
   const quantity = item.quantity;
   const { restPart } = parseBurgerName(item.burger.name);
-  
-  // Swipe left to reduce functionality - COMMENTED OUT
-  // const {
-  //   isSwiping,
-  //   swipeOffset,
-  //   swipeProgress,
-  //   handleMouseDown,
-  //   handleTouchStart,
-  //   cardRef,
-  // } = useSwipeToReduce({
-  //   quantity,
-  //   onUpdateQuantity,
-  //   isEnabled: true,
-  // });
 
   const handleIncrease = (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -64,12 +47,6 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
 
   const hasDecimals = item.burger.price % 1 !== 0;
   const formattedPrice = hasDecimals ? item.burger.price.toFixed(2) : item.burger.price.toString();
-  
-  // Swipe left visual feedback - COMMENTED OUT
-  // const shouldShowTrash = isSwiping && swipeOffset < 0;
-  // const transformValue = swipeOffset !== 0 ? `translateX(${swipeOffset}px)` : 'translateX(0)';
-  // const cursorStyle = isSwiping ? 'grabbing' : 'grab';
-  // const transitionStyle = isSwiping ? 'none' : 'transform 0.3s ease-out';
 
   return (
     <div
@@ -77,14 +54,8 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
         position: 'relative',
       }}
     >
-      {/* Swipe left trash icon - COMMENTED OUT */}
-      {/* {shouldShowTrash && <SwipeTrashIcon progress={swipeProgress} />} */}
       <div
-        // ref={cardRef}
         onClick={(e) => e.stopPropagation()}
-        // Swipe left handlers - COMMENTED OUT
-        // onMouseDown={handleMouseDown}
-        // onTouchStart={handleTouchStart}
         style={{
           position: 'relative',
           padding: `${CARD_PADDING}px`,
@@ -95,11 +66,7 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: `${CARD_GAP}px`,
-          // Swipe left transform - COMMENTED OUT
-          // transform: transformValue,
-          // transition: transitionStyle,
           zIndex: 1,
-          // cursor: cursorStyle,
           userSelect: 'none',
         }}
       >

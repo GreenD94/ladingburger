@@ -5,6 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/features/database/actions/auth/logout.action';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -13,6 +14,7 @@ interface TopBarProps {
 
 export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, isMobile = false }) => {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleLogout = async () => {
     await logout();
@@ -32,7 +34,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, isMobile = false })
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div">
-          Admin Dashboard
+          {t('adminDashboard')}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <Button
@@ -40,7 +42,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, isMobile = false })
           startIcon={<LogoutIcon />}
           onClick={handleLogout}
         >
-          Logout
+          {t('logout')}
         </Button>
       </Toolbar>
     </AppBar>

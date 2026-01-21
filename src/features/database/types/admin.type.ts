@@ -1,6 +1,7 @@
 export interface CreateAdmin {
   email: string;
   password: string;
+  isEnabled?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

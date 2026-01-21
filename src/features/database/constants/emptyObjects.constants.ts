@@ -1,10 +1,10 @@
 import { User } from '../types/user.type';
-import { Order, OrderItem, PaymentInfo, PaymentLog } from '../types/order.type';
+import { Order, OrderItem, PaymentInfo } from '../types/order.type';
 import { Burger } from '../types/burger.type';
 import { BusinessContact } from '../types/businessContact.type';
 import { Admin } from '../types/admin.type';
 import { DailySales, CustomerAnalyticsSchema, MenuAnalytics, AnalyticsSummary } from '../types/analytics.type';
-import { OrderStatus, PaymentStatus } from '../types/status.type';
+import { OrderStatus } from '../types/status.type';
 import { BURGER_IMAGES } from '../types/burger.type';
 import type { CustomerAnalytics } from '../models/analytics.model';
 import type { TestItem, TestResult } from '../../blackbox/types/index.type';
@@ -14,24 +14,17 @@ const EMPTY_DATE = new Date(0);
 export const EMPTY_USER: User = {
   phoneNumber: '',
   name: '',
+  birthdate: EMPTY_DATE,
+  gender: '',
   notes: '',
   tags: [],
   createdAt: EMPTY_DATE,
   updatedAt: EMPTY_DATE,
 };
 
-const EMPTY_PAYMENT_LOG: PaymentLog = {
-  status: PaymentStatus.PENDING,
-  statusName: 'Pendiente',
-  createdAt: EMPTY_DATE,
-  comment: '',
-};
-
 const EMPTY_PAYMENT_INFO: PaymentInfo = {
   bankAccount: '',
   transferReference: '',
-  paymentStatus: PaymentStatus.PENDING,
-  paymentLogs: [EMPTY_PAYMENT_LOG],
 };
 
 const EMPTY_ORDER_ITEM: OrderItem = {
@@ -57,6 +50,7 @@ export const EMPTY_ORDER: Order = {
   internalNotes: '',
   estimatedPrepTime: 0,
   actualPrepTime: 0,
+  cookingStartedAt: EMPTY_DATE,
   problemCategory: '',
   customerName: '',
 };
@@ -69,6 +63,7 @@ export const EMPTY_BURGER: Burger = {
   image: BURGER_IMAGES.CLASSIC,
   category: '',
   isAvailable: false,
+  estimatedPrepTime: 0,
 };
 
 export const EMPTY_BUSINESS_CONTACT: BusinessContact = {
@@ -87,6 +82,7 @@ export const EMPTY_BUSINESS_CONTACT: BusinessContact = {
 export const EMPTY_ADMIN: Omit<Admin, '_id' | 'comparePassword'> = {
   email: '',
   password: '',
+  isEnabled: true,
   createdAt: EMPTY_DATE,
   updatedAt: EMPTY_DATE,
 };

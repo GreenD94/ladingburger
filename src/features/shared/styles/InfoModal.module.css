@@ -1,0 +1,241 @@
+.infoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(32px, 8vw, 36px);
+  height: clamp(32px, 8vw, 36px);
+  min-height: clamp(32px, 8vw, 36px);
+  padding: 0;
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #135bec;
+  cursor: pointer;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.infoButton:hover {
+  background: rgba(19, 91, 236, 0.1);
+}
+
+.infoButton:active {
+  background: rgba(19, 91, 236, 0.2);
+}
+
+.infoIcon {
+  font-size: clamp(18px, 4vw, 20px);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+  padding: calc(16px + env(safe-area-inset-top, 0px))
+           calc(16px + env(safe-area-inset-right, 0px))
+           calc(16px + env(safe-area-inset-bottom, 0px))
+           calc(16px + env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(90vh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  margin: auto;
+}
+
+.modalHeader {
+  background: #135bec;
+  color: #ffffff;
+  padding: clamp(16px, 4vw, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(32px, 8vw, 36px);
+  height: clamp(32px, 8vw, 36px);
+  min-height: clamp(32px, 8vw, 36px);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+  touch-action: manipulation;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.closeButton:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.closeIcon {
+  font-size: clamp(20px, 4vw, 24px);
+}
+
+.modalContent {
+  padding: clamp(16px, 4vw, 24px);
+  overflow-y: auto;
+  flex: 1;
+  background: #f5f5f5;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 700;
+  color: #111318;
+  margin: 0 0 12px 0;
+}
+
+.sectionText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #616f89;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 20px 0;
+}
+
+.goodScenario {
+  background: rgba(34, 197, 94, 0.1);
+  border-left: 3px solid #22c55e;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.badScenario {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+  padding: 12px 16px;
+  border-radius: 6px;
+}
+
+.scenarioTitle {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 600;
+  color: #111318;
+  margin: 0 0 8px 0;
+}
+
+.scenarioText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #616f89;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.formulaBox {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.formulaText {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-family: 'Courier New', monospace;
+  color: #111318;
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.dataSourcesList {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.dataSourceItem {
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  color: #616f89;
+  padding: 8px 0;
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.dataSourceItem::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #135bec;
+  font-weight: 700;
+}
+
+.modalActions {
+  padding: clamp(16px, 4vw, 20px);
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  background: #ffffff;
+}
+
+.closeActionButton {
+  padding: 12px 24px;
+  min-height: 44px;
+  background: #135bec;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(0.875rem, 2vw, 0.9rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.closeActionButton:hover {
+  background: #0F4BC5;
+}
+
+.closeActionButton:active {
+  transform: scale(0.98);
+  background: #0D3FA3;
+}
+

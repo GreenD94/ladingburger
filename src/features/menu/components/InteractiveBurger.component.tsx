@@ -72,8 +72,8 @@ export const InteractiveBurger: React.FC<InteractiveBurgerProps> = ({
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   
-  const containerRef = useRef<HTMLDivElement | undefined>(undefined);
-  const animationFrameRef = useRef<number | undefined>(undefined);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   const lastPositionRef = useRef<number>(0);
   const velocityRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -228,7 +228,7 @@ export const InteractiveBurger: React.FC<InteractiveBurgerProps> = ({
     animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (animationFrameRef.current !== undefined) {
+      if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };

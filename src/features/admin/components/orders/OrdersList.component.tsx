@@ -5,8 +5,8 @@ import { Box, Stack, Typography } from '@mui/material';
 import { Order, OrderStatusType, Burger } from '@/features/database/types/index.type';
 import { updateOrderStatus } from '@/features/orders/actions/updateOrderStatus.action';
 import { useBurgers } from '@/features/orders/hooks/useBurgers.hook';
-import LoadingState from '@/features/analytics/components/LoadingState.component';
-import ErrorState from '@/features/analytics/components/ErrorState.component';
+import LoadingState from '@/features/analytics/components/shared/LoadingState.component';
+import ErrorState from '@/features/analytics/components/shared/ErrorState.component';
 import { OrderCard } from './OrderCard.component';
 
 interface OrdersListProps {

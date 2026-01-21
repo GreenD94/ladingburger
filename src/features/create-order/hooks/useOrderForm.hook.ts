@@ -3,8 +3,8 @@ import { Burger } from '@/features/database/types/index.type';
 import { OrderFormState } from '../types/order.type';
 import { getAvailableBurgers } from '@/features/menu/actions/menu.action';
 import { createOrder } from '@/features/orders/actions/orders.action';
-import { OrderStatus, PaymentStatus } from '@/features/database/types/index.type';
-import { OrderStatusLabels, PaymentStatusLabels } from '@/features/database/types/index.type';
+import { OrderStatus } from '@/features/database/types/index.type';
+import { OrderStatusLabels } from '@/features/database/types/index.type';
 
 export const useOrderForm = () => {
   const [state, setState] = useState<OrderFormState>({

@@ -6,14 +6,33 @@ import { PRIMARY_GREEN, OFF_WHITE, WHATSAPP_GREEN } from '../constants/cartColor
 interface CartFooterProps {
   onBuyNow: () => void;
   onWhatsApp: () => void;
+  onBuyNowClick?: () => void;
 }
 
-export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp }) => {
+export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp, onBuyNowClick }) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    
+    if (onBuyNowClick) {
+      onBuyNowClick();
+    } else {
+      onBuyNow();
+    }
+  };
   return (
     <footer
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+      }}
       style={{
         padding: '24px',
-        paddingBottom: '40px',
+        paddingBottom: 'calc(40px + env(safe-area-inset-bottom, 0px))',
+        paddingRight: 'calc(24px + env(safe-area-inset-right, 0px))',
         backgroundColor: PRIMARY_GREEN,
       }}
     >
@@ -24,7 +43,18 @@ export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp }) 
         }}
       >
         <button
-          onClick={onBuyNow}
+          type="button"
+          onClick={handleClick}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
+          onMouseUp={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
           style={{
             width: '100%',
             backgroundColor: OFF_WHITE,
@@ -60,9 +90,13 @@ export const CartFooter: React.FC<CartFooterProps> = ({ onBuyNow, onWhatsApp }) 
             }
           }}
           onTouchStart={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
             e.currentTarget.style.transform = 'scale(0.98)';
           }}
           onTouchEnd={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
             e.currentTarget.style.transform = 'scale(1)';
           }}
         >

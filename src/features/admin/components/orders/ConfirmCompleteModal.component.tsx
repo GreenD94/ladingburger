@@ -1,16 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography
-} from '@mui/material';
 import { updateOrderStatus } from '@/features/orders/actions/updateOrderStatus.action';
 import { OrderStatus } from '@/features/database/types/index.type';
+import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
+import styles from '@/features/admin/styles/Modal.module.css';
 
 interface ConfirmCompleteModalProps {
   open: boolean;
@@ -20,7 +14,12 @@ interface ConfirmCompleteModalProps {
 }
 
 export function ConfirmCompleteModal({ open, onClose, orderId, onSuccess }: ConfirmCompleteModalProps) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+
+  if (!open) {
+    return null;
+  }
 
   const handleConfirm = async () => {
     try {
@@ -35,28 +34,41 @@ export function ConfirmCompleteModal({ open, onClose, orderId, onSuccess }: Conf
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Confirmar Completado</DialogTitle>
-      <DialogContent>
-        <Typography>
-          ¿Estás seguro de que deseas marcar esta orden como completada?
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
-          Cancelar
-        </Button>
-        <Button 
-          onClick={handleConfirm} 
-          variant="contained" 
-          color="success"
-          disabled={loading}
-        >
-          {loading ? 'Completando...' : 'Confirmar'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>{t('confirmComplete')}</h2>
+          <button className={styles.closeButton} onClick={onClose}>
+            <span className={`material-symbols-outlined ${styles.closeIcon}`}>close</span>
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <p>{t('confirmCompleteMessage')}</p>
+        </div>
+        <div className={styles.modalActions}>
+          <button
+            className={`${styles.button} ${styles.buttonSecondary}`}
+            onClick={onClose}
+            disabled={loading}
+          >
+            {t('cancel')}
+          </button>
+          <button
+            className={`${styles.button} ${styles.buttonSuccess}`}
+            onClick={handleConfirm}
+            disabled={loading}
+          >
+            {loading ? t('completing') : t('confirm')}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
-
