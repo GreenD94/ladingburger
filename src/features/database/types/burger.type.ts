@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { BurgerRecipe } from '@/features/inventory/types/recipe.type';
 
 export const BURGER_IMAGES = {
   CLASSIC: '/media/burgers/classic-burger.jpg',
@@ -17,5 +18,6 @@ export interface Burger {
   category: string;
   isAvailable: boolean;
   estimatedPrepTime?: number;
+  recipe?: BurgerRecipe;
 }
 

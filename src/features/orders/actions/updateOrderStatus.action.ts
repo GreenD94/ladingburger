@@ -48,6 +48,15 @@ export async function updateOrderStatus(orderId: string, status: OrderStatusType
       updateData.actualPrepTime = actualPrepTimeMinutes;
     }
 
+    if (status === OrderStatus.COMPLETED) {
+      try {
+        const { consumeMaterialsFromOrder } = await import('@/features/inventory/actions/orders/consumeMaterialsFromOrder.action');
+        await consumeMaterialsFromOrder(orderId);
+      } catch (consumeError) {
+        console.error('Error consuming materials from order:', consumeError);
+      }
+    }
+
     const result = await db
       .collection<Order>('orders')
       .updateOne(

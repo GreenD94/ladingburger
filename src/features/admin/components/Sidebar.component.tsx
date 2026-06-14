@@ -25,6 +25,7 @@ import {
   Palette as ThemeIcon,
   Settings as ConfigIcon,
   Kitchen as KitchenIcon,
+  Inventory as InventoryIcon,
 } from '@mui/icons-material';
 import { useLanguage } from '@/features/i18n/hooks/useLanguage.hook';
 
@@ -47,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, variant = 'pers
     { text: t('orders'), icon: <OrdersIcon />, path: '/admin/orders' },
     { text: t('kitchen'), icon: <KitchenIcon />, path: '/admin/kitchen' },
     { text: t('menu'), icon: <MenuIcon />, path: '/admin/menu' },
+    { text: t('inventory'), icon: <InventoryIcon />, path: '/admin/inventory' },
     { text: t('business'), icon: <BusinessIcon />, path: '/admin/business' },
     { text: t('theme'), icon: <ThemeIcon />, path: '/admin/theme' },
     { text: t('config'), icon: <ConfigIcon />, path: '/admin/config' },

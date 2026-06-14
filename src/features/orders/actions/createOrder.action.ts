@@ -30,22 +30,27 @@ export async function createOrder(order: OrderWithUser) {
 
     const result = await db.collection<Order>('orders').insertOne(newOrder);
     
-    // Handle etiquetas after order creation
+    const orderId = result.insertedId.toString();
+    
+    try {
+      const { attachCostDataToOrder } = await import('@/features/inventory/actions/orders/attachCostDataToOrder.action');
+      await attachCostDataToOrder(orderId);
+    } catch (costError) {
+      console.error('Error attaching cost data to order:', costError);
+    }
+    
     if (order.userId) {
       try {
-        // Remove "Nuevo" tag if order is created on a different day than user creation
         await handleNuevoOnOrderCreated(order.userId, now);
-        // Recalculate all user etiquetas based on order history
         await recalculateUserEtiquetasForOrderChanges(order.userId, order.customerPhone);
       } catch (etiquetaError) {
         console.error('Error handling etiquetas for order creation:', etiquetaError);
-        // Don't fail order creation if etiqueta handling fails
       }
     }
     
     return {
       success: true,
-      orderId: result.insertedId.toString(),
+      orderId,
     };
   } catch (error) {
     console.error('Error creating order:', error);

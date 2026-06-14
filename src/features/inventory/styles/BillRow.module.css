@@ -1,0 +1,86 @@
+.billCard {
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.billCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.billHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.billInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.billNumber {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 600;
+  color: #212121;
+}
+
+.supplier {
+  color: #757575;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.purchaseDate {
+  color: #757575;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.billDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detailLabel {
+  color: #757575;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.detailValue {
+  font-weight: 500;
+  color: #212121;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.confirmButton {
+  min-height: 44px;
+}
+
+@media (max-width: 600px) {
+  .billCard {
+    padding: 12px;
+  }
+
+  .billHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+

@@ -195,6 +195,17 @@ if (attempts < 3) { ... }
   - Scrollable content areas
 - **Never hardcode padding values that ignore safe areas** - content must be visible on all mobile devices
 
+### Material-UI (MUI) Usage (Mandatory)
+- **Material-UI (MUI) components are FORBIDDEN in this project**
+- Do NOT use any MUI components such as `Box`, `Typography`, `Button`, `Card`, `Dialog`, `Snackbar`, `Alert`, `Tabs`, `Tab`, `CircularProgress`, or any other MUI components
+- Use plain HTML elements (`div`, `button`, `h1`, `h2`, `p`, `span`, `input`, `select`, etc.) with CSS modules for styling
+- All styling must be done through CSS modules (`.module.css` files)
+- Use Material Icons via the `material-symbols-outlined` CSS class, not MUI icon components
+- For dialogs/modals, create custom implementations using HTML and CSS
+- For notifications/snackbars, create custom implementations using HTML and CSS
+- For loading states, use custom CSS animations (spinners, skeletons) instead of MUI components
+- **Never import from `@mui/material` or `@mui/icons-material`** - use plain HTML and CSS instead
+
 ### Select Components (Mandatory)
 - **The `PillSelect` component is the ONLY select component to be used in this project**
 - Use `PillSelect` from `@/features/shared/components/PillSelect.component` for all selection needs
@@ -255,6 +266,31 @@ padding-top: 16px;
 
 // ❌ Bad - Missing fallback values
 padding-top: env(safe-area-inset-top);
+```
+
+### Material-UI Examples:
+```typescript
+// ❌ Bad - Using MUI components
+import { Box, Typography, Button } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+
+<Box className={styles.container}>
+  <Typography variant="h4">Title</Typography>
+  <Button variant="contained" startIcon={<AddIcon />}>
+    Add
+  </Button>
+</Box>
+
+// ✅ Good - Using plain HTML and CSS modules
+import styles from './MyComponent.module.css';
+
+<div className={styles.container}>
+  <h1 className={styles.title}>Title</h1>
+  <button className={styles.addButton} type="button">
+    <span className="material-symbols-outlined">add</span>
+    Add
+  </button>
+</div>
 ```
 
 ### Select Component Examples:
@@ -691,6 +727,7 @@ return (
 - [ ] English names (except routes)
 - [ ] Mobile-first design (entire UI/UX mobile-friendly)
 - [ ] Safe areas implemented for all mobile components (mandatory)
+- [ ] No Material-UI (MUI) components used - plain HTML and CSS modules only (mandatory)
 - [ ] PillSelect component used for all selection needs (mandatory)
 - [ ] InfoModal component used for all graphs and statistics (mandatory)
 - [ ] Translation system used for all user-facing text (mandatory)

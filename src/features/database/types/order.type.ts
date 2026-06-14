@@ -7,6 +7,14 @@ export interface OrderItem {
   quantity: number;
   price: number;
   note?: string;
+  costAtOrder?: number;
+  costBreakdown?: {
+    materialId: string;
+    materialName: string;
+    quantity: number;
+    unitCost: number;
+    totalCost: number;
+  }[];
 }
 
 
@@ -50,5 +58,15 @@ export interface Order {
   cancelledAt?: Date;
   cancellationReason?: string;
   cancelledBy?: string;
+  costData?: {
+    totalCost: number;
+    calculatedAt: Date;
+    burgerCosts: {
+      burgerId: string;
+      quantity: number;
+      unitCost: number;
+      totalCost: number;
+    }[];
+  };
 }
 

@@ -1,0 +1,87 @@
+.materialCard {
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.materialCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.materialHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.materialInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.materialName {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 600;
+  color: #212121;
+}
+
+.categoryChip {
+  align-self: flex-start;
+  font-size: 0.75rem;
+}
+
+.editButton {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.materialDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detailLabel {
+  color: #757575;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.detailValue {
+  font-weight: 500;
+  color: #212121;
+  font-size: clamp(0.875rem, 2vw, 0.9375rem);
+}
+
+.detailValue.normal {
+  color: #4caf50;
+}
+
+.detailValue.low {
+  color: #f44336;
+}
+
+@media (max-width: 600px) {
+  .materialCard {
+    padding: 12px;
+  }
+
+  .materialHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .editButton {
+    align-self: flex-end;
+  }
+}
+
