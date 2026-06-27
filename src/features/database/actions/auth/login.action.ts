@@ -1,8 +1,8 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { sign } from 'jsonwebtoken';
-import { findAdminByEmail } from '../../models/admin.model';
+import { apiPost } from '@/features/api/utils/apiClient.util';
+import { TokenFromAPI } from '@/features/api/types/api.type';
 
 interface LoginResponse {
   success: boolean;
@@ -15,42 +15,23 @@ interface LoginResponse {
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
   try {
-    const admin = await findAdminByEmail(email);
-
-    if (!admin) {
-      return { success: false, error: 'Invalid credentials' };
-    }
-
-    const isValidPassword = await admin.comparePassword(password);
-
-    if (!isValidPassword) {
-      return { success: false, error: 'Invalid credentials' };
-    }
-
-    const token = sign(
-      { id: admin._id.toString(), email: admin.email },
-      process.env.JWT_SECRET || '',
-      { expiresIn: '1d' }
-    );
+    const token = await apiPost<TokenFromAPI>('/api/v1/auth/login', { email, password });
 
     const cookieStore = await cookies();
-    cookieStore.set('adminToken', token, {
+    cookieStore.set('adminToken', token.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
     });
 
-    return { 
-      success: true, 
-      data: { 
-        id: admin._id.toString(),
-        email: admin.email
-      } 
-    };
+    return { success: true };
   } catch (error) {
     console.error('Login error:', error);
-    return { success: false, error: 'An error occurred during login' };
+    if (error instanceof Error && error.message.includes('401')) {
+      return { success: false, error: 'Credenciales inválidas' };
+    }
+    return { success: false, error: 'Error al iniciar sesión' };
   }
 }
-

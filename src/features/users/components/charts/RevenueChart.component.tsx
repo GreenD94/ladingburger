@@ -54,7 +54,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
     ],
   };
 
-  const chartOptions = getDefaultChartOptions({
+  const chartOptions = getDefaultChartOptions<'line'>({
     title: 'Ingresos por Mes',
     height: 300,
     showLegend: false,

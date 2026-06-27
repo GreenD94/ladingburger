@@ -1,7 +1,7 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { Material } from '../types/material.type';
+import { Material } from '../../types/material.type';
 
 export interface GetMaterialsResponse {
   success: boolean;
@@ -29,4 +29,5 @@ export async function getMaterials(): Promise<GetMaterialsResponse> {
     };
   }
 }
+
 

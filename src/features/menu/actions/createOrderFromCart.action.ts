@@ -1,7 +1,7 @@
 'use server';
 
-import { createOrder } from '@/features/orders/actions/orders.action';
-import { CreateOrderDTO } from '@/features/database/types/index.type';
+import { apiPost } from '@/features/api/utils/apiClient.util';
+import { SaleFromAPI } from '@/features/api/types/api.type';
 import { CartItem } from '../contexts/CartContext.context';
 
 interface CreateOrderFromCartParams {
@@ -13,48 +13,27 @@ interface CreateOrderFromCartParams {
 export async function createOrderFromCart({
   items,
   phoneNumber,
-  comment,
 }: CreateOrderFromCartParams): Promise<{ success: boolean; orderId?: string; error?: string }> {
   try {
     if (!phoneNumber || phoneNumber.length !== 11) {
-      return {
-        success: false,
-        error: 'Invalid phone number',
-      };
+      return { success: false, error: 'Invalid phone number' };
     }
 
     if (!items || items.length === 0) {
-      return {
-        success: false,
-        error: 'Cart is empty',
-      };
+      return { success: false, error: 'Cart is empty' };
     }
 
-    const orderItems = items.map((item) => ({
-      burgerId: item.burger._id?.toString() || '',
-      removedIngredients: item.removedIngredients || [],
-      quantity: item.quantity,
-      note: comment || item.note || '',
-    }));
+    const sale = await apiPost<SaleFromAPI>('/api/v1/sales', {
+      customer_phone: phoneNumber,
+      store_id: 1,
+      items: items.map((item) => ({
+        product_id: Number(item.burger._id),
+        quantity: item.quantity,
+        unit_price: Number(item.burger.price),
+      })),
+    });
 
-    const orderDTO: CreateOrderDTO = {
-      customerPhone: phoneNumber,
-      items: orderItems,
-    };
-
-    const result = await createOrder(orderDTO);
-
-    if (!result.success) {
-      return {
-        success: false,
-        error: result.error || 'Failed to create order',
-      };
-    }
-
-    return {
-      success: true,
-      orderId: result.orderId,
-    };
+    return { success: true, orderId: String(sale.id) };
   } catch (error) {
     console.error('Error creating order from cart:', error);
     return {
@@ -63,4 +42,3 @@ export async function createOrderFromCart({
     };
   }
 }
-

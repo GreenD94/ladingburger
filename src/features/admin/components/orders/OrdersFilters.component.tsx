@@ -64,7 +64,7 @@ export const OrdersFilters: React.FC<OrdersFiltersProps> = ({
   };
 
   const handleClose = () => {
-    onClose();
+    onClose?.();
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -1,6 +1,6 @@
 import { Material } from '../types/material.type';
 import { Bill } from '../types/bill.type';
-import { MaterialLoss } from '../types/loss.type';
+import { MaterialLoss, MaterialLossCause } from '../types/loss.type';
 import { MaterialRequirement, BurgerRecipe } from '../types/recipe.type';
 import { EMPTY_DATE, EMPTY_STRING } from '@/features/database/constants/emptyValues.constants';
 
@@ -32,7 +32,7 @@ export const EMPTY_MATERIAL_LOSS: MaterialLoss = {
   quantity: 0,
   unit: EMPTY_STRING,
   lossDate: EMPTY_DATE,
-  cause: 'other' as const,
+  cause: MaterialLossCause.OTHER,
   recordedBy: EMPTY_STRING,
   createdAt: EMPTY_DATE,
 };

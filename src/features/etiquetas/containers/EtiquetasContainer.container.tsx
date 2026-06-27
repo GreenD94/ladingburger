@@ -3,10 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { SafeArea } from '@/features/shared/components/SafeArea.component';
-import {
-  getEtiquetasAction,
-  Etiqueta,
-} from '@/features/etiquetas/actions/getEtiquetas.action';
+import { getEtiquetasAction } from '@/features/etiquetas/actions/getEtiquetas.action';
+import { Etiqueta } from '@/features/database/types/etiqueta.type';
 import { createEtiquetaAction } from '@/features/etiquetas/actions/createEtiqueta.action';
 import { updateEtiquetaAction } from '@/features/etiquetas/actions/updateEtiqueta.action';
 import { EtiquetaList } from '@/features/etiquetas/components/EtiquetaList.component';

@@ -1,9 +1,9 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
 import { Order } from '@/features/database/types/order.type';
 import { Burger } from '@/features/database/types/burger.type';
-import { Material } from '../types/material.type';
+import { Material } from '../../types/material.type';
 import { ObjectId } from 'mongodb';
 import { updateMaterialStock } from '../materials/updateMaterialStock.action';
 
@@ -51,4 +51,5 @@ export async function consumeMaterialsFromOrder(orderId: string): Promise<Consum
     };
   }
 }
+
 

@@ -10,6 +10,7 @@ import {
   TextField,
   Box,
   CircularProgress,
+  Typography,
 } from '@mui/material';
 import { Material } from '../../types/material.type';
 import { EMPTY_MATERIAL } from '../../constants/emptyObjects.constants';
@@ -32,7 +33,7 @@ export function MaterialForm({ open, material, onClose, onSuccess }: MaterialFor
   const { t } = useLanguage();
   const [name, setName] = useState(EMPTY_STRING);
   const [unit, setUnit] = useState(EMPTY_STRING);
-  const [category, setCategory] = useState(MATERIAL_CATEGORIES.OTHER);
+  const [category, setCategory] = useState<string>(MATERIAL_CATEGORIES.OTHER);
   const [minStockLevel, setMinStockLevel] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(EMPTY_STRING);

@@ -118,7 +118,7 @@ export default function SalesChart({ timeRange, aggregationRange }: SalesChartPr
   };
 
   const chartOptions = {
-    ...getDefaultChartOptions({ title: 'Ventas Totales' }),
+    ...getDefaultChartOptions<'line'>({ title: 'Ventas Totales' }),
     scales: {
       y: {
         beginAtZero: true,

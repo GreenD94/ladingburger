@@ -95,6 +95,7 @@ export const BurgerForm: React.FC<BurgerFormProps> = ({
         image: finalImage,
         isAvailable,
         ingredients,
+        category: '',
         estimatedPrepTime: estimatedPrepTime > 0 ? estimatedPrepTime : undefined,
       });
       onClose();

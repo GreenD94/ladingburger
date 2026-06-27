@@ -16,7 +16,7 @@ export function EtiquetaList({ etiquetas, onEdit, onToggleEnabled }: EtiquetaLis
     <div className={styles.list}>
       {etiquetas.map((etiqueta) => (
         <EtiquetaCard
-          key={etiqueta._id}
+          key={etiqueta._id?.toString()}
           etiqueta={etiqueta}
           onEdit={onEdit}
           onToggleEnabled={onToggleEnabled}

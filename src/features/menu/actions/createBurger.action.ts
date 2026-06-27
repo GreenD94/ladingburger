@@ -10,6 +10,7 @@ export interface CreateBurgerInput {
   price: number;
   ingredients: string[];
   image: BurgerImage;
+  category?: string;
   isAvailable: boolean;
   estimatedPrepTime?: number;
 }
@@ -29,6 +30,7 @@ export async function createBurger(burgerData: CreateBurgerInput): Promise<{ suc
     const createdBurger: Burger = {
       _id: result.insertedId.toString(),
       ...burgerData,
+      category: burgerData.category ?? '',
     };
 
     return {

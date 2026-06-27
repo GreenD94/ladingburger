@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Burger } from '@/features/database/types/index.type';
-import { getBurgers } from '@/features/database/actions/burgers.action';
-
+import { getAvailableBurgers } from '@/features/menu/actions/getAvailableBurgers.action';
 
 interface BurgersMap {
   [key: string]: Burger;
@@ -17,18 +16,18 @@ export const useBurgers = () => {
   useEffect(() => {
     const fetchBurgers = async () => {
       try {
-        const fetchedBurgers = await getBurgers();
+        const fetchedBurgers = await getAvailableBurgers();
         if (!fetchedBurgers) {
           throw new Error('Failed to fetch burgers');
         }
-        
-        const burgersMap = fetchedBurgers.reduce<BurgersMap>((acc: BurgersMap, burger: Burger) => {
+
+        const burgersMap = fetchedBurgers.reduce<BurgersMap>((acc, burger) => {
           if (burger._id) {
             acc[burger._id.toString()] = burger;
           }
           return acc;
         }, {});
-        
+
         setBurgers(burgersMap);
         setError('');
       } catch (err) {
@@ -45,4 +44,3 @@ export const useBurgers = () => {
 
   return { burgers, loading, error };
 };
-

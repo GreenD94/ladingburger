@@ -68,7 +68,7 @@ export function OrderTimeDistributionChart({ dayData, hourData }: OrderTimeDistr
     ],
   };
 
-  const chartOptions = getDefaultChartOptions({
+  const chartOptions = getDefaultChartOptions<'bar'>({
     title: '',
     height: 300,
     showLegend: false,
@@ -99,7 +99,7 @@ export function OrderTimeDistributionChart({ dayData, hourData }: OrderTimeDistr
             />
           </div>
           <div className={styles.chartContainer}>
-            <Bar data={dayChartData} options={{ ...chartOptions, title: 'Pedidos por Día' }} />
+            <Bar data={dayChartData} options={chartOptions} />
           </div>
         </div>
       )}
@@ -117,7 +117,7 @@ export function OrderTimeDistributionChart({ dayData, hourData }: OrderTimeDistr
             />
           </div>
           <div className={styles.chartContainer}>
-            <Bar data={hourChartData} options={{ ...chartOptions, title: 'Pedidos por Hora' }} />
+            <Bar data={hourChartData} options={chartOptions} />
           </div>
         </div>
       )}

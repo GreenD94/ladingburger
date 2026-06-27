@@ -54,7 +54,7 @@ export function AverageOrderValueChart({ data }: AverageOrderValueChartProps) {
     ],
   };
 
-  const chartOptions = getDefaultChartOptions({
+  const chartOptions = getDefaultChartOptions<'line'>({
     title: 'Ticket Promedio por Mes',
     height: 300,
     showLegend: false,

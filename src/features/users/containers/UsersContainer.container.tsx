@@ -321,7 +321,7 @@ export default function UsersContainer() {
         ) : (
           <div className={styles.usersList}>
             {displayedUsers.map((user) => (
-              <UserCard key={user._id || user.phoneNumber} user={user} etiquetasMap={etiquetasMap} />
+              <UserCard key={user._id?.toString() ?? user.phoneNumber} user={user} etiquetasMap={etiquetasMap} />
             ))}
             {loadingMore && (
               <div className={styles.loadingMore}>

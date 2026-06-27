@@ -1,7 +1,7 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { Material } from '../types/material.type';
+import { Material } from '../../types/material.type';
 import { ObjectId } from 'mongodb';
 import { EMPTY_DATE } from '@/features/database/constants/emptyValues.constants';
 
@@ -52,4 +52,5 @@ export async function createMaterial(input: CreateMaterialInput): Promise<Create
     };
   }
 }
+
 

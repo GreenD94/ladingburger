@@ -1,3 +1,5 @@
+'use server';
+
 import { Order, OrderStatus, OrderStatusType, CreateOrderDTO } from '@/features/database/types/index.type';
 import { createOrder as createOrderAction } from './createOrder.action';
 import { getOrdersByPhone as getOrdersByPhoneAction } from './getOrdersByPhone.action';

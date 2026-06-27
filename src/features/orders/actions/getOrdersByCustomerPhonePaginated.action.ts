@@ -51,25 +51,27 @@ export async function getOrdersByCustomerPhonePaginated(
     }
 
     if (filters?.minAmount !== undefined || filters?.maxAmount !== undefined) {
-      query.totalPrice = {};
+      const totalPriceFilter: Record<string, unknown> = {};
       if (filters.minAmount !== undefined) {
-        query.totalPrice.$gte = filters.minAmount;
+        totalPriceFilter.$gte = filters.minAmount;
       }
       if (filters.maxAmount !== undefined) {
-        query.totalPrice.$lte = filters.maxAmount;
+        totalPriceFilter.$lte = filters.maxAmount;
       }
+      query.totalPrice = totalPriceFilter;
     }
 
     if (filters?.startDate || filters?.endDate) {
-      query.createdAt = {};
+      const createdAtFilter: Record<string, unknown> = {};
       if (filters.startDate) {
-        query.createdAt.$gte = filters.startDate;
+        createdAtFilter.$gte = filters.startDate;
       }
       if (filters.endDate) {
         const endDate = new Date(filters.endDate);
         endDate.setHours(23, 59, 59, 999);
-        query.createdAt.$lte = endDate;
+        createdAtFilter.$lte = endDate;
       }
+      query.createdAt = createdAtFilter;
     }
 
     if (filters?.searchText && filters.searchText.trim() !== '') {

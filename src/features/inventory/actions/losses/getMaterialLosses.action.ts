@@ -1,7 +1,7 @@
 'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { MaterialLoss } from '../types/loss.type';
+import { MaterialLoss } from '../../types/loss.type';
 
 export interface GetMaterialLossesFilters {
   materialId?: string;
@@ -39,12 +39,12 @@ export async function getMaterialLosses(
     if (filters?.startDate || filters?.endDate) {
       queryFilter.lossDate = {};
       if (filters.startDate) {
-        queryFilter.lossDate = { ...queryFilter.lossDate, $gte: filters.startDate };
+        queryFilter.lossDate = { ...(queryFilter.lossDate as Record<string, unknown>), $gte: filters.startDate };
       }
       if (filters.endDate) {
         const endDate = new Date(filters.endDate);
         endDate.setHours(23, 59, 59, 999);
-        queryFilter.lossDate = { ...queryFilter.lossDate, $lte: endDate };
+        queryFilter.lossDate = { ...(queryFilter.lossDate as Record<string, unknown>), $lte: endDate };
       }
     }
 

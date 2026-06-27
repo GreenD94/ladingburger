@@ -6,6 +6,7 @@ import { Order, OrderStatus } from '@/features/database/types/index.type';
 import { WithId, Document, ObjectId } from 'mongodb';
 import { EMPTY_STRING, EMPTY_DATE } from '@/features/database/constants/emptyValues.constants';
 import { UserWithStats, UserStats } from './getUsersWithStats.action';
+export type { UserWithStats, UserStats };
 
 export interface GetUserByIdResponse {
   success: boolean;
@@ -44,7 +45,7 @@ export async function getUserByIdAction(userId: string): Promise<GetUserByIdResp
       const objectId = new ObjectId(userId);
       userDoc = await usersCollection.findOne({ _id: objectId });
     } catch {
-      userDoc = await usersCollection.findOne({ _id: userId });
+      userDoc = await usersCollection.findOne({ _id: userId as unknown as ObjectId });
     }
 
     if (!userDoc) {

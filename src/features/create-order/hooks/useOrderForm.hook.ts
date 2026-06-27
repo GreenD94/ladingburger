@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Burger } from '@/features/database/types/index.type';
 import { OrderFormState } from '../types/order.type';
-import { getAvailableBurgers } from '@/features/menu/actions/menu.action';
-import { createOrder } from '@/features/orders/actions/orders.action';
-import { OrderStatus } from '@/features/database/types/index.type';
-import { OrderStatusLabels } from '@/features/database/types/index.type';
+import { getAvailableBurgers } from '@/features/menu/actions/getAvailableBurgers.action';
+import { createOrderFromCart } from '@/features/menu/actions/createOrderFromCart.action';
 
 export const useOrderForm = () => {
   const [state, setState] = useState<OrderFormState>({
@@ -78,19 +76,19 @@ export const useOrderForm = () => {
 
     setState(prev => ({ ...prev, loading: true }));
     try {
-      const order = await createOrder({
-        customerPhone: state.phoneNumber,
+      const result = await createOrderFromCart({
+        phoneNumber: state.phoneNumber,
         items: state.selectedBurgers
-          .filter(burger => burger._id)
-          .map(burger => ({
-            burgerId: burger._id?.toString() || '',
-            removedIngredients: burger.removedIngredients || [],
+          .filter((b) => b._id)
+          .map((b) => ({
+            burger: b,
             quantity: 1,
-            note: burger.note || ''
-          }))
+            removedIngredients: b.removedIngredients,
+            note: b.note,
+          })),
       });
 
-      if (order.success) {
+      if (result.success) {
         window.location.href = `/orders?phoneNumber=${state.phoneNumber}`;
       }
     } catch (error) {
@@ -111,4 +109,3 @@ export const useOrderForm = () => {
     handleSubmitOrder
   };
 };
-

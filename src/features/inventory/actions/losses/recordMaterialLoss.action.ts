@@ -1,7 +1,7 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { MaterialLoss, MaterialLossCause } from '../types/loss.type';
+import { MaterialLoss, MaterialLossCause } from '../../types/loss.type';
 import { ObjectId } from 'mongodb';
 import { updateMaterialStock } from '../materials/updateMaterialStock.action';
 
@@ -60,4 +60,5 @@ export async function recordMaterialLoss(
     };
   }
 }
+
 

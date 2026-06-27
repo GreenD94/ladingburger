@@ -11,7 +11,7 @@ import { ObjectId } from 'mongodb';
 export async function createOrder(order: CreateOrderDTO) {
   const { userId } = await getOrCreateUser(order.customerPhone);
 
-  const db = await connectToDatabase();
+  const { db } = await connectToDatabase();
   const user = await db.collection<User>('users').findOne({ _id: new ObjectId(userId) });
   const customerName = user?.name || '';
 

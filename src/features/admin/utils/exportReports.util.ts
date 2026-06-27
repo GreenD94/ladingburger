@@ -1,4 +1,4 @@
-import { Order, OrderStatusLabels, OrderStatusType } from '@/features/database/types/index.type';
+import { Order, OrderStatus, OrderStatusLabels, OrderStatusType } from '@/features/database/types/index.type';
 import { EMPTY_DATE_RANGE } from '@/features/database/constants/emptyValues.constants';
 
 export interface ExportOptions {

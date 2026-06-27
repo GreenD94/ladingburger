@@ -493,7 +493,7 @@ export function OrderCard({ order, onStatusChange, updatingStatus, getBurgerName
         open={cancelModalOpen}
         onClose={() => setCancelModalOpen(false)}
         orderId={orderId}
-        orderNumber={order.orderNumber}
+        orderNumber={order.orderNumber ?? 0}
         onSuccess={onPaymentUpdate}
       />
     </Card>

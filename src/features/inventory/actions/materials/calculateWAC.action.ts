@@ -1,7 +1,7 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { Material, Bill } from '../types/index.type';
+import { Material, Bill } from '../../types/index.type';
 import { ObjectId } from 'mongodb';
 
 export interface CalculateWACResponse {
@@ -59,4 +59,5 @@ export async function calculateWAC(materialId: string): Promise<CalculateWACResp
     };
   }
 }
+
 

@@ -1,110 +1,26 @@
 'use server';
 
-import clientPromise from '@/features/database/config/mongodb';
-import { Order, OrderStatusType, OrderStatusLabels, OrderStatus } from '@/features/database/types/index.type';
-import { ObjectId } from 'mongodb';
-import { canTransitionToStatus } from '../utils/validateStatusTransition.util';
-import { recalculateUserEtiquetasForOrderChanges } from '@/features/etiquetas/utils/userTags.util';
+import { OrderStatusType } from '@/features/database/types/index.type';
+import { SaleFromAPI } from '@/features/api/types/api.type';
+import { apiAuthPut } from '@/features/api/utils/apiClient.util';
+import { ORDER_STATUS_TO_FASTAPI } from '../utils/mapSaleToOrder.util';
 
-export async function updateOrderStatus(orderId: string, status: OrderStatusType, comment?: string, cancelledBy?: string) {
+export async function updateOrderStatus(orderId: string, status: OrderStatusType, _comment?: string, _cancelledBy?: string) {
   try {
-    const client = await clientPromise;
-    const db = client.db('saborea');
-    
-    const currentOrder = await db.collection<Order>('orders').findOne({ _id: new ObjectId(orderId) });
-    
-    if (!currentOrder) {
-      return {
-        success: false,
-        error: 'Order not found',
-      };
+    const fastapiStatus = ORDER_STATUS_TO_FASTAPI[status];
+
+    if (!fastapiStatus) {
+      return { success: false, error: `Status ${status} is not supported by the backend in Cycle 01` };
     }
 
-    if (!canTransitionToStatus(currentOrder.status, status)) {
-      return {
-        success: false,
-        error: `Invalid status transition from ${OrderStatusLabels[currentOrder.status]} to ${OrderStatusLabels[status]}`,
-      };
-    }
-    
-    const now = new Date();
-    const updateData: Partial<Order> = {
-      status,
-      updatedAt: now,
-    };
+    await apiAuthPut<SaleFromAPI>(`/api/v1/sales/${Number(orderId)}/status`, { status: fastapiStatus });
 
-    if (status === OrderStatus.CANCELLED) {
-      updateData.cancelledAt = now;
-      updateData.cancellationReason = comment || '';
-      if (cancelledBy) {
-        updateData.cancelledBy = cancelledBy;
-      }
-    }
-
-    if (status === OrderStatus.READY && currentOrder.cookingStartedAt) {
-      const cookingStartTime = new Date(currentOrder.cookingStartedAt).getTime();
-      const cookingEndTime = now.getTime();
-      const actualPrepTimeMinutes = Math.floor((cookingEndTime - cookingStartTime) / 1000 / 60);
-      updateData.actualPrepTime = actualPrepTimeMinutes;
-    }
-
-    if (status === OrderStatus.COMPLETED) {
-      try {
-        const { consumeMaterialsFromOrder } = await import('@/features/inventory/actions/orders/consumeMaterialsFromOrder.action');
-        await consumeMaterialsFromOrder(orderId);
-      } catch (consumeError) {
-        console.error('Error consuming materials from order:', consumeError);
-      }
-    }
-
-    const result = await db
-      .collection<Order>('orders')
-      .updateOne(
-        { _id: new ObjectId(orderId) },
-        { 
-          $set: updateData,
-          $push: {
-            logs: {
-              status,
-              statusName: OrderStatusLabels[status],
-              createdAt: now,
-              comment: comment || ''
-            }
-          }
-        }
-      );
-
-    if (result.matchedCount === 0) {
-      return {
-        success: false,
-        error: 'Order not found',
-      };
-    }
-
-    // Recalculate user etiquetas after order status change
-    if (currentOrder.userId || currentOrder.customerPhone) {
-      try {
-        const userId = currentOrder.userId || '';
-        const customerPhone = currentOrder.customerPhone || '';
-        if (userId || customerPhone) {
-          await recalculateUserEtiquetasForOrderChanges(userId, customerPhone);
-        }
-      } catch (etiquetaError) {
-        console.error('Error recalculating etiquetas after order status update:', etiquetaError);
-        // Don't fail status update if etiqueta recalculation fails
-      }
-    }
-
-    return {
-      success: true,
-      message: `Order status updated successfully`
-    };
+    return { success: true, message: 'Order status updated successfully' };
   } catch (error) {
     console.error('Error updating order status:', error);
     return {
       success: false,
-      error: 'Failed to update order status',
+      error: error instanceof Error ? error.message : 'Failed to update order status',
     };
   }
 }
-

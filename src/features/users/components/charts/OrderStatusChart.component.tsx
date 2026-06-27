@@ -56,7 +56,7 @@ export function OrderStatusChart({ data }: OrderStatusChartProps) {
     ],
   };
 
-  const chartOptions = getDefaultChartOptions({
+  const chartOptions = getDefaultChartOptions<'doughnut'>({
     title: 'Distribución de Estados',
     height: 300,
     showLegend: true,

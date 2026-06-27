@@ -297,7 +297,7 @@ export function UserHistoryTab({ phoneNumber }: UserHistoryTabProps) {
       ) : (
         <div className={styles.ordersList} ref={scrollContainerRef}>
           {orders.map((order) => (
-            <div key={order._id} className={styles.orderCard}>
+            <div key={order._id?.toString()} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <div className={styles.orderInfo}>
                   <p className={styles.orderId}>Pedido #{order._id?.toString().slice(-6) || 'N/A'}</p>

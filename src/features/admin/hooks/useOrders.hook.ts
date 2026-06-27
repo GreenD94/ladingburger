@@ -33,6 +33,7 @@ export function useOrders(): UseOrdersReturn {
   const [orders, setOrders] = useState<Record<OrderStatusType, Order[]>>({
     [OrderStatus.WAITING_PAYMENT]: [],
     [OrderStatus.PAYMENT_FAILED]: [],
+    [OrderStatus.PENDING]: [],
     [OrderStatus.COOKING]: [],
     [OrderStatus.READY]: [],
     [OrderStatus.IN_TRANSIT]: [],
@@ -48,6 +49,7 @@ export function useOrders(): UseOrdersReturn {
   const [totals, setTotals] = useState<Record<OrderStatusType, number>>({
     [OrderStatus.WAITING_PAYMENT]: NOT_LOADED,
     [OrderStatus.PAYMENT_FAILED]: NOT_LOADED,
+    [OrderStatus.PENDING]: NOT_LOADED,
     [OrderStatus.COOKING]: NOT_LOADED,
     [OrderStatus.READY]: NOT_LOADED,
     [OrderStatus.IN_TRANSIT]: NOT_LOADED,

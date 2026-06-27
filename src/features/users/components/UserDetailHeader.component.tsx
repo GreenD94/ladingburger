@@ -12,8 +12,8 @@ interface UserDetailHeaderProps {
 }
 
 export function UserDetailHeader({ user, onBack }: UserDetailHeaderProps) {
-  const avatarSeed = user._id || user.phoneNumber || EMPTY_STRING;
-  const avatarUrl = getAvatarUrl(user.gender, avatarSeed);
+  const avatarSeed = (user._id || user.phoneNumber || EMPTY_STRING).toString();
+  const avatarUrl = getAvatarUrl(user.gender || EMPTY_STRING, avatarSeed);
   const displayName = user.name || user.phoneNumber || 'Sin nombre';
   const hasHighLTV = user.stats.lifetimeValue > 1000;
   const segment = hasHighLTV ? 'VIP Premium' : 'Cliente Regular';

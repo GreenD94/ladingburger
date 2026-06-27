@@ -1,7 +1,7 @@
 'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { Bill, BillItem, Material } from '../types/index.type';
+import { Bill, BillItem, Material } from '../../types/index.type';
 import { ObjectId } from 'mongodb';
 import { calculateWAC } from '../materials/calculateWAC.action';
 import { updateMaterialStock } from '../materials/updateMaterialStock.action';

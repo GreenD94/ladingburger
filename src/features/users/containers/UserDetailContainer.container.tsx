@@ -94,7 +94,7 @@ export default function UserDetailContainer() {
 
   return (
     <SafeArea className={styles.container} sides="all">
-      <UserDetailView user={user} onBack={handleBack} onUserUpdate={handleUserUpdate} />
+      <UserDetailView user={user as UserWithStats} onBack={handleBack} onUserUpdate={handleUserUpdate} />
     </SafeArea>
   );
 }

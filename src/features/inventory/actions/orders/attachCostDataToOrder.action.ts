@@ -3,7 +3,7 @@
 import { connectToDatabase } from '@/features/database/connection';
 import { Order, OrderItem } from '@/features/database/types/order.type';
 import { Burger } from '@/features/database/types/burger.type';
-import { Material } from '../types/material.type';
+import { Material } from '../../types/material.type';
 import { ObjectId } from 'mongodb';
 import { EMPTY_DATE } from '@/features/database/constants/emptyValues.constants';
 
@@ -116,5 +116,6 @@ export async function attachCostDataToOrder(orderId: string): Promise<AttachCost
       success: false,
       error: 'Failed to attach cost data to order',
     };
+  }
 }
 

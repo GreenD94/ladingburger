@@ -1,7 +1,7 @@
 'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { Bill, BillStatus } from '../types/bill.type';
+import { Bill, BillStatus } from '../../types/bill.type';
 
 export interface GetBillsFilters {
   status?: BillStatus;
@@ -27,12 +27,12 @@ export async function getBills(filters?: GetBillsFilters): Promise<GetBillsRespo
     if (filters?.startDate || filters?.endDate) {
       queryFilter.purchaseDate = {};
       if (filters.startDate) {
-        queryFilter.purchaseDate = { ...queryFilter.purchaseDate, $gte: filters.startDate };
+        queryFilter.purchaseDate = { ...(queryFilter.purchaseDate as Record<string, unknown>), $gte: filters.startDate };
       }
       if (filters.endDate) {
         const endDate = new Date(filters.endDate);
         endDate.setHours(23, 59, 59, 999);
-        queryFilter.purchaseDate = { ...queryFilter.purchaseDate, $lte: endDate };
+        queryFilter.purchaseDate = { ...(queryFilter.purchaseDate as Record<string, unknown>), $lte: endDate };
       }
     }
 

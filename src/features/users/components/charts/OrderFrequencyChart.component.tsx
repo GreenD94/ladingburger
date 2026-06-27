@@ -51,7 +51,7 @@ export function OrderFrequencyChart({ data }: OrderFrequencyChartProps) {
     ],
   };
 
-  const chartOptions = getDefaultChartOptions({
+  const chartOptions = getDefaultChartOptions<'bar'>({
     title: 'Frecuencia de Pedidos',
     height: 300,
     showLegend: false,

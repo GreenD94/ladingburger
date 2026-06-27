@@ -1,8 +1,8 @@
-'use server';
+﻿'use server';
 
 import { connectToDatabase } from '@/features/database/connection';
-import { BurgerRecipe, MaterialRequirement } from '../types/recipe.type';
-import { Material } from '../types/material.type';
+import { BurgerRecipe, MaterialRequirement } from '../../types/recipe.type';
+import { Material } from '../../types/material.type';
 import { Burger } from '@/features/database/types/burger.type';
 import { ObjectId } from 'mongodb';
 import { EMPTY_DATE } from '@/features/database/constants/emptyValues.constants';
@@ -78,4 +78,5 @@ export async function calculateBurgerCost(burgerId: string): Promise<CalculateBu
     };
   }
 }
+
 

@@ -62,8 +62,8 @@ export function BillsContainer() {
       if (burgersResponse && burgersResponse.length > 0) {
         const burgersMap: Record<string, Burger> = {};
         burgersResponse.forEach(burger => {
-          if (burger._id) {
-            const burgerId = typeof burger._id === 'string' ? burger._id : burger._id.toString();
+          const burgerId = burger._id?.toString() || '';
+          if (burgerId) {
             burgersMap[burgerId] = burger;
           }
         });
